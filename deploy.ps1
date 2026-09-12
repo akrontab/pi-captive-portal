@@ -25,6 +25,7 @@
 [CmdletBinding()]
 param(
   [switch]$Rollback,
+  [switch]$PageOnly,
   [string]$PiHost,
   [string]$PiUser
 )
@@ -77,6 +78,47 @@ if ($Rollback) {
   & ssh $target "sudo bash '$remoteDir/setup.sh' rollback"
   if ($LASTEXITCODE -ne 0) { Fail "Rollback failed (exit $LASTEXITCODE)." }
   Write-Host "Rollback complete." -ForegroundColor Green
+  exit 0
+}
+
+# --- LF-normalizing scp helper: stage www/, ship, sudo-install into web root ---
+function Push-WebContent {
+  $wwwSrc = Join-Path $scriptDir 'www'
+  if (-not (Test-Path $wwwSrc)) { Fail "Missing 'www' — nothing to push." }
+
+  $wstage = Join-Path ([System.IO.Path]::GetTempPath()) ("picp_www_" + [guid]::NewGuid().ToString('N'))
+  New-Item -ItemType Directory -Path $wstage -Force | Out-Null
+  try {
+    $textExt = '.html','.css','.js','.txt','.svg'
+    Get-ChildItem -Path $wwwSrc -File | ForEach-Object {
+      $dst = Join-Path $wstage $_.Name
+      if ($textExt -contains $_.Extension.ToLower()) {
+        $raw = [System.IO.File]::ReadAllText($_.FullName)
+        $lf  = $raw -replace "`r`n", "`n" -replace "`r", "`n"
+        [System.IO.File]::WriteAllText($dst, $lf, (New-Object System.Text.UTF8Encoding($false)))
+      } else {
+        Copy-Item $_.FullName $dst -Force
+      }
+    }
+
+    Write-Host "Pushing web content -> /var/www/portal ..." -ForegroundColor Cyan
+    $remoteTmp = "/tmp/portal_www"
+    & ssh $target "rm -rf '$remoteTmp' && mkdir -p '$remoteTmp'"
+    if ($LASTEXITCODE -ne 0) { Fail "Could not prep $remoteTmp on the Pi." }
+    & scp -q (Join-Path $wstage '*') "${target}:${remoteTmp}/"
+    if ($LASTEXITCODE -ne 0) { Fail "scp of web content failed (exit $LASTEXITCODE)." }
+    # nginx serves static files — no reload needed for content changes.
+    & ssh $target "sudo mkdir -p /var/www/portal && sudo cp -f $remoteTmp/* /var/www/portal/ && sudo chmod 644 /var/www/portal/* && rm -rf '$remoteTmp'"
+    if ($LASTEXITCODE -ne 0) { Fail "Installing web content on the Pi failed (exit $LASTEXITCODE)." }
+  }
+  finally {
+    Remove-Item -Path $wstage -Recurse -Force -ErrorAction SilentlyContinue
+  }
+}
+
+if ($PageOnly) {
+  Push-WebContent
+  Write-Host "`nPage updated. Reload http://$($cfg['PORTAL_IP'])/portal on a client." -ForegroundColor Green
   exit 0
 }
 

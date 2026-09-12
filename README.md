@@ -39,6 +39,16 @@ Overrides and rollback:
 .\deploy.ps1 -Rollback        # undo everything, hand wlan0 back to NetworkManager
 ```
 
+### Iterating on the page
+
+Editing `www/index.html`? Push just the web content — seconds, no reinstall:
+
+```powershell
+.\deploy.ps1 -PageOnly        # ships www/* to /var/www/portal (nginx needs no reload)
+```
+
+Then reload the portal on a connected client.
+
 Requires the Windows OpenSSH client (`ssh`, `scp`) — bundled with Windows 10/11;
 enable via *Settings > System > Optional features* if missing.
 
