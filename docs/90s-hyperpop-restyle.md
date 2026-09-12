@@ -2,6 +2,9 @@
 
 The color scheme should be load and bright and and even have some glitch core aesthetics incorperated. Some css tricks should be used to create a glitching effect on text and images. Images should be hard coded into the html and javascript using base 64 strings instead of serving seperate resources. I want to add a couple of easter eggs as well. The guestbook should be on this page Centered and very prominent under the easter eggs and click counter. The guestbook content will journal down the page. The page will be javascript and css heavy to get all the effects to work. No backend API calls should be made other than to get and post guestbook data.
 
+I also want to page to be friendly to mobile browsers along with desktop browsers.
+
+
 Easter eggs:
 
 1. A whismical mushroom image that when clicked applies a psycedelic effect to the site for about 5 seconds
