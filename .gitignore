@@ -1,2 +1,6 @@
 # Local, may contain a Wi-Fi passphrase and host-specific target
 portal.env
+
+# OS images — large binaries, not source
+*.img
+*.img.xz
