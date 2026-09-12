@@ -78,6 +78,23 @@ A 90s-style SQLite guestbook, off unless `GUESTBOOK=1` in `portal.env`.
 To disable later: set `GUESTBOOK=0` and re-run `.\deploy.ps1`, or
 `.\deploy.ps1 -Rollback` (which leaves the DB intact).
 
+### Pulling the posts off the Pi
+
+```powershell
+.\deploy.ps1 -PullGuestbook                    # -> guestbook-YYYYMMDD-HHmmss.csv
+.\deploy.ps1 -PullGuestbook -OutFile posts.csv # custom path
+```
+
+Reads the DB through SQLite (so WAL entries aren't missed) with `sudo`, writes a
+UTF-8 CSV (`id, created_at, name, message`) and pulls it back. Exports are
+git-ignored. If you'd rather grab the raw database file for backup:
+
+```powershell
+ssh pi@raspberrypi.local "sudo cp /var/lib/portal/guestbook.db /tmp/gb.db && sudo chmod 644 /tmp/gb.db"
+scp pi@raspberrypi.local:/tmp/gb.db .\guestbook.db
+ssh pi@raspberrypi.local "rm -f /tmp/gb.db"
+```
+
 Requires the Windows OpenSSH client (`ssh`, `scp`) — bundled with Windows 10/11;
 enable via *Settings > System > Optional features* if missing.
 

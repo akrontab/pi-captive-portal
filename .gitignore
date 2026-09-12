@@ -8,3 +8,6 @@ portal.env
 # Python bytecode
 __pycache__/
 *.pyc
+
+# Guestbook exports pulled from the Pi
+guestbook-*.csv

@@ -27,6 +27,8 @@ param(
   [switch]$Rollback,
   [switch]$PageOnly,
   [switch]$Guestbook,
+  [switch]$PullGuestbook,
+  [string]$OutFile,
   [string]$PiHost,
   [string]$PiUser
 )
@@ -167,6 +169,37 @@ rm -rf $remoteTmp
 if ($Guestbook) {
   Push-Guestbook
   Write-Host "`nGuestbook updated. Reload http://$($cfg['PORTAL_IP'])/guestbook on a client." -ForegroundColor Green
+  exit 0
+}
+
+# --- Export guestbook entries from the Pi's SQLite DB to a local CSV ----------
+if ($PullGuestbook) {
+  if (-not $OutFile) {
+    $OutFile = Join-Path $scriptDir ("guestbook-{0:yyyyMMdd-HHmmss}.csv" -f (Get-Date))
+  }
+  # Read via sqlite3 (through WAL) with sudo, write a temp CSV on the Pi.
+  # Passed over stdin to avoid PowerShell/remote quoting pain.
+  $py = @'
+import sqlite3, csv
+DB = "/var/lib/portal/guestbook.db"
+OUT = "/tmp/guestbook_export.csv"
+con = sqlite3.connect(DB)
+with open(OUT, "w", newline="", encoding="utf-8") as f:
+    w = csv.writer(f)
+    w.writerow(["id", "created_at", "name", "message"])
+    for row in con.execute("SELECT id, created_at, name, message FROM entries ORDER BY id"):
+        w.writerow(row)
+print(con.execute("SELECT COUNT(*) FROM entries").fetchone()[0])
+'@
+  Write-Host "Exporting guestbook entries on the Pi..." -ForegroundColor Cyan
+  $count = ($py | & ssh $target "sudo python3 - && sudo chmod 644 /tmp/guestbook_export.csv") | Select-Object -Last 1
+  if ($LASTEXITCODE -ne 0) { Fail "Export on the Pi failed (exit $LASTEXITCODE). Is the guestbook installed?" }
+
+  & scp -q "${target}:/tmp/guestbook_export.csv" $OutFile
+  if ($LASTEXITCODE -ne 0) { Fail "scp of the export failed (exit $LASTEXITCODE)." }
+  & ssh $target "rm -f /tmp/guestbook_export.csv" | Out-Null
+
+  Write-Host "`nPulled $count entries -> $OutFile" -ForegroundColor Green
   exit 0
 }
 
