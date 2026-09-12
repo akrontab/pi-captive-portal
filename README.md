@@ -98,23 +98,17 @@ scp pi@raspberrypi.local:/tmp/gb.db .\guestbook.db
 ssh pi@raspberrypi.local "rm -f /tmp/gb.db"
 ```
 
-### Secret dump endpoint (no SSH needed)
+### Dump endpoint (no SSH needed)
 
-Set `GUESTBOOK_DUMP_KEY` in `portal.env` to a long random string, deploy, then —
-**from a device connected to the portal Wi-Fi** — fetch every post over HTTP:
+**From a device connected to the portal Wi-Fi**, fetch every post over HTTP:
 
 ```
-http://192.168.4.1/guestbook/dump?key=YOUR_KEY            # JSON
-http://192.168.4.1/guestbook/dump?key=YOUR_KEY&format=csv # CSV download
+http://192.168.4.1/guestbook/dump             # JSON
+http://192.168.4.1/guestbook/dump?format=csv  # CSV download
 ```
 
-An empty `GUESTBOOK_DUMP_KEY` disables the endpoint; a wrong or missing key
-returns 404 so it doesn't advertise itself. The key is written to
-`/etc/guestbook.env` (mode 600, owned by `www-data`), never the world-readable
-unit file. Changing the key needs a full `.\deploy.ps1` (not `-Guestbook`).
-
-> Caveat: on a plain-HTTP portal the key rides in the URL and lands in nginx
-> logs — fine for an isolated LAN, not a real secret. Rotate it in `portal.env`.
+No auth — anyone on the isolated portal network can hit it. That's fine for this
+walled-garden LAN; don't expose the endpoint to an untrusted network.
 
 Requires the Windows OpenSSH client (`ssh`, `scp`) — bundled with Windows 10/11;
 enable via *Settings > System > Optional features* if missing.

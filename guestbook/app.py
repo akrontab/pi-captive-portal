@@ -5,7 +5,6 @@ gunicorn under systemd as www-data (see guestbook.service). The DB path and
 limits are env-overridable so nothing is hardcoded to one deployment.
 """
 import csv
-import hmac
 import io
 import os
 import sqlite3
@@ -18,8 +17,6 @@ DB_PATH     = os.environ.get("GUESTBOOK_DB", "/var/lib/portal/guestbook.db")
 MAX_NAME    = int(os.environ.get("GUESTBOOK_MAX_NAME", "40"))
 MAX_MESSAGE = int(os.environ.get("GUESTBOOK_MAX_MESSAGE", "500"))
 SHOW_LIMIT  = int(os.environ.get("GUESTBOOK_SHOW_LIMIT", "200"))
-# Secret token for the /guestbook/dump endpoint. Empty = endpoint disabled.
-DUMP_KEY    = os.environ.get("GUESTBOOK_DUMP_KEY", "")
 
 app = Flask(__name__)
 
@@ -80,17 +77,11 @@ def sign():
 
 @app.route("/guestbook/dump")
 def dump():
-    """Secret export of every entry — JSON (default) or ?format=csv.
+    """Export every entry — JSON (default) or ?format=csv.
 
-    Guarded by ?key=<GUESTBOOK_DUMP_KEY>. When no key is configured, or the key
-    is wrong/missing, we 404 so the endpoint doesn't reveal that it exists.
-    Note: on a plain-HTTP portal the key travels in the URL and lands in nginx
-    logs — fine for an isolated LAN, not a real secret. Rotate via portal.env.
+    No auth: reachable by anyone on the isolated portal network. Fine for this
+    walled-garden LAN; do not expose it to an untrusted network.
     """
-    supplied = request.args.get("key", "")
-    if not DUMP_KEY or not hmac.compare_digest(supplied, DUMP_KEY):
-        abort(404)
-
     with get_db() as conn:
         rows = [dict(r) for r in conn.execute(
             "SELECT id, created_at, name, message FROM entries ORDER BY id"

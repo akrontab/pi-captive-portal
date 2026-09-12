@@ -136,12 +136,10 @@ install_guestbook() {
   # DB lives outside the app dir so redeploys never clobber it.
   install -d -o www-data -g www-data /var/lib/portal
 
-  # Secret/config env file, 0600, owned by the service user. Keeps the dump key
-  # out of the world-readable unit and out of the app dir.
+  # Service config env file (systemd EnvironmentFile), owned by the service user.
   ( umask 077
     cat > /etc/guestbook.env <<ENVEOF
 GUESTBOOK_DB=/var/lib/portal/guestbook.db
-GUESTBOOK_DUMP_KEY=${GUESTBOOK_DUMP_KEY:-}
 ENVEOF
   )
   chown www-data:www-data /etc/guestbook.env
