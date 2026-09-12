@@ -121,6 +121,8 @@ header{text-align:center;padding-top:6px}
 .entry .when{font-family:"Courier New",monospace;font-size:11px;color:var(--cyan);float:right}
 .entry .msg{margin:6px 0 0;color:#fff;font-size:15px;line-height:1.4;clear:both}
 
+.uptime{font-family:"Courier New",monospace;font-size:13px;color:var(--lime);text-shadow:0 0 8px var(--lime);margin:0 0 8px;letter-spacing:1px}
+.uptime:empty{display:none}
 footer{text-align:center;margin-top:34px;font-family:"Courier New",monospace;font-size:12px;color:#c9a6ff}
 footer a{color:var(--cyan)}
 .construction{font-size:15px;color:var(--yellow);text-shadow:0 0 6px var(--orange);margin:8px 0}
@@ -187,6 +189,7 @@ footer a{color:var(--cyan)}
   </section>
 
   <footer>
+    <div class="uptime" id="uptime"></div>
     <div class="construction blink">&#128679; UND3R C0NSTRUCT10N 4EVER &#128679;</div>
     <p>&#128274; the b00k is s3aled &bull; admins pull it over the wire &#128274;</p>
     <p>best viewed in Netscape Navigator 4.0 @ 800x600 &bull; &copy; 1997&ndash;&#8734;</p>
@@ -221,10 +224,14 @@ function renderEntries(list){
     d.appendChild(when);d.appendChild(who);d.appendChild(msg);box.appendChild(d);
   });
 }
+var _upBase=null,_upT0=0,_upTimer=null;
+function _fmtDur(s){var d=Math.floor(s/86400);s-=d*86400;var h=Math.floor(s/3600);s-=h*3600;var m=Math.floor(s/60);var sec=Math.floor(s-m*60);var p=function(n){return String(n).padStart(2,"0");};return (d?d+"d ":"")+p(h)+"h "+p(m)+"m "+p(sec)+"s";}
+function _tickUptime(){if(_upBase==null)return;var live=_upBase+(Date.now()-_upT0)/1000;$("uptime").textContent="↑ TH1S B0X HAS B33N UP "+_fmtDur(live);}
+function setUptime(sec){_upBase=sec;_upT0=Date.now();if(!_upTimer)_upTimer=setInterval(_tickUptime,1000);_tickUptime();}
 function loadEntries(){
   fetch("/guestbook/entries",{headers:{"Accept":"application/json"}})
     .then(function(r){return r.json();})
-    .then(function(j){renderEntries(j.entries);})
+    .then(function(j){renderEntries(j.entries);if(typeof j.server_uptime_s==="number")setUptime(j.server_uptime_s);})
     .catch(function(){$("entries").innerHTML='<p style="text-align:center;color:#ff00c8">[ guestbook offline ]</p>';});
 }
 $("gbform").addEventListener("submit",function(ev){

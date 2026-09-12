@@ -210,11 +210,22 @@ def guestbook():
     return render_template("guestbook.html", entries=entries, count=count)
 
 
+def _server_uptime_s():
+    """Host uptime in whole seconds (Linux /proc/uptime); None off-Linux."""
+    try:
+        with open("/proc/uptime") as f:
+            return int(float(f.read().split()[0]))
+    except Exception:
+        return None
+
+
 @app.route("/guestbook/entries")
 def entries():
     """Public guestbook feed as JSON (no fingerprint meta), newest first.
 
-    Backs the fetch()-driven guestbook on the restyled portal page.
+    Backs the fetch()-driven guestbook on the restyled portal page. Also carries
+    the host uptime so the page can show a live "server up" ticker without a
+    second endpoint (the page ticks it client-side between fetches).
     """
     with get_db() as conn:
         rows = conn.execute(
@@ -223,7 +234,8 @@ def entries():
             (SHOW_LIMIT,),
         ).fetchall()
         count = conn.execute("SELECT COUNT(*) FROM entries").fetchone()[0]
-    return jsonify({"count": count, "entries": [dict(r) for r in rows]})
+    return jsonify({"count": count, "entries": [dict(r) for r in rows],
+                    "server_uptime_s": _server_uptime_s()})
 
 
 @app.route("/guestbook/sign", methods=["POST"])
