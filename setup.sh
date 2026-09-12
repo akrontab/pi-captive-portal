@@ -34,7 +34,7 @@ source "$ENV_FILE"
 WPA_PASSPHRASE="${WPA_PASSPHRASE:-}"
 GUESTBOOK="${GUESTBOOK:-0}"
 SSID_ROTATE="${SSID_ROTATE:-1}"
-SSID_ROTATE_INTERVAL="${SSID_ROTATE_INTERVAL:-15min}"
+SSID_ROTATE_INTERVAL="${SSID_ROTATE_INTERVAL:-2min}"
 SSID_BAIT_COUNT="${SSID_BAIT_COUNT:-7}"
 
 # ── render: expand @TOKEN@ placeholders from portal.env into a file ────────────
