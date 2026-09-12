@@ -292,6 +292,9 @@ RULES
 
 start_services() {
   echo "Starting services..."
+  # Clear any prior failed/rate-limited state (e.g. a hostapd restart loop from
+  # a bad config) so the restarts below aren't blocked by systemd's start limit.
+  systemctl reset-failed hostapd dnsmasq nginx 2>/dev/null || true
   systemctl enable --now hostapd
   systemctl enable --now dnsmasq
   systemctl enable --now nginx

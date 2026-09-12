@@ -67,10 +67,63 @@ def read_pool(path, primary):
     return pool
 
 
+def _iface_mac(iface):
+    try:
+        with open(f"/sys/class/net/{iface}/address") as f:
+            return f.read().strip().lower()
+    except Exception:
+        return None
+
+
+def _bssid_block(mac, n):
+    """Explicit, block-aligned, locally-administered BSSIDs for 1 primary + n
+    baits. hostapd derives a BSSID mask across all BSSes and requires the
+    lowest (primary) address to be block-aligned (addr AND mask == addr); the
+    card's burned-in MAC usually isn't, which makes multi-BSS fail. So we hand
+    out our own: set the locally-administered bit, clear the low nibble of the
+    last octet for the block base, then increment for each bait."""
+    if not mac or mac.count(":") != 5:
+        return None, []
+    try:
+        b = [int(x, 16) for x in mac.split(":")]
+    except ValueError:
+        return None, []
+    b[0] = (b[0] & 0xfe) | 0x02      # locally administered, unicast
+    b[5] = b[5] & 0xf0               # 16-address block base (fits primary + 15)
+    fmt = lambda v: ":".join("%02x" % x for x in v)
+    primary = fmt(b)
+    baits = []
+    for i in range(n):
+        c = b[:]
+        c[5] = (b[5] + i + 1) & 0xff
+        baits.append(fmt(c))
+    return primary, baits
+
+
 def build_conf(base_text, iface, baits):
-    parts = [base_text.rstrip("\n"), ""]
+    base = base_text.rstrip("\n")
+    if not baits:
+        return base + "\n"          # single SSID -> no multi-BSS, no mask
+
+    primary_bssid, bait_bssids = _bssid_block(_iface_mac(iface), len(baits))
+    if primary_bssid:
+        # Primary advertises the block-base BSSID so hostapd's mask check
+        # passes (only inject if the base config has no bssid already).
+        lines = base.split("\n")
+        if not any(l.strip().startswith("bssid=") for l in lines):
+            out = []
+            for l in lines:
+                out.append(l)
+                if l.strip().startswith("interface="):
+                    out.append("bssid=" + primary_bssid)
+            base = "\n".join(out)
+
+    parts = [base, ""]
     for i, name in enumerate(baits):
-        parts += [f"bss={iface}_{i}", f"ssid={name}", "ignore_broadcast_ssid=0", ""]
+        parts += [f"bss={iface}_{i}", f"ssid={name}"]
+        if i < len(bait_bssids):
+            parts.append(f"bssid={bait_bssids[i]}")
+        parts += ["ignore_broadcast_ssid=0", ""]
     return "\n".join(parts) + "\n"
 
 
