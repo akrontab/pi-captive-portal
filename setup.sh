@@ -32,6 +32,7 @@ source "$ENV_FILE"
 : "${PORTAL_IP:?}"; : "${NETMASK:?}"; : "${PREFIX:?}"
 : "${DHCP_START:?}"; : "${DHCP_END:?}"; : "${DHCP_LEASE:?}"
 WPA_PASSPHRASE="${WPA_PASSPHRASE:-}"
+GUESTBOOK="${GUESTBOOK:-0}"
 
 # ── render: expand @TOKEN@ placeholders from portal.env into a file ────────────
 render() {
@@ -124,15 +125,48 @@ DROPIN
 }
 
 configure_portal_page() {
-  echo "[7/9] Portal page -> /var/www/portal/index.html..."
+  echo "[7/9] Portal page -> /var/www/portal/..."
   mkdir -p /var/www/portal
-  install -m 644 "${SCRIPT_DIR}/www/index.html" /var/www/portal/index.html
+  install -m 644 "${SCRIPT_DIR}/www/"* /var/www/portal/
+}
+
+install_guestbook() {
+  echo "[guestbook] Installing Flask/gunicorn guestbook..."
+  apt-get install -y -qq python3 python3-venv
+  # DB lives outside the app dir so redeploys never clobber it.
+  install -d -o www-data -g www-data /var/lib/portal
+
+  mkdir -p /opt/guestbook
+  cp -f "${SCRIPT_DIR}/guestbook/app.py" /opt/guestbook/
+  cp -f "${SCRIPT_DIR}/guestbook/requirements.txt" /opt/guestbook/
+  rm -rf /opt/guestbook/templates
+  cp -rf "${SCRIPT_DIR}/guestbook/templates" /opt/guestbook/
+
+  [[ -d /opt/guestbook/.venv ]] || python3 -m venv /opt/guestbook/.venv
+  /opt/guestbook/.venv/bin/pip install --quiet --upgrade pip
+  /opt/guestbook/.venv/bin/pip install --quiet -r /opt/guestbook/requirements.txt
+  chown -R www-data:www-data /opt/guestbook
+
+  cp -f "${SCRIPT_DIR}/guestbook/guestbook.service" /etc/systemd/system/guestbook.service
+  systemctl daemon-reload
+  systemctl enable guestbook
+  systemctl restart guestbook
 }
 
 configure_nginx() {
   echo "[8/9] nginx..."
   rm -f /etc/nginx/sites-enabled/default
   render "${SCRIPT_DIR}/config/nginx-portal.conf.tmpl" /etc/nginx/sites-available/portal
+
+  # Fill the @GUESTBOOK_BLOCK@ slot: a proxy location when enabled, else nothing.
+  local gb=""
+  if [[ "$GUESTBOOK" == "1" ]]; then
+    gb=$'    location /guestbook {\n        proxy_pass http://127.0.0.1:8080;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    }'
+  fi
+  awk -v blk="$gb" '{ if ($0=="@GUESTBOOK_BLOCK@") { if (blk!="") print blk } else print }' \
+    /etc/nginx/sites-available/portal > /etc/nginx/sites-available/portal.new
+  mv /etc/nginx/sites-available/portal.new /etc/nginx/sites-available/portal
+
   ln -sf /etc/nginx/sites-available/portal /etc/nginx/sites-enabled/portal
   nginx -t
 }
@@ -181,17 +215,23 @@ do_install() {
   configure_hostapd
   configure_dnsmasq
   configure_portal_page
+  [[ "$GUESTBOOK" == "1" ]] && install_guestbook
   configure_nginx
   configure_firewall
   start_services
   echo ""
   echo "Done. SSID '${SSID}' should be broadcasting. Portal at http://${PORTAL_IP}/portal"
+  [[ "$GUESTBOOK" == "1" ]] && echo "Guestbook at http://${PORTAL_IP}/guestbook"
   echo "Verify:  iw dev ${WLAN_IF} info | grep type   # expect: type AP"
   echo "         dig @127.0.0.1 example.com +short    # expect: ${PORTAL_IP}"
 }
 
 do_rollback() {
   echo "Rolling back captive portal..."
+  systemctl disable --now guestbook 2>/dev/null || true
+  rm -f /etc/systemd/system/guestbook.service
+  # /opt/guestbook and /var/lib/portal (the DB) are left in place on purpose so
+  # a rollback never destroys signed entries. Remove them by hand if you mean to.
   systemctl disable --now hostapd dnsmasq 2>/dev/null || true
   rm -f /etc/NetworkManager/conf.d/99-portal-unmanaged.conf
   rm -f "/etc/systemd/network/10-${WLAN_IF}-portal.network"

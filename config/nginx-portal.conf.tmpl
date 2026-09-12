@@ -13,6 +13,9 @@ server {
         try_files /index.html =404;
     }
 
+    # Guestbook proxy is inserted here by setup.sh when GUESTBOOK=1.
+    # The /guestbook prefix is longer than /, so it wins over the catch-all.
+@GUESTBOOK_BLOCK@
     # Everything else, including all OS probe URLs, bounces to the portal.
     location / {
         return 302 http://@PORTAL_IP@/portal;

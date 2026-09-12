@@ -4,3 +4,7 @@ portal.env
 # OS images — large binaries, not source
 *.img
 *.img.xz
+
+# Python bytecode
+__pycache__/
+*.pyc

@@ -47,7 +47,36 @@ Editing `www/index.html`? Push just the web content — seconds, no reinstall:
 .\deploy.ps1 -PageOnly        # ships www/* to /var/www/portal (nginx needs no reload)
 ```
 
-Then reload the portal on a connected client.
+Iterating on the guestbook app or its template?
+
+```powershell
+.\deploy.ps1 -Guestbook       # ships guestbook/* to /opt/guestbook + restarts service
+```
+
+Then reload the portal/guestbook on a connected client. (A change to
+`guestbook/requirements.txt` needs a full `.\deploy.ps1` — quick-push doesn't
+reinstall Python deps.)
+
+## Guestbook (optional)
+
+A 90s-style SQLite guestbook, off unless `GUESTBOOK=1` in `portal.env`.
+
+- Flask + gunicorn on `127.0.0.1:8080`, run by systemd as `www-data`
+  (`guestbook.service`); nginx reverse-proxies `/guestbook` to it.
+- SQLite DB at `/var/lib/portal/guestbook.db` — kept outside the app dir so
+  redeploys and rollbacks never wipe signed entries.
+- Output is HTML-escaped (Jinja autoescape) and SQL is parameterised; name and
+  message are length-capped. Linked from the portal splash page.
+
+| Path | What it is |
+|---|---|
+| `guestbook/app.py` | Flask app — stdlib `sqlite3`, no ORM. |
+| `guestbook/templates/guestbook.html` | The form + entries list. |
+| `guestbook/guestbook.service` | systemd unit. |
+| `guestbook/requirements.txt` | Flask + gunicorn (pinned). |
+
+To disable later: set `GUESTBOOK=0` and re-run `.\deploy.ps1`, or
+`.\deploy.ps1 -Rollback` (which leaves the DB intact).
 
 Requires the Windows OpenSSH client (`ssh`, `scp`) — bundled with Windows 10/11;
 enable via *Settings > System > Optional features* if missing.

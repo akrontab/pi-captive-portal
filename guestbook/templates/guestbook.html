@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign the Guestbook</title>
+  <style>
+    body {
+      font-family: "Comic Sans MS", "Segoe UI", system-ui, sans-serif;
+      background: #000080;
+      color: #ffff00;
+      margin: 0; padding: 1rem;
+      text-align: center;
+    }
+    .wrap { max-width: 44rem; margin: 0 auto; }
+    h1 {
+      font-size: 2rem; color: #00ff00;
+      text-shadow: 2px 2px #ff00ff;
+      margin: .5rem 0;
+    }
+    .sub { color: #00ffff; margin-bottom: 1rem; }
+    .count { color: #ff9900; font-weight: bold; }
+    hr { border: 0; border-top: 2px dashed #00ffff; margin: 1rem 0; }
+
+    form {
+      background: #c0c0c0; color: #000;
+      border: 3px outset #fff;
+      padding: 1rem; margin: 0 auto 1.5rem;
+      text-align: left; max-width: 36rem;
+    }
+    form label { display: block; font-weight: bold; margin: .5rem 0 .2rem; }
+    form input[type=text], form textarea {
+      width: 100%; box-sizing: border-box;
+      border: 2px inset #fff; padding: .4rem;
+      font-family: inherit; font-size: 1rem;
+    }
+    form textarea { min-height: 4.5rem; resize: vertical; }
+    form button {
+      margin-top: .8rem; padding: .5rem 1.2rem;
+      border: 2px outset #fff; background: #e0e0e0;
+      font-family: inherit; font-weight: bold; cursor: pointer;
+    }
+    form button:active { border-style: inset; }
+
+    .entry {
+      background: #1a1a5a; border: 2px ridge #00ffff;
+      padding: .7rem 1rem; margin: .6rem auto; max-width: 36rem;
+      text-align: left;
+    }
+    .entry .who { color: #00ff00; font-weight: bold; }
+    .entry .when { color: #aaaaaa; font-size: .8rem; float: right; }
+    .entry .msg { color: #ffffff; margin-top: .4rem; white-space: pre-wrap;
+                  word-wrap: break-word; }
+    .empty { color: #ffffff; font-style: italic; }
+    a { color: #00ffff; }
+    footer { margin-top: 1.5rem; color: #8888ff; font-size: .8rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>~*~ Sign My Guestbook ~*~</h1>
+    <p class="sub">Welcome, traveler! You are visitor to the walled garden.</p>
+    <p class="count">{{ count }} {{ 'soul has' if count == 1 else 'souls have' }} signed so far</p>
+
+    <form method="post" action="/guestbook/sign">
+      <label for="name">Your name</label>
+      <input type="text" id="name" name="name" maxlength="40" required
+             placeholder="l33t_visitor_2000">
+      <label for="message">Your message</label>
+      <textarea id="message" name="message" maxlength="500" required
+                placeholder="Cool site! Keep it up..."></textarea>
+      <button type="submit">Sign it!</button>
+    </form>
+
+    <hr>
+
+    {% if entries %}
+      {% for e in entries %}
+        <div class="entry">
+          <span class="when">{{ e.created_at }}</span>
+          <span class="who">{{ e.name }}</span> wrote:
+          <div class="msg">{{ e.message }}</div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="empty">No entries yet — be the first to sign!</p>
+    {% endif %}
+
+    <footer><a href="/portal">&laquo; Back to the portal</a></footer>
+  </div>
+</body>
+</html>

@@ -26,6 +26,7 @@
 param(
   [switch]$Rollback,
   [switch]$PageOnly,
+  [switch]$Guestbook,
   [string]$PiHost,
   [string]$PiUser
 )
@@ -122,8 +123,55 @@ if ($PageOnly) {
   exit 0
 }
 
+# --- Quick-push the guestbook app + restart its service (no full reinstall) ---
+function Push-Guestbook {
+  $gbSrc = Join-Path $scriptDir 'guestbook'
+  if (-not (Test-Path $gbSrc)) { Fail "Missing 'guestbook' — nothing to push." }
+
+  $gstage = Join-Path ([System.IO.Path]::GetTempPath()) ("picp_gb_" + [guid]::NewGuid().ToString('N'))
+  New-Item -ItemType Directory -Path $gstage -Force | Out-Null
+  try {
+    Copy-Item -Path $gbSrc -Destination $gstage -Recurse -Force
+    $textExt = '.py','.service','.txt','.html','.css','.js'
+    Get-ChildItem -Path $gstage -Recurse -File | ForEach-Object {
+      if ($textExt -contains $_.Extension.ToLower()) {
+        $raw = [System.IO.File]::ReadAllText($_.FullName)
+        $lf  = $raw -replace "`r`n", "`n" -replace "`r", "`n"
+        [System.IO.File]::WriteAllText($_.FullName, $lf, (New-Object System.Text.UTF8Encoding($false)))
+      }
+    }
+
+    Write-Host "Pushing guestbook app -> /opt/guestbook ..." -ForegroundColor Cyan
+    $remoteTmp = "/tmp/portal_gb"
+    & ssh $target "rm -rf '$remoteTmp' && mkdir -p '$remoteTmp'"
+    if ($LASTEXITCODE -ne 0) { Fail "Could not prep $remoteTmp on the Pi." }
+    & scp -q -r (Join-Path $gstage 'guestbook/*') "${target}:${remoteTmp}/"
+    if ($LASTEXITCODE -ne 0) { Fail "scp of guestbook failed (exit $LASTEXITCODE)." }
+    # Sync app + templates (not the service unit — install.sh owns that), fix perms, restart.
+    & ssh $target @"
+sudo mkdir -p /opt/guestbook &&
+sudo cp -f $remoteTmp/app.py $remoteTmp/requirements.txt /opt/guestbook/ &&
+sudo rm -rf /opt/guestbook/templates &&
+sudo cp -rf $remoteTmp/templates /opt/guestbook/ &&
+sudo chown -R www-data:www-data /opt/guestbook &&
+sudo systemctl restart guestbook &&
+rm -rf $remoteTmp
+"@
+    if ($LASTEXITCODE -ne 0) { Fail "Installing guestbook on the Pi failed (exit $LASTEXITCODE)." }
+  }
+  finally {
+    Remove-Item -Path $gstage -Recurse -Force -ErrorAction SilentlyContinue
+  }
+}
+
+if ($Guestbook) {
+  Push-Guestbook
+  Write-Host "`nGuestbook updated. Reload http://$($cfg['PORTAL_IP'])/guestbook on a client." -ForegroundColor Green
+  exit 0
+}
+
 # --- Stage payload with LF line endings so bash on the Pi is happy ---
-$items = @('setup.sh','portal.env','config','www')
+$items = @('setup.sh','portal.env','config','www','guestbook')
 foreach ($i in $items) {
   if (-not (Test-Path (Join-Path $scriptDir $i))) { Fail "Missing '$i' — nothing to deploy." }
 }
@@ -132,7 +180,7 @@ $stage = Join-Path ([System.IO.Path]::GetTempPath()) ("picp_" + [guid]::NewGuid(
 New-Item -ItemType Directory -Path $stage -Force | Out-Null
 try {
   # Text extensions to normalize; everything else copied byte-for-byte.
-  $textExt = '.sh','.env','.conf','.tmpl','.html','.network','.md'
+  $textExt = '.sh','.env','.conf','.tmpl','.html','.network','.md','.py','.service','.txt'
   foreach ($i in $items) {
     $src = Join-Path $scriptDir $i
     Copy-Item -Path $src -Destination $stage -Recurse -Force
