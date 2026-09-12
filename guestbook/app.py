@@ -205,11 +205,35 @@ def guestbook():
     return render_template("guestbook.html", entries=entries, count=count)
 
 
+@app.route("/guestbook/entries")
+def entries():
+    """Public guestbook feed as JSON (no fingerprint meta), newest first.
+
+    Backs the fetch()-driven guestbook on the restyled portal page.
+    """
+    with get_db() as conn:
+        rows = conn.execute(
+            "SELECT id, name, message, created_at FROM entries "
+            "ORDER BY id DESC LIMIT ?",
+            (SHOW_LIMIT,),
+        ).fetchall()
+        count = conn.execute("SELECT COUNT(*) FROM entries").fetchone()[0]
+    return jsonify({"count": count, "entries": [dict(r) for r in rows]})
+
+
 @app.route("/guestbook/sign", methods=["POST"])
 def sign():
-    name    = (request.form.get("name") or "").strip()[:MAX_NAME]
-    message = (request.form.get("message") or "").strip()[:MAX_MESSAGE]
+    # Accept either a form post (classic <form>) or a JSON body (fetch()).
+    src = request.get_json(silent=True) if request.is_json else request.form
+    src = src or {}
+    name    = str(src.get("name") or "").strip()[:MAX_NAME]
+    message = str(src.get("message") or "").strip()[:MAX_MESSAGE]
+    wants_json = request.is_json or \
+        "application/json" in request.headers.get("Accept", "")
     if not name or not message:
+        if wants_json:
+            return jsonify({"ok": False,
+                            "error": "Name and message are both required."}), 400
         abort(400, "Name and message are both required.")
     stamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     try:
@@ -217,11 +241,16 @@ def sign():
     except Exception:
         meta = None   # never let fingerprinting failure block a signing
     with get_db() as conn:  # parameterised -> no SQL injection
-        conn.execute(
+        cur = conn.execute(
             "INSERT INTO entries (name, message, created_at, meta) "
             "VALUES (?, ?, ?, ?)",
             (name, message, stamp, meta),
         )
+        new_id = cur.lastrowid
+    if wants_json:
+        return jsonify({"ok": True,
+                        "entry": {"id": new_id, "name": name,
+                                  "message": message, "created_at": stamp}})
     return redirect("/guestbook")
 
 
