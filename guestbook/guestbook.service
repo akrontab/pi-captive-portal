@@ -7,7 +7,9 @@ Type=simple
 User=www-data
 Group=www-data
 WorkingDirectory=/opt/guestbook
-Environment=GUESTBOOK_DB=/var/lib/portal/guestbook.db
+# Secrets/config (GUESTBOOK_DB, GUESTBOOK_DUMP_KEY) — written 0600 by setup.sh.
+# Leading '-' so a missing file doesn't fail the unit.
+EnvironmentFile=-/etc/guestbook.env
 ExecStart=/opt/guestbook/.venv/bin/gunicorn --workers 2 --bind 127.0.0.1:8080 app:app
 Restart=on-failure
 RestartSec=2

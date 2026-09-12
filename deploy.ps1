@@ -9,16 +9,28 @@
 
   RUN THIS OVER ETHERNET. setup.sh takes wlan0 away from NetworkManager; if the
   Pi is reached over the Wi-Fi you're repurposing, you'll lose it mid-run.
+
+  Run with NO arguments for an interactive menu.
 .PARAMETER Rollback
   Run `sudo ./setup.sh rollback` on the Pi instead of install.
+.PARAMETER PageOnly
+  Push only www/* to /var/www/portal (fast page iteration, no reinstall).
+.PARAMETER Guestbook
+  Push only guestbook/* to /opt/guestbook and restart the service.
+.PARAMETER PullGuestbook
+  Export all guestbook posts from the Pi to a local CSV.
+.PARAMETER OutFile
+  Destination for -PullGuestbook (default: guestbook-<timestamp>.csv).
 .PARAMETER PiHost
   Override PI_HOST from portal.env.
 .PARAMETER PiUser
   Override PI_USER from portal.env.
 .EXAMPLE
-  .\deploy.ps1
+  .\deploy.ps1                       # interactive menu
 .EXAMPLE
-  .\deploy.ps1 -PiHost 192.168.1.42 -PiUser pi
+  .\deploy.ps1 -PageOnly
+.EXAMPLE
+  .\deploy.ps1 -PullGuestbook -OutFile posts.csv
 .EXAMPLE
   .\deploy.ps1 -Rollback
 #>
@@ -38,6 +50,29 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $envFile   = Join-Path $scriptDir 'portal.env'
 
 function Fail($msg) { Write-Error $msg; exit 1 }
+
+# --- Interactive menu when run with no arguments ------------------------------
+if ($PSBoundParameters.Count -eq 0) {
+  Write-Host ""
+  Write-Host "  pi-captive-portal deploy" -ForegroundColor Cyan
+  Write-Host "  ========================" -ForegroundColor Cyan
+  Write-Host "  1) Full deploy        (install / reconfigure on the Pi)"
+  Write-Host "  2) Push page only     (www/* -> /var/www/portal)"
+  Write-Host "  3) Push guestbook     (guestbook/* -> /opt/guestbook + restart)"
+  Write-Host "  4) Pull guestbook     (export posts -> local CSV)"
+  Write-Host "  5) Rollback           (undo portal, hand wlan0 back)"
+  Write-Host "  Q) Quit"
+  Write-Host ""
+  switch (Read-Host "  Choose") {
+    '1'     { }                      # full deploy is the default path
+    '2'     { $PageOnly = $true }
+    '3'     { $Guestbook = $true }
+    '4'     { $PullGuestbook = $true }
+    '5'     { $Rollback = $true }
+    'q'     { Write-Host "  Bye." -ForegroundColor DarkGray; exit 0 }
+    default { Fail "Unknown choice." }
+  }
+}
 
 # --- Preflight: OpenSSH client present? ---
 foreach ($cmd in 'ssh','scp') {
