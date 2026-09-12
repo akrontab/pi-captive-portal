@@ -1,0 +1,23 @@
+interface=@WLAN_IF@
+bind-interfaces
+except-interface=lo
+
+# Answer everything ourselves — no upstream resolver, no /etc/hosts.
+no-resolv
+no-hosts
+
+# Every hostname resolves to the portal.
+address=/#/@PORTAL_IP@
+
+dhcp-range=@DHCP_START@,@DHCP_END@,@NETMASK@,@DHCP_LEASE@
+dhcp-option=option:router,@PORTAL_IP@
+dhcp-option=option:dns-server,@PORTAL_IP@
+
+# RFC 8910 captive-portal URI (DHCP option 114).
+dhcp-option=114,http://@PORTAL_IP@/portal
+
+# Short TTL so clients re-resolve promptly after release.
+local-ttl=2
+
+log-queries
+log-dhcp

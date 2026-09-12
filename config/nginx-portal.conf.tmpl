@@ -1,0 +1,20 @@
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name _;
+
+    root /var/www/portal;
+
+    # Probe responses must never be cached.
+    add_header Cache-Control "no-store, no-cache, must-revalidate" always;
+
+    # The portal page — exact match so the catch-all doesn't swallow it.
+    location = /portal {
+        try_files /index.html =404;
+    }
+
+    # Everything else, including all OS probe URLs, bounces to the portal.
+    location / {
+        return 302 http://@PORTAL_IP@/portal;
+    }
+}

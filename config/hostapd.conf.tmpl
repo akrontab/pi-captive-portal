@@ -1,0 +1,17 @@
+interface=@WLAN_IF@
+driver=nl80211
+
+ssid=@SSID@
+country_code=@COUNTRY@
+hw_mode=g
+channel=@CHANNEL@
+ieee80211n=1
+wmm_enabled=1
+
+macaddr_acl=0
+ignore_broadcast_ssid=0
+
+# @SECURITY@ block below is rendered by setup.sh:
+#   open  -> auth_algs=1, wpa=0
+#   wpa2  -> auth_algs=1, wpa=2, wpa_passphrase=..., WPA-PSK, CCMP
+@SECURITY@
