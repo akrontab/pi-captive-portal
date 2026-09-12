@@ -1,0 +1,10 @@
+[Unit]
+Description=Refresh portal Wi-Fi station snapshot every 10s
+
+[Timer]
+OnBootSec=15
+OnUnitActiveSec=10
+AccuracySec=2s
+
+[Install]
+WantedBy=timers.target

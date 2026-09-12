@@ -1,0 +1,7 @@
+[Unit]
+Description=Snapshot Wi-Fi station stats for the portal guestbook
+After=hostapd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /opt/guestbook/portal-stations.py wlan0

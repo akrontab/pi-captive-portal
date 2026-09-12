@@ -132,7 +132,8 @@ configure_portal_page() {
 
 install_guestbook() {
   echo "[guestbook] Installing Flask/gunicorn guestbook..."
-  apt-get install -y -qq python3 python3-venv
+  # iw: used by the Wi-Fi station-stats sidecar for device fingerprinting.
+  apt-get install -y -qq python3 python3-venv iw
   # DB lives outside the app dir so redeploys never clobber it.
   install -d -o www-data -g www-data /var/lib/portal
 
@@ -148,6 +149,7 @@ ENVEOF
   mkdir -p /opt/guestbook
   cp -f "${SCRIPT_DIR}/guestbook/app.py" /opt/guestbook/
   cp -f "${SCRIPT_DIR}/guestbook/requirements.txt" /opt/guestbook/
+  cp -f "${SCRIPT_DIR}/guestbook/portal-stations.py" /opt/guestbook/
   rm -rf /opt/guestbook/templates
   cp -rf "${SCRIPT_DIR}/guestbook/templates" /opt/guestbook/
 
@@ -157,9 +159,17 @@ ENVEOF
   chown -R www-data:www-data /opt/guestbook
 
   cp -f "${SCRIPT_DIR}/guestbook/guestbook.service" /etc/systemd/system/guestbook.service
+
+  # Wi-Fi station-stats sidecar: runs as root on a timer, writes a world-readable
+  # snapshot the (unprivileged) web app reads. Keeps privilege out of the app.
+  cp -f "${SCRIPT_DIR}/guestbook/portal-stations.service" /etc/systemd/system/portal-stations.service
+  cp -f "${SCRIPT_DIR}/guestbook/portal-stations.timer"   /etc/systemd/system/portal-stations.timer
+
   systemctl daemon-reload
   systemctl enable guestbook
   systemctl restart guestbook
+  systemctl enable --now portal-stations.timer
+  systemctl start portal-stations.service   # seed the first snapshot now
 }
 
 configure_nginx() {
@@ -238,7 +248,9 @@ do_install() {
 do_rollback() {
   echo "Rolling back captive portal..."
   systemctl disable --now guestbook 2>/dev/null || true
+  systemctl disable --now portal-stations.timer 2>/dev/null || true
   rm -f /etc/systemd/system/guestbook.service
+  rm -f /etc/systemd/system/portal-stations.service /etc/systemd/system/portal-stations.timer
   # /opt/guestbook and /var/lib/portal (the DB) are left in place on purpose so
   # a rollback never destroys signed entries. Remove them by hand if you mean to.
   systemctl disable --now hostapd dnsmasq 2>/dev/null || true

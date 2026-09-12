@@ -5,7 +5,12 @@ fingerprinting information about the poster's device as the captive AP can see,
 without asking them to type anything. This is a walled-garden AP we own; all
 data below is already observable on our own hardware.
 
-Status: **planned**. This file is the build spec; nothing here is wired up yet.
+Status: **v1 implemented** (in `guestbook/app.py` + `guestbook/portal-stations.*`).
+Live: HTTP layer (A), IP→MAC via `ip neigh` + dnsmasq leases, vendor/randomized-MAC,
+DHCP hostname (B), and Wi-Fi station stats via the sidecar (C). Stored as a JSON
+blob in `entries.meta`; surfaced in `/guestbook/dump` (nested JSON; flattened CSV).
+Deferred: DHCP option fingerprinting (D), probe correlation (E), p0f (F), and a
+full OUI table (only a small built-in vendor map so far).
 
 > Light-touch note (your call): a one-line "connections on this network are
 > logged" on the form is good practice. Not required for it to work.
