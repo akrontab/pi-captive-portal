@@ -239,7 +239,9 @@ print(con.execute("SELECT COUNT(*) FROM entries").fetchone()[0])
 }
 
 # --- Stage payload with LF line endings so bash on the Pi is happy ---
-$items = @('setup.sh','portal.env','config','www','guestbook')
+$items = @('setup.sh','portal.env','config','www','guestbook','ssid')
+# ssids.txt (bait pool) is optional + git-ignored; ship it only when present.
+if (Test-Path (Join-Path $scriptDir 'ssids.txt')) { $items += 'ssids.txt' }
 foreach ($i in $items) {
   if (-not (Test-Path (Join-Path $scriptDir $i))) { Fail "Missing '$i' — nothing to deploy." }
 }
@@ -248,7 +250,7 @@ $stage = Join-Path ([System.IO.Path]::GetTempPath()) ("picp_" + [guid]::NewGuid(
 New-Item -ItemType Directory -Path $stage -Force | Out-Null
 try {
   # Text extensions to normalize; everything else copied byte-for-byte.
-  $textExt = '.sh','.env','.conf','.tmpl','.html','.network','.md','.py','.service','.txt'
+  $textExt = '.sh','.env','.conf','.tmpl','.html','.network','.md','.py','.service','.timer','.txt'
   foreach ($i in $items) {
     $src = Join-Path $scriptDir $i
     Copy-Item -Path $src -Destination $stage -Recurse -Force

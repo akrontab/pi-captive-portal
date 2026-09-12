@@ -33,6 +33,9 @@ source "$ENV_FILE"
 : "${DHCP_START:?}"; : "${DHCP_END:?}"; : "${DHCP_LEASE:?}"
 WPA_PASSPHRASE="${WPA_PASSPHRASE:-}"
 GUESTBOOK="${GUESTBOOK:-0}"
+SSID_ROTATE="${SSID_ROTATE:-0}"
+SSID_ROTATE_INTERVAL="${SSID_ROTATE_INTERVAL:-15min}"
+SSID_BAIT_COUNT="${SSID_BAIT_COUNT:-7}"
 
 # ── render: expand @TOKEN@ placeholders from portal.env into a file ────────────
 render() {
@@ -55,7 +58,7 @@ install_packages() {
   echo "[1/9] Installing packages..."
   apt-get update -qq
   DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
-    hostapd dnsmasq nginx-light iptables iptables-persistent
+    hostapd dnsmasq nginx-light iptables iptables-persistent python3
   systemctl unmask hostapd
   systemctl stop hostapd dnsmasq nginx 2>/dev/null || true
 }
@@ -95,13 +98,65 @@ configure_hostapd() {
     sec=$'auth_algs=1\nwpa=0'
     echo "      security: OPEN"
   fi
-  render "${SCRIPT_DIR}/config/hostapd.conf.tmpl" /etc/hostapd/hostapd.conf
+  # Render the PRIMARY BSS (the stable "Portal") + security into a base file.
+  # The live /etc/hostapd/hostapd.conf is (re)built from this base by
+  # configure_ssid / portal-ssid-rotate.py, which append the bait BSSes after it.
+  local base=/etc/hostapd/hostapd.base.conf
+  render "${SCRIPT_DIR}/config/hostapd.conf.tmpl" "$base"
   # Substitute the security block (multi-line) via awk to avoid sed newline pain.
   awk -v blk="$sec" '{ if ($0=="@SECURITY@") print blk; else print }' \
-    /etc/hostapd/hostapd.conf > /etc/hostapd/hostapd.conf.new
-  mv /etc/hostapd/hostapd.conf.new /etc/hostapd/hostapd.conf
-  chmod 600 /etc/hostapd/hostapd.conf
+    "$base" > "${base}.new"
+  mv "${base}.new" "$base"
+  chmod 600 "$base"
   sed -i 's|^#*DAEMON_CONF=.*|DAEMON_CONF="/etc/hostapd/hostapd.conf"|' /etc/default/hostapd
+}
+
+configure_ssid() {
+  echo "[5b/9] Multi-SSID / bait rotation..."
+  local pool_src="${SCRIPT_DIR}/ssids.txt"
+  local pool_dst=/etc/portal-ssids.txt
+  local n_pool=0
+  if [[ -f "$pool_src" ]]; then
+    install -m 644 "$pool_src" "$pool_dst"
+    n_pool=$(grep -vcE '^[[:space:]]*(#|$)' "$pool_dst" || true)
+  else
+    rm -f "$pool_dst"
+  fi
+
+  # Config for the rotate engine (it reads this file directly; systemd runs it too).
+  cat > /etc/portal-ssid.env <<SSIDENV
+WLAN_IF=${WLAN_IF}
+SSID_POOL_FILE=${pool_dst}
+SSID_BAIT_COUNT=${SSID_BAIT_COUNT}
+PRIMARY_SSID=${SSID}
+HOSTAPD_BASE=/etc/hostapd/hostapd.base.conf
+HOSTAPD_CONF=/etc/hostapd/hostapd.conf
+SSIDENV
+  chmod 600 /etc/portal-ssid.env
+
+  install -m 755 "${SCRIPT_DIR}/ssid/portal-ssid-rotate.py" /opt/portal-ssid-rotate.py
+
+  # Build the live hostapd.conf now (base + an initial bait set). hostapd is
+  # started later by start_services, so do not restart it here.
+  python3 /opt/portal-ssid-rotate.py --no-restart
+
+  cp -f "${SCRIPT_DIR}/ssid/portal-ssid-rotate.service" /etc/systemd/system/portal-ssid-rotate.service
+  cp -f "${SCRIPT_DIR}/ssid/portal-ssid-rotate.timer"   /etc/systemd/system/portal-ssid-rotate.timer
+  sed -i "s|^OnUnitActiveSec=.*|OnUnitActiveSec=${SSID_ROTATE_INTERVAL}|" \
+    /etc/systemd/system/portal-ssid-rotate.timer
+  systemctl daemon-reload
+
+  if [[ "$SSID_ROTATE" == "1" && "$n_pool" -gt 0 ]]; then
+    systemctl enable --now portal-ssid-rotate.timer
+    echo "      rotation: ON every ${SSID_ROTATE_INTERVAL} (${SSID_BAIT_COUNT} of ${n_pool} baits live)"
+  else
+    systemctl disable --now portal-ssid-rotate.timer 2>/dev/null || true
+    if [[ "$n_pool" -gt 0 ]]; then
+      echo "      rotation: OFF (static ${SSID_BAIT_COUNT} of ${n_pool} baits)"
+    else
+      echo "      rotation: OFF (no ssids.txt -> single SSID '${SSID}')"
+    fi
+  fi
 }
 
 configure_dnsmasq() {
@@ -232,6 +287,7 @@ do_install() {
   nm_unmanage
   static_ip
   configure_hostapd
+  configure_ssid
   configure_dnsmasq
   configure_portal_page
   [[ "$GUESTBOOK" == "1" ]] && install_guestbook
@@ -251,6 +307,10 @@ do_rollback() {
   systemctl disable --now portal-stations.timer 2>/dev/null || true
   rm -f /etc/systemd/system/guestbook.service
   rm -f /etc/systemd/system/portal-stations.service /etc/systemd/system/portal-stations.timer
+  systemctl disable --now portal-ssid-rotate.timer 2>/dev/null || true
+  rm -f /etc/systemd/system/portal-ssid-rotate.service /etc/systemd/system/portal-ssid-rotate.timer
+  rm -f /opt/portal-ssid-rotate.py /etc/portal-ssid.env /etc/portal-ssids.txt
+  rm -f /etc/hostapd/hostapd.base.conf
   # /opt/guestbook and /var/lib/portal (the DB) are left in place on purpose so
   # a rollback never destroys signed entries. Remove them by hand if you mean to.
   systemctl disable --now hostapd dnsmasq 2>/dev/null || true

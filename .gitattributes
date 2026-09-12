@@ -9,6 +9,7 @@ portal.env.example text eol=lf
 *.html            text eol=lf
 *.py              text eol=lf
 *.service         text eol=lf
+*.timer           text eol=lf
 *.txt             text eol=lf
 
 # Windows-side driver: CRLF is fine.

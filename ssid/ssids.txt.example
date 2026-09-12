@@ -1,0 +1,15 @@
+# Bait SSID pool — one name per line; blank lines and #-comments are ignored.
+# Up to SSID_BAIT_COUNT (max 7) of these broadcast alongside the primary SSID.
+# Copy to ssids.txt and edit; ssids.txt is git-ignored (your own bait list).
+# Names must be <= 32 bytes (longer ones are skipped). These are common
+# open-network names client devices tend to probe for / auto-join.
+xfinitywifi
+attwifi
+Starbucks WiFi
+Google Starbucks
+Guest
+Free Public WiFi
+Airport Free WiFi
+McDonalds Free WiFi
+Boingo Hotspot
+Marriott_GUEST

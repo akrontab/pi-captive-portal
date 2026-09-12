@@ -1,0 +1,8 @@
+[Unit]
+Description=Rotate captive-portal bait SSIDs and restart hostapd
+After=hostapd.service
+Wants=hostapd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /opt/portal-ssid-rotate.py

@@ -1,6 +1,9 @@
 # Local, may contain a Wi-Fi passphrase and host-specific target
 portal.env
 
+# Local bait-SSID pool (ship ssids.txt.example instead)
+ssids.txt
+
 # OS images — large binaries, not source
 *.img
 *.img.xz
