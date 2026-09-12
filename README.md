@@ -19,10 +19,39 @@ Full annotated walkthrough of every step lives in
 `portal.env` is the single source of truth: the IP set there is rendered into
 every config file, so nothing drifts and each piece stays swappable.
 
+## Finding the Pi
+
+Don't know the Pi's address? `find-pi.ps1` locates it:
+
+```powershell
+.\find-pi.ps1                # prints candidates + a best guess
+$pi = .\find-pi.ps1 -Quiet   # just the IP, for scripting:  ssh "pi@$pi"
+```
+
+How it works, best-first:
+
+1. **mDNS** — resolves `raspberrypi.local` / `pi.local` (`-Names` to add more).
+   Works when the Pi's `avahi` is up; gives you the host with no scanning.
+2. **Subnet sweep** — finds your local IPv4 that has a default gateway, then
+   async-pings every host in that `/24`. It doesn't need the replies; the point
+   is that each ping forces your OS to ARP for the address, filling the ARP
+   cache. Async (`.NET SendPingAsync`) so all 254 go out at once — a second or
+   two, not minutes.
+3. **ARP match** — reads the now-warm `arp -a` cache and flags any MAC whose
+   first three octets (the OUI) belong to Raspberry Pi (`b8:27:eb`, `dc:a6:32`,
+   `e4:5f:01`, …). That's how it finds a Pi with a non-obvious hostname.
+4. **SSH probe** — TCP-connects port 22 on each candidate so you can see which
+   is actually reachable. The best guess prefers an SSH-open, mDNS-named host.
+
+Read-only — it changes nothing on your machine or the Pi. Note it identifies a
+Pi by the interface that's on the network: a Pi on Wi-Fi shows its Wi-Fi MAC,
+on Ethernet its (different) Ethernet MAC — both are Pi OUIs.
+
 ## Use it (from Windows)
 
 > **Connect the Pi over Ethernet first.** `setup.sh` takes `wlan0` away from
-> NetworkManager — do this over Wi-Fi and you lose the box mid-run.
+> NetworkManager — do this over Wi-Fi and you lose the box mid-run. Use
+> `find-pi.ps1` to confirm which interface it's on (Wi-Fi MAC vs Ethernet MAC).
 
 ```powershell
 cd C:\Users\Aaron\repo\pi-captive-portal
