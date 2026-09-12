@@ -24,6 +24,10 @@ LEASES      = os.environ.get("DNSMASQ_LEASES", "/var/lib/misc/dnsmasq.leases")
 STATIONS    = os.environ.get("PORTAL_STATIONS", "/run/portal/stations.json")
 
 app = Flask(__name__)
+# Hostile-network hardening: cap request bodies so a client cannot flood us
+# with a giant POST (names/messages are further length-capped in sign()).
+app.config["MAX_CONTENT_LENGTH"] = int(
+    os.environ.get("GUESTBOOK_MAX_BODY", str(64 * 1024)))
 
 # ── Device fingerprinting ─────────────────────────────────────────────────────
 # Everything here is observable on our own AP. See docs/metadata-capture.md.
@@ -164,6 +168,7 @@ def collect_metadata():
 def get_db():
     conn = sqlite3.connect(DB_PATH, timeout=5)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA busy_timeout=5000")
     return conn
 
 
@@ -254,6 +259,16 @@ def sign():
     return redirect("/guestbook")
 
 
+def _csv_safe(v):
+    """Neutralise CSV/formula injection: a cell starting with = + - @ (or a
+    control char) can execute when the export is opened in Excel/Sheets.
+    Attacker-controlled fields (name, message, hostname, UA) flow into the
+    CSV, so prefix any such cell with a single quote."""
+    if isinstance(v, str) and v[:1] in ("=", "+", "-", "@", "\t", "\r"):
+        return "'" + v
+    return v
+
+
 @app.route("/guestbook/dump")
 def dump():
     """Export every entry — JSON (default) or ?format=csv.
@@ -286,11 +301,11 @@ def dump():
         for r in rows:
             m = r["meta"] or {}
             wifi = (m.get("wifi") or {})
-            w.writerow(
+            w.writerow([_csv_safe(x) for x in (
                 [r["id"], r["created_at"], r["name"], r["message"]]
                 + [m.get(k) for k in flat]
                 + [wifi.get("signal_dbm")]
-            )
+            )])
         return Response(
             buf.getvalue(),
             mimetype="text/csv",

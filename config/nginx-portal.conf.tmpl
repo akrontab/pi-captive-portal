@@ -8,6 +8,20 @@ server {
     # Probe responses must never be cached.
     add_header Cache-Control "no-store, no-cache, must-revalidate" always;
 
+    # ── Hardening: this AP serves a hostile (hacker-conference) client network ──
+    server_tokens off;                 # don't leak the nginx version
+    client_max_body_size 64k;          # no giant POST floods
+    client_body_timeout 10s;           # slowloris resistance
+    client_header_timeout 10s;
+    send_timeout 15s;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header Referrer-Policy "no-referrer" always;
+    # Page is fully self-contained (inline CSS/JS, base64 imgs); only same-origin
+    # fetch() for the guestbook. 'unsafe-inline' is required for the inline
+    # script/style; connect-src 'self' blocks data exfiltration to other hosts.
+    add_header Content-Security-Policy "default-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'" always;
+
     # The portal page — exact match so the catch-all doesn't swallow it.
     location = /portal {
         try_files /index.html =404;

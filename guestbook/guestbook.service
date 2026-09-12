@@ -14,11 +14,21 @@ ExecStart=/opt/guestbook/.venv/bin/gunicorn --workers 2 --bind 127.0.0.1:8080 ap
 Restart=on-failure
 RestartSec=2
 
-# Light hardening — the app only needs its own dirs.
+# Hardening — hostile client network. The app only needs its own dirs; it also
+# shells out to `ip neigh` (netlink) and reads /run + /var/lib/misc, so we avoid
+# RestrictAddressFamilies / SystemCallFilter which would break those.
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=full
 ReadWritePaths=/var/lib/portal
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+LockPersonality=true
 
 [Install]
 WantedBy=multi-user.target

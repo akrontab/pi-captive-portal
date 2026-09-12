@@ -230,12 +230,19 @@ ENVEOF
 configure_nginx() {
   echo "[8/9] nginx..."
   rm -f /etc/nginx/sites-enabled/default
+  # http-context rate-limit zone (limit_req_zone can't live in a server block).
+  cat > /etc/nginx/conf.d/portal-hardening.conf <<'RLZONE'
+limit_req_zone $binary_remote_addr zone=portal_sign:10m rate=5r/s;
+RLZONE
   render "${SCRIPT_DIR}/config/nginx-portal.conf.tmpl" /etc/nginx/sites-available/portal
 
   # Fill the @GUESTBOOK_BLOCK@ slot: a proxy location when enabled, else nothing.
   local gb=""
   if [[ "$GUESTBOOK" == "1" ]]; then
-    gb=$'    location /guestbook {\n        proxy_pass http://127.0.0.1:8080;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    }'
+    # Exact-match locations win over the /guestbook prefix. sign is rate-limited;
+    # dump (captured fingerprint data) is restricted to localhost so conference
+    # attendees can't scrape everyone's MACs/hostnames (pull via -PullGuestbook).
+    gb=$'    location = /guestbook/sign {\n        limit_req zone=portal_sign burst=10 nodelay;\n        proxy_pass http://127.0.0.1:8080;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    }\n    location = /guestbook/dump {\n        allow 127.0.0.1;\n        allow ::1;\n        deny all;\n        proxy_pass http://127.0.0.1:8080;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    }\n    location /guestbook {\n        proxy_pass http://127.0.0.1:8080;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    }'
   fi
   awk -v blk="$gb" '{ if ($0=="@GUESTBOOK_BLOCK@") { if (blk!="") print blk } else print }' \
     /etc/nginx/sites-available/portal > /etc/nginx/sites-available/portal.new
@@ -262,7 +269,19 @@ COMMIT
 :INPUT ACCEPT [0:0]
 :FORWARD ACCEPT [0:0]
 :OUTPUT ACCEPT [0:0]
+# Loopback + return traffic.
+-A INPUT -i lo -j ACCEPT
+-A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+# Only the services portal clients legitimately need are open on ${WLAN_IF}.
+-A INPUT -i ${WLAN_IF} -p udp --dport 67 -j ACCEPT
+-A INPUT -i ${WLAN_IF} -p udp --dport 53 -j ACCEPT
+-A INPUT -i ${WLAN_IF} -p tcp --dport 53 -j ACCEPT
+-A INPUT -i ${WLAN_IF} -p tcp --dport 80 -j ACCEPT
+# Fast-fail HTTPS so captive detection doesn't hang (we never MITM TLS).
 -A INPUT -i ${WLAN_IF} -p tcp --dport 443 -j REJECT --reject-with tcp-reset
+# Drop everything else from the hostile client network (SSH, gunicorn:8080, ...).
+# Management/SSH stays reachable over the WIRED interface, which is untouched.
+-A INPUT -i ${WLAN_IF} -j DROP
 -A FORWARD -i ${WLAN_IF} -p tcp --dport 443 -j REJECT --reject-with tcp-reset
 COMMIT
 RULES
@@ -318,6 +337,7 @@ do_rollback() {
   rm -f "/etc/systemd/network/10-${WLAN_IF}-portal.network"
   rm -f /etc/systemd/system/dnsmasq.service.d/after-hostapd.conf
   rm -f /etc/nginx/sites-enabled/portal
+  rm -f /etc/nginx/conf.d/portal-hardening.conf
   [[ -f /etc/dnsmasq.conf.orig ]] && mv -f /etc/dnsmasq.conf.orig /etc/dnsmasq.conf
   systemctl daemon-reload
   systemctl reload NetworkManager 2>/dev/null || true
