@@ -22,16 +22,16 @@ full OUI table (only a small built-in vendor map so far).
 ### A. HTTP request — free, no privilege (Flask `request`)
 Grabbed directly in the POST handler:
 
-| Field | Source | Notes |
-|---|---|---|
-| User-Agent | `request.headers['User-Agent']` | Parse → OS, browser, device family |
-| Accept-Language | header | Language/locale preference |
-| Accept, Accept-Encoding | headers | Capability fingerprint |
-| Referer | header | Usually the portal page |
-| Client IP | `request.headers['X-Real-IP']` | nginx already sets it (see nginx tmpl) |
-| Sec-CH-UA*, platform, mobile, model | Client Hints | Chromium only; see caveat below |
-| DNT | header | Rarely useful, cheap to keep |
-| Raw header dump | `dict(request.headers)` | Store as JSON for later mining |
+| Field                               | Source                          | Notes                                  |
+| ----------------------------------- | ------------------------------- | -------------------------------------- |
+| User-Agent                          | `request.headers['User-Agent']` | Parse → OS, browser, device family     |
+| Accept-Language                     | header                          | Language/locale preference             |
+| Accept, Accept-Encoding             | headers                         | Capability fingerprint                 |
+| Referer                             | header                          | Usually the portal page                |
+| Client IP                           | `request.headers['X-Real-IP']`  | nginx already sets it (see nginx tmpl) |
+| Sec-CH-UA*, platform, mobile, model | Client Hints                    | Chromium only; see caveat below        |
+| DNT                                 | header                          | Rarely useful, cheap to keep           |
+| Raw header dump                     | `dict(request.headers)`         | Store as JSON for later mining         |
 
 **Client Hints caveat:** high-entropy hints (platform-version, model,
 full-version) are only sent by Chromium browsers, only after the server asks via
@@ -44,25 +44,25 @@ what we get.
 **MAC is not in the HTTP request.** Get it by matching the client IP against the
 Pi's own tables:
 
-| Field | Source | Notes |
-|---|---|---|
-| MAC address | `/var/lib/misc/dnsmasq.leases` or `ip neigh show <ip>` | The key join |
-| DHCP hostname | dnsmasq leases (col 4) | Device's self-reported name, e.g. `Aarons-iPhone` — often the richest single field |
-| Lease start/expiry | dnsmasq leases | When they joined |
-| Vendor (OUI) | first 3 MAC octets → vendor table | Apple / Samsung / etc. |
-| Randomized-MAC flag | 2nd hex digit of MAC ∈ {2,6,A,E} = locally administered | iOS/Android private-MAC privacy feature; flags a device deliberately hiding |
+| Field               | Source                                                  | Notes                                                                              |
+| ------------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| MAC address         | `/var/lib/misc/dnsmasq.leases` or `ip neigh show <ip>`  | The key join                                                                       |
+| DHCP hostname       | dnsmasq leases (col 4)                                  | Device's self-reported name, e.g. `Aarons-iPhone` — often the richest single field |
+| Lease start/expiry  | dnsmasq leases                                          | When they joined                                                                   |
+| Vendor (OUI)        | first 3 MAC octets → vendor table                       | Apple / Samsung / etc.                                                             |
+| Randomized-MAC flag | 2nd hex digit of MAC ∈ {2,6,A,E} = locally administered | iOS/Android private-MAC privacy feature; flags a device deliberately hiding        |
 
 `dnsmasq.leases` format: `<expiry_epoch> <mac> <ip> <hostname> <client-id>`.
 
 ### C. Wi-Fi / radio layer — needs privilege (`iw`)
 From hostapd's associated-station table, keyed by MAC:
 
-| Field | Source | Notes |
-|---|---|---|
-| Signal strength (dBm) | `iw dev wlan0 station dump` | Rough proximity |
-| Connected time | same | How long associated |
-| TX/RX bytes & packets | same | Activity volume |
-| Negotiated rate / caps | same | Device capability hints |
+| Field                  | Source                      | Notes                   |
+| ---------------------- | --------------------------- | ----------------------- |
+| Signal strength (dBm)  | `iw dev wlan0 station dump` | Rough proximity         |
+| Connected time         | same                        | How long associated     |
+| TX/RX bytes & packets  | same                        | Activity volume         |
+| Negotiated rate / caps | same                        | Device capability hints |
 
 `iw ... station dump` needs root. **Do not give the web app root.** Use a
 sidecar (systemd timer, every ~10s) that writes a world-readable snapshot
@@ -72,11 +72,11 @@ reads. Keeps privilege out of the request path and stays pluggable.
 ### D. DHCP fingerprinting — dnsmasq logs
 dnsmasq already has `log-dhcp` on. Parseable from the journal:
 
-| Field | Source | Notes |
-|---|---|---|
-| Option 55 (param request list) | DHCP DISCOVER/REQUEST | Fingerbank-style OS fingerprint |
-| Option 60 (vendor class) | DHCP | e.g. `android-dhcp-14`, `MSFT 5.0` |
-| Option 12 (hostname) | DHCP | Same as lease hostname |
+| Field                          | Source                | Notes                              |
+| ------------------------------ | --------------------- | ---------------------------------- |
+| Option 55 (param request list) | DHCP DISCOVER/REQUEST | Fingerbank-style OS fingerprint    |
+| Option 60 (vendor class)       | DHCP                  | e.g. `android-dhcp-14`, `MSFT 5.0` |
+| Option 12 (hostname)           | DHCP                  | Same as lease hostname             |
 
 ### E. Captive-portal probe correlation — dnsmasq query log
 Which OS probe host the device hit first confirms platform:
