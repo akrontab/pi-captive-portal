@@ -7,6 +7,13 @@ upstream — this is a walled garden, not a gateway.
 **Network:** `192.168.4.0/24`, Pi at `192.168.4.1`
 **Radio:** built-in `wlan0`, 2.4 GHz
 
+> **The actual deployed rig differs from this generic guide.** It's a **Raspberry
+> Pi 2 Model B** (no built-in Wi-Fi) running **Trixie armhf (32-bit)**, with the
+> AP radio on a **USB `rt2800usb` adapter** (`wlan0`). Everything below still
+> applies — `wlan0` is `wlan0` either way — but that adapter can't beacon more
+> than one BSS, which is why multi-SSID is parked; see
+> `docs/multi-ssid-adapter-upgrade.md`.
+
 Do this over Ethernet or a directly attached keyboard. You will take `wlan0`
 away from NetworkManager partway through, and if that is your only link you
 will lose the box.

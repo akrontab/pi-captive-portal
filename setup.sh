@@ -37,6 +37,14 @@ SSID_ROTATE="${SSID_ROTATE:-1}"
 SSID_ROTATE_INTERVAL="${SSID_ROTATE_INTERVAL:-2min}"
 SSID_BAIT_COUNT="${SSID_BAIT_COUNT:-7}"
 
+# Portal subnet as CIDR (network address / prefix), derived from PORTAL_IP+PREFIX.
+# Used to let the guestbook dump endpoint be reached from portal clients.
+IFS=. read -r _a _b _c _d <<<"$PORTAL_IP"
+_ipn=$(( (_a<<24)|(_b<<16)|(_c<<8)|_d ))
+_maskn=$(( (0xFFFFFFFF << (32 - PREFIX)) & 0xFFFFFFFF ))
+_netn=$(( _ipn & _maskn ))
+PORTAL_NET="$(( (_netn>>24)&255 )).$(( (_netn>>16)&255 )).$(( (_netn>>8)&255 )).$(( _netn&255 ))/${PREFIX}"
+
 # ── render: expand @TOKEN@ placeholders from portal.env into a file ────────────
 render() {
   local src="$1" dst="$2"
@@ -239,10 +247,12 @@ RLZONE
   # Fill the @GUESTBOOK_BLOCK@ slot: a proxy location when enabled, else nothing.
   local gb=""
   if [[ "$GUESTBOOK" == "1" ]]; then
-    # Exact-match locations win over the /guestbook prefix. sign is rate-limited;
-    # dump (captured fingerprint data) is restricted to localhost so conference
-    # attendees can't scrape everyone's MACs/hostnames (pull via -PullGuestbook).
-    gb=$'    location = /guestbook/sign {\n        limit_req zone=portal_sign burst=10 nodelay;\n        proxy_pass http://127.0.0.1:8080;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    }\n    location = /guestbook/dump {\n        allow 127.0.0.1;\n        allow ::1;\n        deny all;\n        proxy_pass http://127.0.0.1:8080;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    }\n    location /guestbook {\n        proxy_pass http://127.0.0.1:8080;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    }'
+    # Exact-match locations win over the /guestbook prefix. sign is rate-limited.
+    # dump (captured fingerprint data) is reachable from localhost and the portal
+    # network (${PORTAL_NET}); denied to everything else. NOTE: this deliberately
+    # lets any client on the portal Wi-Fi pull every visitor's MAC/hostname/UA.
+    # Off the portal net, pull it with `deploy.ps1 -PullJson` / `-PullGuestbook`.
+    gb=$'    location = /guestbook/sign {\n        limit_req zone=portal_sign burst=10 nodelay;\n        proxy_pass http://127.0.0.1:8080;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    }\n    location = /guestbook/dump {\n        allow 127.0.0.1;\n        allow ::1;\n        allow '"${PORTAL_NET}"$';\n        deny all;\n        proxy_pass http://127.0.0.1:8080;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    }\n    location /guestbook {\n        proxy_pass http://127.0.0.1:8080;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    }'
   fi
   awk -v blk="$gb" '{ if ($0=="@GUESTBOOK_BLOCK@") { if (blk!="") print blk } else print }' \
     /etc/nginx/sites-available/portal > /etc/nginx/sites-available/portal.new

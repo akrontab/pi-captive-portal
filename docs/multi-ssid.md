@@ -1,5 +1,13 @@
 # Multi-SSID + bait rotation
 
+> **Parked — does not work on the deployed adapter (2026-09-13).** The Pi's USB
+> `rt2800usb` only ever beacons the **primary** BSS; the bait `wlan0_N`
+> interfaces come up but never transmit, so from the air you see only `Portal`.
+> The live `portal.env` therefore ships with `SSID_ROTATE=0` and
+> `SSID_BAIT_COUNT=0` (single stable SSID). The plumbing below is correct and
+> should light up once a multi-BSS-capable radio is fitted — full write-up and
+> recommended adapters in **`docs/multi-ssid-adapter-upgrade.md`**.
+
 Broadcast several Wi-Fi SSIDs from the one radio, and (optionally) reshuffle the
 "bait" set on a timer. The rt2800usb USB adapter advertises `#{AP,mesh}<=8,
 #channels<=1`, so up to **8 BSSes total on one channel** — the stable primary
@@ -20,13 +28,15 @@ Broadcast several Wi-Fi SSIDs from the one radio, and (optionally) reshuffle the
 The primary "Portal" BSS is the interface stanza, so it is never rotated — only
 the bait `bss=` blocks are rewritten. hostapd has no runtime add/remove-BSS, so a
 reshuffle restarts hostapd, which briefly drops **all** clients (primary
-included). Keep `SSID_ROTATE_INTERVAL` generous (default 15min).
+included), so keep the interval long. The shipped default is `2min`, which is
+too aggressive for restart-based rotation — raise it (or leave rotation off, as
+the live config does) once the feature has working hardware.
 
 ## Configure (`portal.env`)
 ```
 SSID=Portal                  # the stable primary (never rotates)
 SSID_ROTATE=1                # 1 = reshuffle baits on a timer; 0 = static set
-SSID_ROTATE_INTERVAL=15min   # systemd time: 30s, 5min, 1h, ...
+SSID_ROTATE_INTERVAL=2min    # systemd time: 30s, 5min, 1h, ...  (raise this)
 SSID_BAIT_COUNT=7            # baits broadcast at once (max 7)
 ```
 Put the bait names in **`ssids.txt`** (copy `ssids.txt.example`), one per line,

@@ -20,6 +20,9 @@ DB_PATH     = os.environ.get("GUESTBOOK_DB", "/var/lib/portal/guestbook.db")
 MAX_NAME    = int(os.environ.get("GUESTBOOK_MAX_NAME", "40"))
 MAX_MESSAGE = int(os.environ.get("GUESTBOOK_MAX_MESSAGE", "500"))
 SHOW_LIMIT  = int(os.environ.get("GUESTBOOK_SHOW_LIMIT", "200"))
+# Global "visitors since 1997" nixie counter: shared across all clients, and
+# wraps back to 0 once it reaches this limit (the 420 easter egg).
+COUNTER_LIMIT = int(os.environ.get("PORTAL_COUNTER_LIMIT", "420"))
 LEASES      = os.environ.get("DNSMASQ_LEASES", "/var/lib/misc/dnsmasq.leases")
 STATIONS    = os.environ.get("PORTAL_STATIONS", "/run/portal/stations.json")
 
@@ -192,6 +195,13 @@ def init_db():
         cols = [r[1] for r in conn.execute("PRAGMA table_info(entries)")]
         if "meta" not in cols:
             conn.execute("ALTER TABLE entries ADD COLUMN meta TEXT")
+        # Global visit counter (one row). Shared across every client/session.
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS counters ("
+            "  key TEXT PRIMARY KEY, value INTEGER NOT NULL DEFAULT 0)"
+        )
+        conn.execute(
+            "INSERT OR IGNORE INTO counters (key, value) VALUES ('visits', 0)")
 
 
 init_db()
@@ -236,6 +246,43 @@ def entries():
         count = conn.execute("SELECT COUNT(*) FROM entries").fetchone()[0]
     return jsonify({"count": count, "entries": [dict(r) for r in rows],
                     "server_uptime_s": _server_uptime_s()})
+
+
+@app.route("/guestbook/counter")
+def counter_get():
+    """Current global visit count — display only, no increment.
+
+    Backs the nixie "V1S1T0RS S1NC3 1997" readout on the portal page so every
+    client sees the same shared number (not a per-browser localStorage tally).
+    """
+    with get_db() as conn:
+        row = conn.execute(
+            "SELECT value FROM counters WHERE key='visits'").fetchone()
+    return jsonify({"count": row[0] if row else 0, "limit": COUNTER_LIMIT})
+
+
+@app.route("/guestbook/counter/bump", methods=["POST"])
+def counter_bump():
+    """Atomically increment the global counter; wrap to 0 at COUNTER_LIMIT.
+
+    SQLite serialises writers, and Python's sqlite3 holds the write lock from
+    the first UPDATE until commit, so the UPDATE+SELECT below is atomic even
+    across gunicorn workers: each caller reads back its own increment. When the
+    count reaches the limit we report that value once (with reset=True, which
+    fires the 420 easter egg client-side) and roll the stored value back to 0.
+    """
+    with get_db() as conn:
+        conn.execute(
+            "INSERT OR IGNORE INTO counters (key, value) VALUES ('visits', 0)")
+        conn.execute(
+            "UPDATE counters SET value = value + 1 WHERE key='visits'")
+        val = conn.execute(
+            "SELECT value FROM counters WHERE key='visits'").fetchone()[0]
+        reset = val >= COUNTER_LIMIT
+        if reset:
+            val = COUNTER_LIMIT
+            conn.execute("UPDATE counters SET value = 0 WHERE key='visits'")
+    return jsonify({"count": val, "reset": reset, "limit": COUNTER_LIMIT})
 
 
 @app.route("/guestbook/sign", methods=["POST"])

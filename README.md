@@ -64,6 +64,38 @@ notepad portal.env            # set PI_HOST/PI_USER, SSID, WPA_PASSPHRASE, etc.
 Run with no arguments for a menu (full deploy / push page / push guestbook /
 pull posts / rollback), or pass a switch directly to skip it.
 
+### Pi prerequisites (one-time)
+
+`deploy.ps1` drives the Pi over a **non-interactive** SSH session, so the Pi has
+to admit it with no prompts of any kind:
+
+- **SSH key auth for the deploy target.** `~/.ssh/pi-captive-portal` (ed25519) is
+  the Pi's key; `~/.ssh/config` must offer it for the exact `PI_HOST` you set in
+  `portal.env`. The `Host` line has to list that host/IP verbatim:
+
+  ```
+  Host pi.local pi-portal 192.168.40.233
+      User pi
+      IdentityFile ~/.ssh/pi-captive-portal
+      IdentitiesOnly yes
+  ```
+
+  If `PI_HOST` is an IP that isn't on that line, SSH never offers the key and the
+  deploy dies with `Permission denied (publickey)` — password auth is off on the
+  Pi (see `docs/security-hardening.md`).
+
+- **Passwordless sudo.** `setup.sh` and the page/guestbook pushes run `sudo` over
+  that non-interactive session, which has no terminal to type a sudo password into
+  (`sudo: a terminal is required to read the password`). Enable it once, from an
+  interactive shell — enter the `pi` password when prompted:
+
+  ```bash
+  ssh -t pi@<host> "echo 'pi ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/011_pi-nopasswd >/dev/null && sudo chmod 440 /etc/sudoers.d/011_pi-nopasswd && sudo visudo -cf /etc/sudoers.d/011_pi-nopasswd"
+  ```
+
+  It should end `parsed OK`. Why this is acceptable under the conference threat
+  model: `docs/security-hardening.md` → *SSH & sudo*.
+
 Overrides and rollback:
 
 ```powershell
@@ -113,13 +145,17 @@ To disable later: set `GUESTBOOK=0` and re-run `.\deploy.ps1`, or
 ### Pulling the posts off the Pi
 
 ```powershell
-.\deploy.ps1 -PullGuestbook                    # -> guestbook-YYYYMMDD-HHmmss.csv
+.\deploy.ps1 -PullGuestbook                    # CSV  -> guestbook-YYYYMMDD-HHmmss.csv
 .\deploy.ps1 -PullGuestbook -OutFile posts.csv # custom path
+.\deploy.ps1 -PullJson                         # JSON -> guestbook-YYYYMMDD-HHmmss.json
+.\deploy.ps1 -PullJson -OutFile posts.json     # custom path
 ```
 
-Reads the DB through SQLite (so WAL entries aren't missed) with `sudo`, writes a
-UTF-8 CSV (`id, created_at, name, message`) and pulls it back. Exports are
-git-ignored. If you'd rather grab the raw database file for backup:
+`-PullGuestbook` reads the DB through SQLite (so WAL entries aren't missed) with
+`sudo`, writes a UTF-8 CSV (`id, created_at, name, message`) and pulls it back.
+`-PullJson` curls the `/guestbook/dump` endpoint on the Pi (via localhost, so it
+works regardless of client-network rules) and pulls the JSON — every entry with
+its full captured `meta` block. Both are git-ignored. If you'd rather grab the raw database file for backup:
 
 ```powershell
 ssh pi@raspberrypi.local "sudo cp /var/lib/portal/guestbook.db /tmp/gb.db && sudo chmod 644 /tmp/gb.db"
@@ -136,8 +172,12 @@ http://192.168.4.1/guestbook/dump             # JSON
 http://192.168.4.1/guestbook/dump?format=csv  # CSV download
 ```
 
-No auth — anyone on the isolated portal network can hit it. That's fine for this
-walled-garden LAN; don't expose the endpoint to an untrusted network.
+No auth — **anyone on the portal Wi-Fi (`192.168.4.0/24`) can hit it**, by
+design (`setup.sh` allows the portal subnet + localhost, denies everything else).
+That means each connected client can pull *every* visitor's captured
+fingerprint data (MACs, hostnames, UAs). If that's not what you want at a hostile
+event, lock it back to localhost in `configure_nginx` and pull with `-PullJson` /
+`-PullGuestbook` instead — see `docs/security-hardening.md`.
 
 Requires the Windows OpenSSH client (`ssh`, `scp`) — bundled with Windows 10/11;
 enable via *Settings > System > Optional features* if missing.

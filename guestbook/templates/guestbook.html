@@ -46,7 +46,11 @@
       background: #1a1a5a; border: 2px ridge #00ffff;
       padding: .7rem 1rem; margin: .6rem auto; max-width: 36rem;
       text-align: left;
+      /* Keep the page's Comic Sans nostalgia in the chrome, but render the
+         entries people actually read in a legible stack. */
+      font-family: "Segoe UI", Tahoma, Verdana, Geneva, system-ui, sans-serif;
     }
+    .entry .msg { line-height: 1.55; font-size: 1.02rem; }
     .entry .who { color: #00ff00; font-weight: bold; }
     .entry .when { color: #aaaaaa; font-size: .8rem; float: right; }
     .entry .msg { color: #ffffff; margin-top: .4rem; white-space: pre-wrap;

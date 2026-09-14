@@ -1,4 +1,4 @@
-# Guestbook metadata capture — design spec (NOT YET IMPLEMENTED)
+# Guestbook metadata capture — design spec (v1 IMPLEMENTED)
 
 Goal: alongside each guestbook post, silently record as much identifying /
 fingerprinting information about the poster's device as the captive AP can see,

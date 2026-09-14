@@ -19,6 +19,8 @@
   Push only guestbook/* to /opt/guestbook and restart the service.
 .PARAMETER PullGuestbook
   Export all guestbook posts from the Pi to a local CSV.
+.PARAMETER PullJson
+  Export all guestbook posts (incl. captured meta) from the Pi to a local JSON.
 .PARAMETER OutFile
   Destination for -PullGuestbook (default: guestbook-<timestamp>.csv).
 .PARAMETER PiHost
@@ -32,6 +34,8 @@
 .EXAMPLE
   .\deploy.ps1 -PullGuestbook -OutFile posts.csv
 .EXAMPLE
+  .\deploy.ps1 -PullJson -OutFile posts.json
+.EXAMPLE
   .\deploy.ps1 -Rollback
 #>
 [CmdletBinding()]
@@ -40,6 +44,7 @@ param(
   [switch]$PageOnly,
   [switch]$Guestbook,
   [switch]$PullGuestbook,
+  [switch]$PullJson,
   [string]$OutFile,
   [string]$PiHost,
   [string]$PiUser
@@ -59,8 +64,9 @@ if ($PSBoundParameters.Count -eq 0) {
   Write-Host "  1) Full deploy        (install / reconfigure on the Pi)"
   Write-Host "  2) Push page only     (www/* -> /var/www/portal)"
   Write-Host "  3) Push guestbook     (guestbook/* -> /opt/guestbook + restart)"
-  Write-Host "  4) Pull guestbook     (export posts -> local CSV)"
-  Write-Host "  5) Rollback           (undo portal, hand wlan0 back)"
+  Write-Host "  4) Pull guestbook CSV (export posts -> local CSV)"
+  Write-Host "  5) Pull guestbook JSON (export posts + meta -> local JSON)"
+  Write-Host "  6) Rollback           (undo portal, hand wlan0 back)"
   Write-Host "  Q) Quit"
   Write-Host ""
   switch (Read-Host "  Choose") {
@@ -68,7 +74,8 @@ if ($PSBoundParameters.Count -eq 0) {
     '2'     { $PageOnly = $true }
     '3'     { $Guestbook = $true }
     '4'     { $PullGuestbook = $true }
-    '5'     { $Rollback = $true }
+    '5'     { $PullJson = $true }
+    '6'     { $Rollback = $true }
     'q'     { Write-Host "  Bye." -ForegroundColor DarkGray; exit 0 }
     default { Fail "Unknown choice." }
   }
@@ -235,6 +242,25 @@ print(con.execute("SELECT COUNT(*) FROM entries").fetchone()[0])
   & ssh $target "rm -f /tmp/guestbook_export.csv" | Out-Null
 
   Write-Host "`nPulled $count entries -> $OutFile" -ForegroundColor Green
+  exit 0
+}
+
+# --- Pull all guestbook entries as JSON (via the /guestbook/dump endpoint) ----
+if ($PullJson) {
+  if (-not $OutFile) {
+    $OutFile = Join-Path $scriptDir ("guestbook-{0:yyyyMMdd-HHmmss}.json" -f (Get-Date))
+  }
+  Write-Host "Fetching guestbook JSON from the Pi..." -ForegroundColor Cyan
+  # curl the dump on the Pi via localhost (always allowed, whatever nginx allows
+  # for client networks), then scp the file back verbatim so PowerShell never
+  # re-encodes the JSON.
+  & ssh $target "curl -fsS http://127.0.0.1/guestbook/dump -o /tmp/guestbook_dump.json"
+  if ($LASTEXITCODE -ne 0) { Fail "Fetching the dump on the Pi failed (exit $LASTEXITCODE). Is the guestbook installed?" }
+  & scp -q "${target}:/tmp/guestbook_dump.json" $OutFile
+  if ($LASTEXITCODE -ne 0) { Fail "scp of the JSON dump failed (exit $LASTEXITCODE)." }
+  & ssh $target "rm -f /tmp/guestbook_dump.json" | Out-Null
+
+  Write-Host "`nSaved JSON -> $OutFile" -ForegroundColor Green
   exit 0
 }
 

@@ -1,7 +1,15 @@
 # Session handoff — pi-captive-portal
 
 Written 2026-09-11 at the end of a session where command execution got blocked
-(see "Safety classifier" at the bottom). Read this first in a fresh session.
+(see "Safety classifier" at the bottom).
+
+> **SUPERSEDED (2026-09-13).** The work this handoff hands off is **done**: device
+> fingerprinting was committed (`2eec507`) and deployed, and multi-SSID landed and
+> was then parked on a hardware limit (`docs/multi-ssid-adapter-upgrade.md`). This
+> file is kept for the safety-classifier write-up and as a record; treat
+> `README.md` + `docs/security-hardening.md` as the current source of truth, and
+> note the two corrections inline below. The "Uncommitted changes" and "Do this in
+> the fresh session" sections are historical — that work is already merged.
 
 ## TL;DR
 - The captive portal **is deployed and running** on the Pi — but it's the
@@ -17,10 +25,15 @@ Written 2026-09-11 at the end of a session where command execution got blocked
   (route metric 100). `wlan0` is a USB **rt2800usb** adapter (the AP radio).
 - **SSH key auth is set up**: `~/.ssh/pi-captive-portal` (ed25519), and
   `~/.ssh/config` has a `Host pi.local pi-portal` block → `ssh pi.local` just works.
-- **sudo needs a password** (passwordless sudo was intentionally NOT enabled).
-  It's the password you set in Raspberry Pi Imager. `deploy.ps1`'s sudo step will
-  prompt once when you run it interactively — that's expected.
-- OS: Raspberry Pi OS Lite **Trixie armhf** (32-bit).
+- **Passwordless sudo is now the chosen model** (corrected 2026-09-13; this doc
+  originally said the opposite). `deploy.ps1` runs `sudo` over a non-interactive
+  SSH session that can't answer a prompt, so `pi` gets `NOPASSWD` via
+  `/etc/sudoers.d/011_pi-nopasswd`. Setup one-liner: README → *Pi prerequisites*;
+  rationale: `docs/security-hardening.md` → *SSH & sudo*. (SSH password auth is
+  also now off — key-only.)
+- OS: Raspberry Pi OS Lite **Trixie armhf** (32-bit). **Host: Raspberry Pi 2
+  Model B** — no built-in Wi-Fi; the AP radio is the USB `rt2800usb`
+  (field-confirmed 2026-09-13, `docs/multi-ssid-adapter-upgrade.md`).
 
 ## Portal facts (already live)
 - AP SSID **`Portal`** (open), channel 6, Pi at **192.168.4.1**, DHCP .50–.150.
