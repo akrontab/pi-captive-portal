@@ -34,8 +34,21 @@ source "$ENV_FILE"
 WPA_PASSPHRASE="${WPA_PASSPHRASE:-}"
 GUESTBOOK="${GUESTBOOK:-0}"
 SSID_ROTATE="${SSID_ROTATE:-1}"
-SSID_ROTATE_INTERVAL="${SSID_ROTATE_INTERVAL:-2min}"
+# Each rotation restarts hostapd, which briefly drops ALL clients (Portal too),
+# so keep this generous. Baits are decoration; they don't need to churn fast.
+SSID_ROTATE_INTERVAL="${SSID_ROTATE_INTERVAL:-1h}"
 SSID_BAIT_COUNT="${SSID_BAIT_COUNT:-7}"
+# Passwordless sudo for the deploy user (deploy.ps1 runs sudo over a
+# non-interactive SSH session with no TTY). 1 = install the NOPASSWD drop-in.
+NOPASSWD_SUDO="${NOPASSWD_SUDO:-1}"
+# Probe-request logger (monitor mode) — OFF by default; needs a DEDICATED second
+# radio (the AP radio can't also monitor). See docs/probe-logging.md.
+PROBE_LOG="${PROBE_LOG:-0}"
+MONITOR_IF="${MONITOR_IF:-wlan1}"
+PROBE_CHANNELS="${PROBE_CHANNELS:-1,6,11}"
+PROBE_HOP="${PROBE_HOP:-1}"
+PROBE_HOP_INTERVAL="${PROBE_HOP_INTERVAL:-0.5}"
+PROBE_COMMIT_INTERVAL="${PROBE_COMMIT_INTERVAL:-5}"
 
 # Portal subnet as CIDR (network address / prefix), derived from PORTAL_IP+PREFIX.
 # Used to let the guestbook dump endpoint be reached from portal clients.
@@ -65,8 +78,12 @@ render() {
 install_packages() {
   echo "[1/9] Installing packages..."
   apt-get update -qq
+  # iw: needed to manage/inspect the radio (AP-mode verify, and the multi-SSID
+  # rotate/cleanup that deletes orphaned wlan0_N bait VIFs). Kept in the base set
+  # so multi-SSID works independently of the optional guestbook.
+  # tcpdump: kernel-BPF probe-request capture for the optional probe logger.
   DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
-    hostapd dnsmasq nginx-light iptables iptables-persistent python3
+    hostapd dnsmasq nginx-light iptables iptables-persistent python3 iw tcpdump
   systemctl unmask hostapd
   systemctl stop hostapd dnsmasq nginx 2>/dev/null || true
 }
@@ -152,6 +169,16 @@ SSIDENV
   cp -f "${SCRIPT_DIR}/ssid/portal-ssid-rotate.timer"   /etc/systemd/system/portal-ssid-rotate.timer
   sed -i "s|^OnUnitActiveSec=.*|OnUnitActiveSec=${SSID_ROTATE_INTERVAL}|" \
     /etc/systemd/system/portal-ssid-rotate.timer
+
+  # Reap orphaned bait VIFs (wlan0_N) before every hostapd start. hostapd creates
+  # them but never deletes them, so without this they pile up across restarts.
+  # '-' ignores errors (e.g. nothing to remove); runs as root with hostapd.
+  mkdir -p /etc/systemd/system/hostapd.service.d
+  cat > /etc/systemd/system/hostapd.service.d/portal-cleanup.conf <<'DROPIN'
+[Service]
+ExecStartPre=-/usr/bin/python3 /opt/portal-ssid-rotate.py --cleanup-only
+DROPIN
+
   systemctl daemon-reload
 
   if [[ "$SSID_ROTATE" == "1" && "$n_pool" -gt 0 ]]; then
@@ -313,7 +340,75 @@ start_services() {
   systemctl --no-pager --lines=0 status hostapd dnsmasq nginx || true
 }
 
+install_sudoers() {
+  echo "[0/9] Passwordless sudo for the deploy user..."
+  # deploy.ps1 runs `sudo` over a non-interactive SSH session that has no TTY to
+  # type a password into. Grant NOPASSWD to the invoking user so every deploy
+  # after the first (which is interactive via `ssh -t`) runs unattended. Opt out
+  # with NOPASSWD_SUDO=0 in portal.env.
+  local u="${SUDO_USER:-${DEPLOY_USER:-}}"
+  if [[ -z "$u" || "$u" == "root" ]]; then
+    echo "      skipped: no non-root deploy user detected (SUDO_USER unset)."
+    return 0
+  fi
+  local f=/etc/sudoers.d/011_pi-nopasswd
+  local tmp; tmp="$(mktemp)"
+  printf '%s ALL=(ALL) NOPASSWD: ALL\n' "$u" > "$tmp"
+  # Validate BEFORE installing — a bad sudoers file can lock you out of sudo.
+  if visudo -cf "$tmp" >/dev/null 2>&1; then
+    install -m 440 -o root -g root "$tmp" "$f"
+    echo "      enabled for '${u}' (${f})"
+  else
+    echo "ERROR: generated sudoers file failed visudo validation; not installed." >&2
+  fi
+  rm -f "$tmp"
+}
+
+install_probe() {
+  echo "[8b/9] Probe-request logger (monitor mode)..."
+  if [[ "$PROBE_LOG" != "1" ]]; then
+    # Disabled: tear down any prior install so toggling PROBE_LOG=0 is clean.
+    systemctl disable --now portal-probe-logger.service 2>/dev/null || true
+    rm -f /etc/systemd/system/portal-probe-logger.service /opt/portal-probe-logger.py \
+          /etc/portal-probe.env /etc/NetworkManager/conf.d/99-portal-probe-unmanaged.conf
+    systemctl daemon-reload
+    echo "      probe logging: OFF (PROBE_LOG=0)"
+    return 0
+  fi
+  if [[ "$MONITOR_IF" == "$WLAN_IF" ]]; then
+    echo "ERROR: MONITOR_IF ('$MONITOR_IF') must differ from the AP's WLAN_IF" >&2
+    echo "       ('$WLAN_IF'). Probe logging needs its own radio; skipping." >&2
+    return 0
+  fi
+
+  cat > /etc/portal-probe.env <<PROBEENV
+MONITOR_IF=${MONITOR_IF}
+PROBE_DB=/var/lib/portal/probes.db
+PROBE_CHANNELS=${PROBE_CHANNELS}
+PROBE_HOP=${PROBE_HOP}
+PROBE_HOP_INTERVAL=${PROBE_HOP_INTERVAL}
+PROBE_COMMIT_INTERVAL=${PROBE_COMMIT_INTERVAL}
+PROBEENV
+  chmod 600 /etc/portal-probe.env
+  install -m 755 "${SCRIPT_DIR}/probe/portal-probe-logger.py" /opt/portal-probe-logger.py
+
+  # Keep the monitor radio out of NetworkManager's hands (like the AP radio).
+  cat > /etc/NetworkManager/conf.d/99-portal-probe-unmanaged.conf <<NMCONF
+[keyfile]
+unmanaged-devices=interface-name:${MONITOR_IF}
+NMCONF
+  systemctl reload NetworkManager 2>/dev/null || true
+
+  cp -f "${SCRIPT_DIR}/probe/portal-probe-logger.service" \
+    /etc/systemd/system/portal-probe-logger.service
+  systemctl daemon-reload
+  systemctl enable --now portal-probe-logger.service
+  echo "      probe logging: ON, monitor=${MONITOR_IF} channels=${PROBE_CHANNELS}"
+  echo "      view: sudo python3 /opt/portal-probe-logger.py --report"
+}
+
 do_install() {
+  [[ "$NOPASSWD_SUDO" == "1" ]] && install_sudoers
   install_packages
   radio_country
   nm_unmanage
@@ -323,6 +418,7 @@ do_install() {
   configure_dnsmasq
   configure_portal_page
   [[ "$GUESTBOOK" == "1" ]] && install_guestbook
+  install_probe
   configure_nginx
   configure_firewall
   start_services
@@ -343,6 +439,15 @@ do_rollback() {
   rm -f /etc/systemd/system/portal-ssid-rotate.service /etc/systemd/system/portal-ssid-rotate.timer
   rm -f /opt/portal-ssid-rotate.py /etc/portal-ssid.env /etc/portal-ssids.txt
   rm -f /etc/hostapd/hostapd.base.conf
+  rm -f /etc/systemd/system/hostapd.service.d/portal-cleanup.conf
+  rmdir /etc/systemd/system/hostapd.service.d 2>/dev/null || true
+  systemctl disable --now portal-probe-logger.service 2>/dev/null || true
+  rm -f /etc/systemd/system/portal-probe-logger.service /opt/portal-probe-logger.py
+  rm -f /etc/portal-probe.env /etc/NetworkManager/conf.d/99-portal-probe-unmanaged.conf
+  # /var/lib/portal/probes.db is left in place (like the guestbook DB).
+  # Undo the passwordless-sudo drop-in this setup installed (deploy infra, not
+  # portal runtime — a fresh `setup.sh install` re-adds it via `ssh -t`).
+  rm -f /etc/sudoers.d/011_pi-nopasswd
   # /opt/guestbook and /var/lib/portal (the DB) are left in place on purpose so
   # a rollback never destroys signed entries. Remove them by hand if you mean to.
   systemctl disable --now hostapd dnsmasq 2>/dev/null || true

@@ -12,5 +12,7 @@ ssids.txt
 __pycache__/
 *.pyc
 
-# Guestbook exports pulled from the Pi
+# Data exports pulled from the Pi
 guestbook-*.csv
+guestbook-*.json
+probes-*.csv

@@ -21,8 +21,13 @@
   Export all guestbook posts from the Pi to a local CSV.
 .PARAMETER PullJson
   Export all guestbook posts (incl. captured meta) from the Pi to a local JSON.
+.PARAMETER PullProbes
+  Export captured Wi-Fi probe-request data from the Pi to a local CSV.
+.PARAMETER PullAll
+  Pull both datasets in one go: guestbook JSON + probes CSV (ignores -OutFile,
+  uses default timestamped names for each).
 .PARAMETER OutFile
-  Destination for -PullGuestbook (default: guestbook-<timestamp>.csv).
+  Destination for a single -Pull* export (default: <dataset>-<timestamp>.<ext>).
 .PARAMETER PiHost
   Override PI_HOST from portal.env.
 .PARAMETER PiUser
@@ -36,6 +41,10 @@
 .EXAMPLE
   .\deploy.ps1 -PullJson -OutFile posts.json
 .EXAMPLE
+  .\deploy.ps1 -PullProbes -OutFile probes.csv
+.EXAMPLE
+  .\deploy.ps1 -PullAll
+.EXAMPLE
   .\deploy.ps1 -Rollback
 #>
 [CmdletBinding()]
@@ -45,6 +54,8 @@ param(
   [switch]$Guestbook,
   [switch]$PullGuestbook,
   [switch]$PullJson,
+  [switch]$PullProbes,
+  [switch]$PullAll,
   [string]$OutFile,
   [string]$PiHost,
   [string]$PiUser
@@ -66,7 +77,9 @@ if ($PSBoundParameters.Count -eq 0) {
   Write-Host "  3) Push guestbook     (guestbook/* -> /opt/guestbook + restart)"
   Write-Host "  4) Pull guestbook CSV (export posts -> local CSV)"
   Write-Host "  5) Pull guestbook JSON (export posts + meta -> local JSON)"
-  Write-Host "  6) Rollback           (undo portal, hand wlan0 back)"
+  Write-Host "  6) Pull probe data    (export probe-requests -> local CSV)"
+  Write-Host "  7) Pull ALL data      (guestbook JSON + probes CSV)"
+  Write-Host "  8) Rollback           (undo portal, hand wlan0 back)"
   Write-Host "  Q) Quit"
   Write-Host ""
   switch (Read-Host "  Choose") {
@@ -75,7 +88,9 @@ if ($PSBoundParameters.Count -eq 0) {
     '3'     { $Guestbook = $true }
     '4'     { $PullGuestbook = $true }
     '5'     { $PullJson = $true }
-    '6'     { $Rollback = $true }
+    '6'     { $PullProbes = $true }
+    '7'     { $PullAll = $true }
+    '8'     { $Rollback = $true }
     'q'     { Write-Host "  Bye." -ForegroundColor DarkGray; exit 0 }
     default { Fail "Unknown choice." }
   }
@@ -214,11 +229,9 @@ if ($Guestbook) {
   exit 0
 }
 
-# --- Export guestbook entries from the Pi's SQLite DB to a local CSV ----------
-if ($PullGuestbook) {
-  if (-not $OutFile) {
-    $OutFile = Join-Path $scriptDir ("guestbook-{0:yyyyMMdd-HHmmss}.csv" -f (Get-Date))
-  }
+# --- Data-pull helpers (guestbook CSV/JSON, probe CSV) ------------------------
+# Each connects to the Pi, exports to a temp file there, scp's it back, cleans up.
+function Export-GuestbookCsv([string]$Out) {
   # Read via sqlite3 (through WAL) with sudo, write a temp CSV on the Pi.
   # Passed over stdin to avoid PowerShell/remote quoting pain.
   $py = @'
@@ -236,31 +249,86 @@ print(con.execute("SELECT COUNT(*) FROM entries").fetchone()[0])
   Write-Host "Exporting guestbook entries on the Pi..." -ForegroundColor Cyan
   $count = ($py | & ssh $target "sudo python3 - && sudo chmod 644 /tmp/guestbook_export.csv") | Select-Object -Last 1
   if ($LASTEXITCODE -ne 0) { Fail "Export on the Pi failed (exit $LASTEXITCODE). Is the guestbook installed?" }
-
-  & scp -q "${target}:/tmp/guestbook_export.csv" $OutFile
+  & scp -q "${target}:/tmp/guestbook_export.csv" $Out
   if ($LASTEXITCODE -ne 0) { Fail "scp of the export failed (exit $LASTEXITCODE)." }
   & ssh $target "rm -f /tmp/guestbook_export.csv" | Out-Null
-
-  Write-Host "`nPulled $count entries -> $OutFile" -ForegroundColor Green
-  exit 0
+  Write-Host "Pulled $count guestbook entries -> $Out" -ForegroundColor Green
 }
 
-# --- Pull all guestbook entries as JSON (via the /guestbook/dump endpoint) ----
-if ($PullJson) {
-  if (-not $OutFile) {
-    $OutFile = Join-Path $scriptDir ("guestbook-{0:yyyyMMdd-HHmmss}.json" -f (Get-Date))
-  }
+function Export-GuestbookJson([string]$Out) {
   Write-Host "Fetching guestbook JSON from the Pi..." -ForegroundColor Cyan
   # curl the dump on the Pi via localhost (always allowed, whatever nginx allows
   # for client networks), then scp the file back verbatim so PowerShell never
   # re-encodes the JSON.
   & ssh $target "curl -fsS http://127.0.0.1/guestbook/dump -o /tmp/guestbook_dump.json"
   if ($LASTEXITCODE -ne 0) { Fail "Fetching the dump on the Pi failed (exit $LASTEXITCODE). Is the guestbook installed?" }
-  & scp -q "${target}:/tmp/guestbook_dump.json" $OutFile
+  & scp -q "${target}:/tmp/guestbook_dump.json" $Out
   if ($LASTEXITCODE -ne 0) { Fail "scp of the JSON dump failed (exit $LASTEXITCODE)." }
   & ssh $target "rm -f /tmp/guestbook_dump.json" | Out-Null
+  Write-Host "Saved guestbook JSON -> $Out" -ForegroundColor Green
+}
 
-  Write-Host "`nSaved JSON -> $OutFile" -ForegroundColor Green
+function Export-ProbeData([string]$Out) {
+  # Export the probe DB (probes JOIN devices) to a temp CSV on the Pi via sqlite3.
+  # Degrades gracefully if probe logging was never enabled (no DB / no tables).
+  $py = @'
+import sqlite3, csv, os
+DB = "/var/lib/portal/probes.db"
+OUT = "/tmp/probes_export.csv"
+cols = ["mac", "vendor", "randomized", "ssid", "count",
+        "first_seen", "last_seen", "last_signal"]
+rows, devices = [], 0
+if os.path.exists(DB):
+    con = sqlite3.connect(DB)
+    have = {r[0] for r in con.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+    if "probes" in have and "devices" in have:
+        rows = list(con.execute("""
+            SELECT p.mac, d.vendor, d.randomized, p.ssid, p.count,
+                   p.first_seen, p.last_seen, d.last_signal
+            FROM probes p LEFT JOIN devices d ON d.mac = p.mac
+            ORDER BY p.last_seen DESC, p.mac"""))
+        devices = con.execute("SELECT COUNT(*) FROM devices").fetchone()[0]
+with open(OUT, "w", newline="", encoding="utf-8") as f:
+    w = csv.writer(f)
+    w.writerow(cols)
+    w.writerows(rows)
+print(devices)
+'@
+  Write-Host "Exporting probe data on the Pi..." -ForegroundColor Cyan
+  $count = ($py | & ssh $target "sudo python3 - && sudo chmod 644 /tmp/probes_export.csv") | Select-Object -Last 1
+  if ($LASTEXITCODE -ne 0) { Fail "Probe export on the Pi failed (exit $LASTEXITCODE)." }
+  & scp -q "${target}:/tmp/probes_export.csv" $Out
+  if ($LASTEXITCODE -ne 0) { Fail "scp of the probe export failed (exit $LASTEXITCODE)." }
+  & ssh $target "rm -f /tmp/probes_export.csv" | Out-Null
+  if ([int]$count -eq 0) {
+    Write-Host "Pulled probe data -> $Out (0 devices — is probe logging enabled with a monitor radio?)" -ForegroundColor Yellow
+  } else {
+    Write-Host "Pulled probes for $count devices -> $Out" -ForegroundColor Green
+  }
+}
+
+# --- Pull dispatch ------------------------------------------------------------
+if ($PullGuestbook) {
+  if (-not $OutFile) { $OutFile = Join-Path $scriptDir ("guestbook-{0:yyyyMMdd-HHmmss}.csv" -f (Get-Date)) }
+  Export-GuestbookCsv $OutFile
+  exit 0
+}
+if ($PullJson) {
+  if (-not $OutFile) { $OutFile = Join-Path $scriptDir ("guestbook-{0:yyyyMMdd-HHmmss}.json" -f (Get-Date)) }
+  Export-GuestbookJson $OutFile
+  exit 0
+}
+if ($PullProbes) {
+  if (-not $OutFile) { $OutFile = Join-Path $scriptDir ("probes-{0:yyyyMMdd-HHmmss}.csv" -f (Get-Date)) }
+  Export-ProbeData $OutFile
+  exit 0
+}
+if ($PullAll) {
+  if ($OutFile) { Write-Host "-OutFile is ignored with -PullAll; each dataset gets a default name." -ForegroundColor DarkGray }
+  $ts = "{0:yyyyMMdd-HHmmss}" -f (Get-Date)
+  Export-GuestbookJson (Join-Path $scriptDir "guestbook-$ts.json")
+  Export-ProbeData     (Join-Path $scriptDir "probes-$ts.csv")
+  Write-Host "`nPulled all data." -ForegroundColor Green
   exit 0
 }
 

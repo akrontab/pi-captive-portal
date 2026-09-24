@@ -1,0 +1,14 @@
+[Unit]
+Description=Captive-portal Wi-Fi probe-request logger (monitor mode)
+# Needs a DEDICATED monitor radio (not the AP's). setup.sh only installs+enables
+# this when PROBE_LOG=1 in portal.env. Running it on the AP's radio kills the AP.
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/portal-probe-logger.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

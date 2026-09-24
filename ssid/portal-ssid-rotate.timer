@@ -3,8 +3,9 @@ Description=Periodically reshuffle captive-portal bait SSIDs
 
 [Timer]
 # OnUnitActiveSec is rewritten by setup.sh to SSID_ROTATE_INTERVAL.
+# Restarting hostapd on each rotation drops all clients, so default generous.
 OnBootSec=5min
-OnUnitActiveSec=15min
+OnUnitActiveSec=1h
 AccuracySec=10s
 
 [Install]

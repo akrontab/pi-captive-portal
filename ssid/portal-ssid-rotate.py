@@ -9,6 +9,9 @@ bait set goes live. Run periodically by portal-ssid-rotate.timer to reshuffle.
 Config comes from /etc/portal-ssid.env (KEY=VALUE); real environment variables
 override it. Keys: WLAN_IF, SSID_POOL_FILE, SSID_BAIT_COUNT, PRIMARY_SSID,
 HOSTAPD_BASE, HOSTAPD_CONF. All privileged work runs as root from the timer.
+
+Flags: --no-restart (render the conf but don't bounce hostapd), --cleanup-only
+(just delete leftover <iface>_N bait VIFs and exit; used as hostapd ExecStartPre).
 """
 import os
 import random
@@ -65,6 +68,37 @@ def read_pool(path, primary):
     except FileNotFoundError:
         pass
     return pool
+
+
+def _secondary_ifaces(iface):
+    """Existing hostapd-created secondary VIFs for this radio: <iface>_0, _1 …
+
+    hostapd names extra BSSes `<iface>_N`; it creates them on start but never
+    deletes them on stop, so they pile up across restarts (ifindex climbs into
+    the thousands on a long-lived Pi). Match by the `<iface>_<digits>` shape."""
+    import re
+    pat = re.compile(rf"^{re.escape(iface)}_\d+$")
+    try:
+        return sorted(n for n in os.listdir("/sys/class/net") if pat.match(n))
+    except OSError:
+        return []
+
+
+def cleanup_secondaries(iface):
+    """Delete leftover `<iface>_N` VIFs so a hostapd (re)start builds them fresh.
+
+    Runs before every restart in the rotate path; hostapd also gets an
+    ExecStartPre calling `--cleanup-only` (see setup.sh) so cold starts that
+    don't go through this script are covered too."""
+    removed = []
+    for name in _secondary_ifaces(iface):
+        r = subprocess.run(["iw", "dev", name, "del"],
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if r.returncode == 0:
+            removed.append(name)
+    if removed:
+        print(f"[portal-ssid] removed orphan VIFs: {', '.join(removed)}")
+    return removed
 
 
 def _iface_mac(iface):
@@ -128,8 +162,14 @@ def build_conf(base_text, iface, baits):
 
 
 def main():
-    no_restart = "--no-restart" in sys.argv[1:]
+    args = sys.argv[1:]
+    no_restart = "--no-restart" in args
     cfg = load_config()
+
+    # ExecStartPre hook: just reap orphan VIFs, don't touch the config.
+    if "--cleanup-only" in args:
+        cleanup_secondaries(cfg["WLAN_IF"])
+        return
 
     try:
         count = int(cfg["SSID_BAIT_COUNT"])
@@ -155,6 +195,8 @@ def main():
           f"baits={baits or '(none)'} pool={len(pool)}")
 
     if not no_restart:
+        # Reap the old BSS VIFs first; hostapd rebuilds them from the new conf.
+        cleanup_secondaries(cfg["WLAN_IF"])
         subprocess.run(["systemctl", "restart", "hostapd"], check=False)
 
 

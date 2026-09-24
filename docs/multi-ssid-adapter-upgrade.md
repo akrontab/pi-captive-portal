@@ -88,9 +88,10 @@ The bait plumbing already exists; two architectures:
   Pi 2 caveats: two USB Wi-Fi adapters need a **powered USB hub** (current
   limits), the USB 2.0 bus is shared with Ethernet, and interface names can swap
   on boot — pin them by MAC (systemd `.link`/udev) and set `WLAN_IF` to the AP.
-  The monitor/probe-logging component is net-new (tcpdump/tshark/scapy/Kismet);
-  for baits that mirror what clients probe for (dynamic KARMA) see
-  `hostapd-mana`. Capability background: `docs/radio-capabilities.md`.
+  The monitor/probe-logging component is **now built** (`probe/portal-probe-logger.py`,
+  tcpdump-based; OFF until the monitor radio exists) — see `docs/probe-logging.md`.
+  For baits that mirror what clients probe for (dynamic KARMA) see `hostapd-mana`.
+  Capability background: `docs/radio-capabilities.md`.
 
 ### Probe-listening (KARMA/MANA) + multi-SSID at the same time?
 
@@ -118,11 +119,16 @@ MT7612U for monitor). Verify a candidate with:
 with both `AP` and `monitor`.
 
 Also fix regardless of adapter:
-- **Orphan-interface teardown:** `portal-ssid-rotate.py` creates `wlan0_N` but
-  never deletes them; across restarts they accumulate (seen climbing to
-  ifindex ~5800 on the Pi 2). Add `iw dev wlan0_N del` for each secondary before
-  (re)building/restarting, or an `ExecStartPre` cleanup on the hostapd unit.
-- Revisit `SSID_ROTATE_INTERVAL` default (currently `2min`, far too aggressive)
-  and document the client-drop cost of restart-based rotation.
+- **Orphan-interface teardown:** ✅ **DONE (2026-09-24).** `portal-ssid-rotate.py`
+  gained `cleanup_secondaries()` (deletes every `wlan0_N` VIF via `iw dev … del`)
+  — called before each rotation restart, and exposed as `--cleanup-only`, which
+  `setup.sh` wires into a hostapd `ExecStartPre` drop-in
+  (`/etc/systemd/system/hostapd.service.d/portal-cleanup.conf`) so cold starts
+  reap orphans too. No more ifindex climb across restarts.
+- **Rotation interval:** ✅ **DONE (2026-09-24).** Default moved `2min → 1h`
+  everywhere (`setup.sh`, `portal.env.example`, the timer unit), with the
+  restart-drops-all-clients cost documented inline at each spot. hostapd has no
+  runtime add/remove-BSS, so restart-based rotation is inherently client-dropping
+  — rotate rarely, or (with two radios) rotate only the bait instance.
 
 See also: `docs/multi-ssid.md`, `docs/radio-capabilities.md`.

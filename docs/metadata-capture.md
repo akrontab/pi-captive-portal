@@ -1,4 +1,12 @@
-# Guestbook metadata capture — design spec (v1 IMPLEMENTED)
+# Guestbook metadata capture — design spec (DROPPED)
+
+> **DROPPED (2026-09-24) — no further work.** Device fingerprinting is off the
+> roadmap by decision. None of the deferred layers below (DHCP-option
+> fingerprinting, probe correlation, p0f, a full OUI table, `Accept-CH`) will be
+> built. The already-shipped v1 collector (`collect_metadata()` in
+> `guestbook/app.py` + the `portal-stations` sidecar) remains deployed for now and
+> was **not** ripped out — remove it separately if/when desired. This spec is kept
+> only as a record of intent.
 
 Goal: alongside each guestbook post, silently record as much identifying /
 fingerprinting information about the poster's device as the captive AP can see,

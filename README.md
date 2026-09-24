@@ -86,8 +86,15 @@ to admit it with no prompts of any kind:
 
 - **Passwordless sudo.** `setup.sh` and the page/guestbook pushes run `sudo` over
   that non-interactive session, which has no terminal to type a sudo password into
-  (`sudo: a terminal is required to read the password`). Enable it once, from an
-  interactive shell — enter the `pi` password when prompted:
+  (`sudo: a terminal is required to read the password`). **`setup.sh` now installs
+  this itself** (`/etc/sudoers.d/011_pi-nopasswd` for the invoking user, validated
+  with `visudo -cf`; controlled by `NOPASSWD_SUDO` in `portal.env`). The catch is
+  bootstrap: the *first* `sudo ./setup.sh` still needs a password — `deploy.ps1`
+  handles this by running it over `ssh -t` (interactive), so just enter the `pi`
+  password that once and every deploy after is unattended.
+
+  To enable it up front without a full deploy, run this once from an interactive
+  shell (enter the `pi` password when prompted):
 
   ```bash
   ssh -t pi@<host> "echo 'pi ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/011_pi-nopasswd >/dev/null && sudo chmod 440 /etc/sudoers.d/011_pi-nopasswd && sudo visudo -cf /etc/sudoers.d/011_pi-nopasswd"
@@ -149,13 +156,20 @@ To disable later: set `GUESTBOOK=0` and re-run `.\deploy.ps1`, or
 .\deploy.ps1 -PullGuestbook -OutFile posts.csv # custom path
 .\deploy.ps1 -PullJson                         # JSON -> guestbook-YYYYMMDD-HHmmss.json
 .\deploy.ps1 -PullJson -OutFile posts.json     # custom path
+.\deploy.ps1 -PullProbes                       # CSV  -> probes-YYYYMMDD-HHmmss.csv
+.\deploy.ps1 -PullAll                          # guestbook JSON + probes CSV, both
 ```
 
 `-PullGuestbook` reads the DB through SQLite (so WAL entries aren't missed) with
 `sudo`, writes a UTF-8 CSV (`id, created_at, name, message`) and pulls it back.
 `-PullJson` curls the `/guestbook/dump` endpoint on the Pi (via localhost, so it
 works regardless of client-network rules) and pulls the JSON — every entry with
-its full captured `meta` block. Both are git-ignored. If you'd rather grab the raw database file for backup:
+its full captured `meta` block. `-PullProbes` exports the probe DB
+(`/var/lib/portal/probes.db`, `probes` joined with `devices`) to a CSV — one row
+per `(device, requested SSID)` with vendor, randomized-MAC flag, counts, and
+signal; it degrades to a header-only file if probe logging was never enabled.
+`-PullAll` grabs the guestbook JSON and the probes CSV in one run. All are
+git-ignored. If you'd rather grab the raw database file for backup:
 
 ```powershell
 ssh pi@raspberrypi.local "sudo cp /var/lib/portal/guestbook.db /tmp/gb.db && sudo chmod 644 /tmp/gb.db"
@@ -181,6 +195,71 @@ event, lock it back to localhost in `configure_nginx` and pull with `-PullJson` 
 
 Requires the Windows OpenSSH client (`ssh`, `scp`) — bundled with Windows 10/11;
 enable via *Settings > System > Optional features* if missing.
+
+## Probe logging (optional, needs a second radio)
+
+Passively logs 802.11 probe-requests — each nearby device's MAC and the SSIDs
+it's searching for — on a **dedicated monitor radio** (the AP radio can't also
+monitor). **OFF by default** (`PROBE_LOG=0`); enable it only once a second Wi-Fi
+adapter is present as `MONITOR_IF` (the intended split: AR9271 = AP, rt2800usb =
+monitor). Standalone root daemon (`portal-probe-logger.service`), tcpdump-based
+capture, SQLite at `/var/lib/portal/probes.db`. View with
+`sudo python3 /opt/portal-probe-logger.py --report`. Full write-up and the
+privacy note: `docs/probe-logging.md`.
+
+### When the second radio (AR9271) arrives — do this
+
+The plan: the **AR9271 becomes the AP** (and finally lights up multi-SSID baits),
+and the existing **rt2800usb becomes the probe monitor**. Steps:
+
+1. **Plug it in.** On the Pi 2, run both radios off a **powered USB hub** — two
+   USB Wi-Fi adapters exceed the Pi's own port current budget. Watch for brownout
+   after: `dmesg | grep -i under.voltage`.
+
+2. **Identify the interfaces and which driver is which:**
+   ```sh
+   for i in /sys/class/net/wlan*; do
+     n=$(basename "$i"); echo "$n -> $(readlink -f "$i/device/driver" | sed 's#.*/##') $(cat "$i/address")"
+   done
+   # expect one 'ath9k_htc' (the AR9271, your new AP) and one 'rt2800usb' (monitor)
+   ```
+
+3. **Pin the names by MAC** so `wlanN` can't swap on reboot (it will, otherwise).
+   Create a `.link` file per adapter with its MAC — e.g. AR9271 → `wlan0`,
+   rt2800usb → `wlan1`:
+   ```sh
+   sudo tee /etc/systemd/network/10-ap.link >/dev/null <<'EOF'
+   [Match]
+   MACAddress=aa:bb:cc:dd:ee:ff        # <-- the AR9271's MAC
+   [Link]
+   Name=wlan0
+   EOF
+   # repeat as 11-mon.link with the rt2800usb's MAC and Name=wlan1, then reboot
+   ```
+
+4. **Edit `portal.env`:** point the AP at the AR9271 and turn baits + probe
+   logging on:
+   ```sh
+   WLAN_IF=wlan0            # the AR9271 (the AP radio)
+   SSID_ROTATE=1            # baits can finally beacon on this chip
+   SSID_BAIT_COUNT=7        # AR9271 should do the full 7; verify in step 6
+   PROBE_LOG=1
+   MONITOR_IF=wlan1         # the rt2800usb (must NOT equal WLAN_IF)
+   ```
+   Make sure `ssids.txt` has your bait names (copy `ssid/ssids.txt.example`).
+
+5. **Deploy:** `.\deploy.ps1` (over Ethernet, as always).
+
+6. **Verify:**
+   ```sh
+   /usr/sbin/iw dev wlan0 info | grep type            # expect: type AP
+   sudo journalctl -u hostapd | grep AP-ENABLED       # one line PER bait BSS now
+   # from a phone/laptop: scan and confirm Portal + all baits are visible
+   systemctl status portal-probe-logger
+   sudo python3 /opt/portal-probe-logger.py --report  # devices + probed SSIDs
+   ```
+   If fewer than 7 baits beacon, lower `SSID_BAIT_COUNT` to what the chip
+   actually broadcasts. If a bait fails, check `docs/multi-ssid-adapter-upgrade.md`.
 
 ## Run setup directly on the Pi (no Windows)
 
