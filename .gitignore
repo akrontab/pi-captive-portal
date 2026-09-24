@@ -16,3 +16,6 @@ __pycache__/
 guestbook-*.csv
 guestbook-*.json
 probes-*.csv
+
+# Redundant archive of img/faces/faces_transparent/*.png (kept locally only)
+img/faces/*.zip
