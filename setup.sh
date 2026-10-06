@@ -38,6 +38,9 @@ SSID_ROTATE="${SSID_ROTATE:-1}"
 # so keep this generous. Baits are decoration; they don't need to churn fast.
 SSID_ROTATE_INTERVAL="${SSID_ROTATE_INTERVAL:-1h}"
 SSID_BAIT_COUNT="${SSID_BAIT_COUNT:-7}"
+# 1 = single rotating SSID: one BSS whose name is re-picked from the pool each
+# rotation (for radios that only beacon one BSS). Forces baits off.
+SSID_ROTATE_PRIMARY="${SSID_ROTATE_PRIMARY:-0}"
 # Passwordless sudo for the deploy user (deploy.ps1 runs sudo over a
 # non-interactive SSH session with no TTY). 1 = install the NOPASSWD drop-in.
 NOPASSWD_SUDO="${NOPASSWD_SUDO:-1}"
@@ -45,6 +48,10 @@ NOPASSWD_SUDO="${NOPASSWD_SUDO:-1}"
 # radio (the AP radio can't also monitor). See docs/probe-logging.md.
 PROBE_LOG="${PROBE_LOG:-0}"
 MONITOR_IF="${MONITOR_IF:-wlan1}"
+# Optional MAC->name pinning for multi-radio rigs (see pin_interfaces). Empty =
+# no pinning. Use the BURNED-IN MAC: cat /sys/class/ieee80211/phy*/macaddress
+WLAN_IF_MAC="${WLAN_IF_MAC:-}"
+MONITOR_IF_MAC="${MONITOR_IF_MAC:-}"
 PROBE_CHANNELS="${PROBE_CHANNELS:-1,6,11}"
 PROBE_HOP="${PROBE_HOP:-1}"
 PROBE_HOP_INTERVAL="${PROBE_HOP_INTERVAL:-0.5}"
@@ -76,7 +83,7 @@ render() {
 }
 
 install_packages() {
-  echo "[1/9] Installing packages..."
+  echo "[1/10] Installing packages..."
   apt-get update -qq
   # iw: needed to manage/inspect the radio (AP-mode verify, and the multi-SSID
   # rotate/cleanup that deletes orphaned wlan0_N bait VIFs). Kept in the base set
@@ -89,29 +96,61 @@ install_packages() {
 }
 
 radio_country() {
-  echo "[2/9] Unblocking radio, setting regulatory domain ${COUNTRY}..."
+  echo "[2/10] Unblocking radio, setting regulatory domain ${COUNTRY}..."
   rfkill unblock wlan || true
   if command -v raspi-config >/dev/null 2>&1; then
     raspi-config nonint do_wifi_country "${COUNTRY}" || true
   fi
 }
 
+# ── pin_interfaces: lock each USB radio to a fixed netdev name by its ──────────
+# BURNED-IN MAC, so two dongles never swap wlan0/wlan1 across reboots, USB
+# ports, or a powered hub (we match the hardware MAC, never the fragile USB
+# path). Optional: skipped entirely if no *_IF_MAC is set (single-radio rigs
+# don't need it). Match on PermanentMACAddress, not MACAddress, because hostapd
+# reassigns the AP radio's running MAC to its BSSID at runtime.
+pin_interfaces() {
+  echo "[3/10] Pinning Wi-Fi interface names by MAC..."
+  if [[ -z "${WLAN_IF_MAC}" && -z "${MONITOR_IF_MAC}" ]]; then
+    echo "      (no *_IF_MAC set in portal.env; leaving kernel naming as-is)"
+    return 0
+  fi
+  _pin_one() {  # $1=mac  $2=target ifname  $3=source var name (for the comment)
+    [[ -z "$1" ]] && return 0
+    cat >"/etc/systemd/network/10-${2}-pin.link" <<EOF
+# Pin ${2} to its radio by burned-in MAC — survives reboot / USB reorder / hub.
+# Managed by setup.sh from ${3}=${1} in portal.env; edit there, not here.
+[Match]
+PermanentMACAddress=${1}
+
+[Link]
+Name=${2}
+EOF
+    echo "      ${2} <- ${1}"
+  }
+  _pin_one "${WLAN_IF_MAC}"    "${WLAN_IF}"    "WLAN_IF_MAC"
+  _pin_one "${MONITOR_IF_MAC}" "${MONITOR_IF}" "MONITOR_IF_MAC"
+  # udev applies the rename at device appearance; we don't re-trigger here so a
+  # live AP isn't renamed out from under hostapd. Effective on next reboot.
+  echo "      (effective on next reboot; not renaming live interfaces now)"
+}
+
 nm_unmanage() {
-  echo "[3/9] Marking ${WLAN_IF} unmanaged by NetworkManager..."
+  echo "[4/10] Marking ${WLAN_IF} unmanaged by NetworkManager..."
   render "${SCRIPT_DIR}/config/99-portal-unmanaged.conf.tmpl" \
          /etc/NetworkManager/conf.d/99-portal-unmanaged.conf
   systemctl reload NetworkManager 2>/dev/null || true
 }
 
 static_ip() {
-  echo "[4/9] Static IP ${PORTAL_IP}/${PREFIX} on ${WLAN_IF} via systemd-networkd..."
+  echo "[5/10] Static IP ${PORTAL_IP}/${PREFIX} on ${WLAN_IF} via systemd-networkd..."
   render "${SCRIPT_DIR}/config/10-wlan0-portal.network.tmpl" \
          "/etc/systemd/network/10-${WLAN_IF}-portal.network"
   systemctl enable --now systemd-networkd
 }
 
 configure_hostapd() {
-  echo "[5/9] hostapd (SSID '${SSID}', channel ${CHANNEL})..."
+  echo "[6/10] hostapd (SSID '${SSID}', channel ${CHANNEL})..."
   local sec
   if [[ -n "$WPA_PASSPHRASE" ]]; then
     if (( ${#WPA_PASSPHRASE} < 8 || ${#WPA_PASSPHRASE} > 63 )); then
@@ -153,6 +192,7 @@ configure_ssid() {
 WLAN_IF=${WLAN_IF}
 SSID_POOL_FILE=${pool_dst}
 SSID_BAIT_COUNT=${SSID_BAIT_COUNT}
+SSID_ROTATE_PRIMARY=${SSID_ROTATE_PRIMARY}
 PRIMARY_SSID=${SSID}
 HOSTAPD_BASE=/etc/hostapd/hostapd.base.conf
 HOSTAPD_CONF=/etc/hostapd/hostapd.conf
@@ -183,7 +223,11 @@ DROPIN
 
   if [[ "$SSID_ROTATE" == "1" && "$n_pool" -gt 0 ]]; then
     systemctl enable --now portal-ssid-rotate.timer
-    echo "      rotation: ON every ${SSID_ROTATE_INTERVAL} (${SSID_BAIT_COUNT} of ${n_pool} baits live)"
+    if [[ "$SSID_ROTATE_PRIMARY" == "1" ]]; then
+      echo "      rotation: ON every ${SSID_ROTATE_INTERVAL} (single SSID cycling ${n_pool} names)"
+    else
+      echo "      rotation: ON every ${SSID_ROTATE_INTERVAL} (${SSID_BAIT_COUNT} of ${n_pool} baits live)"
+    fi
   else
     systemctl disable --now portal-ssid-rotate.timer 2>/dev/null || true
     if [[ "$n_pool" -gt 0 ]]; then
@@ -195,7 +239,7 @@ DROPIN
 }
 
 configure_dnsmasq() {
-  echo "[6/9] dnsmasq (DHCP + wildcard DNS)..."
+  echo "[7/10] dnsmasq (DHCP + wildcard DNS)..."
   [[ -f /etc/dnsmasq.conf && ! -f /etc/dnsmasq.conf.orig ]] && \
     mv /etc/dnsmasq.conf /etc/dnsmasq.conf.orig
   render "${SCRIPT_DIR}/config/dnsmasq.conf.tmpl" /etc/dnsmasq.conf
@@ -204,18 +248,23 @@ configure_dnsmasq() {
     echo "      systemd-resolved holds :53 — disabling it"
     systemctl disable --now systemd-resolved || true
   fi
-  # dnsmasq must start after hostapd brings up the carrier and networkd the IP.
+  # dnsmasq starts after hostapd brings up the carrier and networkd the IP.
+  # Wants (not Requires): DHCP must survive hostapd flaps. With Requires, a
+  # hostapd crash-loop blocked dnsmasq from ever starting, and every SSID
+  # rotation (systemctl restart hostapd) tore dnsmasq down and left it dead —
+  # clients then got no lease. Wants keeps dnsmasq serving across restarts;
+  # After= still orders it so the initial bind-interfaces sees wlan0 up.
   mkdir -p /etc/systemd/system/dnsmasq.service.d
   cat > /etc/systemd/system/dnsmasq.service.d/after-hostapd.conf <<'DROPIN'
 [Unit]
 After=hostapd.service
-Requires=hostapd.service
+Wants=hostapd.service
 DROPIN
   systemctl daemon-reload
 }
 
 configure_portal_page() {
-  echo "[7/9] Portal page -> /var/www/portal/..."
+  echo "[8/10] Portal page -> /var/www/portal/..."
   mkdir -p /var/www/portal
   install -m 644 "${SCRIPT_DIR}/www/"* /var/www/portal/
 }
@@ -263,7 +312,7 @@ ENVEOF
 }
 
 configure_nginx() {
-  echo "[8/9] nginx..."
+  echo "[9/10] nginx..."
   rm -f /etc/nginx/sites-enabled/default
   # http-context rate-limit zone (limit_req_zone can't live in a server block).
   cat > /etc/nginx/conf.d/portal-hardening.conf <<'RLZONE'
@@ -290,7 +339,7 @@ RLZONE
 }
 
 configure_firewall() {
-  echo "[9/9] Firewall rules (idempotent via iptables-restore)..."
+  echo "[10/10] Firewall rules (idempotent via iptables-restore)..."
   mkdir -p /etc/iptables
   cat > /etc/iptables/rules.v4 <<RULES
 *nat
@@ -341,7 +390,7 @@ start_services() {
 }
 
 install_sudoers() {
-  echo "[0/9] Passwordless sudo for the deploy user..."
+  echo "[0/10] Passwordless sudo for the deploy user..."
   # deploy.ps1 runs `sudo` over a non-interactive SSH session that has no TTY to
   # type a password into. Grant NOPASSWD to the invoking user so every deploy
   # after the first (which is interactive via `ssh -t`) runs unattended. Opt out
@@ -411,6 +460,7 @@ do_install() {
   [[ "$NOPASSWD_SUDO" == "1" ]] && install_sudoers
   install_packages
   radio_country
+  pin_interfaces
   nm_unmanage
   static_ip
   configure_hostapd
@@ -453,6 +503,7 @@ do_rollback() {
   systemctl disable --now hostapd dnsmasq 2>/dev/null || true
   rm -f /etc/NetworkManager/conf.d/99-portal-unmanaged.conf
   rm -f "/etc/systemd/network/10-${WLAN_IF}-portal.network"
+  rm -f "/etc/systemd/network/10-${WLAN_IF}-pin.link" "/etc/systemd/network/10-${MONITOR_IF}-pin.link"
   rm -f /etc/systemd/system/dnsmasq.service.d/after-hostapd.conf
   rm -f /etc/nginx/sites-enabled/portal
   rm -f /etc/nginx/conf.d/portal-hardening.conf

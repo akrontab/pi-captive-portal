@@ -20,8 +20,9 @@ DB_PATH     = os.environ.get("GUESTBOOK_DB", "/var/lib/portal/guestbook.db")
 MAX_NAME    = int(os.environ.get("GUESTBOOK_MAX_NAME", "40"))
 MAX_MESSAGE = int(os.environ.get("GUESTBOOK_MAX_MESSAGE", "500"))
 SHOW_LIMIT  = int(os.environ.get("GUESTBOOK_SHOW_LIMIT", "200"))
-# Global "visitors since 1997" nixie counter: shared across all clients, and
-# wraps back to 0 once it reaches this limit (the 420 easter egg).
+# Global "visitors since 1997" nixie counter: shared across all clients. It
+# climbs forever (never resets); every multiple of this period fires the goatse
+# easter egg (the 420 gag).
 COUNTER_LIMIT = int(os.environ.get("PORTAL_COUNTER_LIMIT", "420"))
 LEASES      = os.environ.get("DNSMASQ_LEASES", "/var/lib/misc/dnsmasq.leases")
 STATIONS    = os.environ.get("PORTAL_STATIONS", "/run/portal/stations.json")
@@ -263,13 +264,13 @@ def counter_get():
 
 @app.route("/guestbook/counter/bump", methods=["POST"])
 def counter_bump():
-    """Atomically increment the global counter; wrap to 0 at COUNTER_LIMIT.
+    """Atomically increment the global counter; it climbs forever, never resets.
 
     SQLite serialises writers, and Python's sqlite3 holds the write lock from
     the first UPDATE until commit, so the UPDATE+SELECT below is atomic even
-    across gunicorn workers: each caller reads back its own increment. When the
-    count reaches the limit we report that value once (with reset=True, which
-    fires the 420 easter egg client-side) and roll the stored value back to 0.
+    across gunicorn workers: each caller reads back its own increment. Every
+    COUNTER_LIMIT-th visit (multiples of 420) we report goatse=True, which fires
+    the goatse easter egg client-side; the stored count keeps counting up.
     """
     with get_db() as conn:
         conn.execute(
@@ -278,11 +279,8 @@ def counter_bump():
             "UPDATE counters SET value = value + 1 WHERE key='visits'")
         val = conn.execute(
             "SELECT value FROM counters WHERE key='visits'").fetchone()[0]
-        reset = val >= COUNTER_LIMIT
-        if reset:
-            val = COUNTER_LIMIT
-            conn.execute("UPDATE counters SET value = 0 WHERE key='visits'")
-    return jsonify({"count": val, "reset": reset, "limit": COUNTER_LIMIT})
+    goatse = COUNTER_LIMIT > 0 and val % COUNTER_LIMIT == 0
+    return jsonify({"count": val, "goatse": goatse, "limit": COUNTER_LIMIT})
 
 
 @app.route("/guestbook/sign", methods=["POST"])

@@ -1,14 +1,23 @@
 #!/usr/bin/env python3
-"""Render hostapd's live config from a base file + a bait-SSID selection.
+"""Render hostapd's live config from a base file + an SSID selection.
 
-The primary SSID (the stable "Portal") lives in the base config as the first
-BSS. This script appends up to SSID_BAIT_COUNT extra `bss=` stanzas — chosen at
-random from a pool file — and (unless --no-restart) restarts hostapd so the new
-bait set goes live. Run periodically by portal-ssid-rotate.timer to reshuffle.
+Two modes, both driven periodically by portal-ssid-rotate.timer:
+
+* Default (SSID_ROTATE_PRIMARY=0): the primary SSID (the stable "Portal") lives
+  in the base config as the first BSS; this script appends up to
+  SSID_BAIT_COUNT extra `bss=` stanzas chosen at random from a pool file. Needs
+  a radio that can beacon multiple BSSes.
+* Single rotating SSID (SSID_ROTATE_PRIMARY=1): there is ONE BSS whose name is a
+  random pick from the pool, rewritten each run — the broadcast SSID changes on
+  every tick. No baits. This is the mode for radios that only beacon one BSS
+  (both USB radios on hand — rt2800usb and AR9271/ath9k_htc).
+
+Unless --no-restart, it restarts hostapd so the new config goes live.
 
 Config comes from /etc/portal-ssid.env (KEY=VALUE); real environment variables
 override it. Keys: WLAN_IF, SSID_POOL_FILE, SSID_BAIT_COUNT, PRIMARY_SSID,
-HOSTAPD_BASE, HOSTAPD_CONF. All privileged work runs as root from the timer.
+SSID_ROTATE_PRIMARY, HOSTAPD_BASE, HOSTAPD_CONF. All privileged work runs as
+root from the timer.
 
 Flags: --no-restart (render the conf but don't bounce hostapd), --cleanup-only
 (just delete leftover <iface>_N bait VIFs and exit; used as hostapd ExecStartPre).
@@ -20,7 +29,7 @@ import sys
 
 ENV_FILE = os.environ.get("PORTAL_SSID_ENV", "/etc/portal-ssid.env")
 KEYS = ("WLAN_IF", "SSID_POOL_FILE", "SSID_BAIT_COUNT", "PRIMARY_SSID",
-        "HOSTAPD_BASE", "HOSTAPD_CONF")
+        "SSID_ROTATE_PRIMARY", "HOSTAPD_BASE", "HOSTAPD_CONF")
 # rt2800usb tops out at 8 BSSes on one channel; primary is one, so 7 baits max.
 MAX_BAITS = 7
 SSID_MAX_OCTETS = 32
@@ -45,6 +54,7 @@ def load_config():
     cfg.setdefault("SSID_POOL_FILE", "/etc/portal-ssids.txt")
     cfg.setdefault("SSID_BAIT_COUNT", str(MAX_BAITS))
     cfg.setdefault("PRIMARY_SSID", "")
+    cfg.setdefault("SSID_ROTATE_PRIMARY", "0")
     cfg.setdefault("HOSTAPD_BASE", "/etc/hostapd/hostapd.base.conf")
     cfg.setdefault("HOSTAPD_CONF", "/etc/hostapd/hostapd.conf")
     return cfg
@@ -134,6 +144,29 @@ def _bssid_block(mac, n):
     return primary, baits
 
 
+def _set_primary_ssid(base_text, ssid):
+    """Rewrite the primary `ssid=` line in the base config to `ssid`.
+
+    Used by the single-rotating-SSID mode so the one BSS this radio can beacon
+    changes name each run. Falls back to inserting after `interface=` if the
+    base somehow carries no ssid= line."""
+    out, replaced = [], False
+    for line in base_text.split("\n"):
+        if not replaced and line.strip().startswith("ssid="):
+            out.append("ssid=" + ssid)
+            replaced = True
+        else:
+            out.append(line)
+    if not replaced:
+        patched = []
+        for line in out:
+            patched.append(line)
+            if line.strip().startswith("interface="):
+                patched.append("ssid=" + ssid)
+        out = patched
+    return "\n".join(out)
+
+
 def build_conf(base_text, iface, baits):
     base = base_text.rstrip("\n")
     if not baits:
@@ -171,17 +204,27 @@ def main():
         cleanup_secondaries(cfg["WLAN_IF"])
         return
 
-    try:
-        count = int(cfg["SSID_BAIT_COUNT"])
-    except ValueError:
-        count = MAX_BAITS
-    count = max(0, min(count, MAX_BAITS))
-
     with open(cfg["HOSTAPD_BASE"]) as f:
         base_text = f.read()
 
-    pool = read_pool(cfg["SSID_POOL_FILE"], cfg["PRIMARY_SSID"])
-    baits = random.sample(pool, min(count, len(pool))) if (pool and count) else []
+    if cfg.get("SSID_ROTATE_PRIMARY", "0") == "1":
+        # Single rotating SSID: ONE BSS, its name a random pool pick each run.
+        # Don't exclude PRIMARY_SSID — the whole point is to rotate the name.
+        pool = read_pool(cfg["SSID_POOL_FILE"], "")
+        chosen = random.choice(pool) if pool else cfg["PRIMARY_SSID"]
+        base_text = _set_primary_ssid(base_text, chosen)
+        baits = []
+        print(f"[portal-ssid] single rotating SSID -> '{chosen}' (pool={len(pool)})")
+    else:
+        try:
+            count = int(cfg["SSID_BAIT_COUNT"])
+        except ValueError:
+            count = MAX_BAITS
+        count = max(0, min(count, MAX_BAITS))
+        pool = read_pool(cfg["SSID_POOL_FILE"], cfg["PRIMARY_SSID"])
+        baits = random.sample(pool, min(count, len(pool))) if (pool and count) else []
+        print(f"[portal-ssid] primary='{cfg['PRIMARY_SSID']}' "
+              f"baits={baits or '(none)'} pool={len(pool)}")
 
     conf = build_conf(base_text, cfg["WLAN_IF"], baits)
     dst = cfg["HOSTAPD_CONF"]
@@ -190,9 +233,6 @@ def main():
         f.write(conf)
     os.chmod(tmp, 0o600)
     os.replace(tmp, dst)
-
-    print(f"[portal-ssid] primary='{cfg['PRIMARY_SSID']}' "
-          f"baits={baits or '(none)'} pool={len(pool)}")
 
     if not no_restart:
         # Reap the old BSS VIFs first; hostapd rebuilds them from the new conf.

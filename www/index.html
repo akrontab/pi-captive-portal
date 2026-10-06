@@ -317,12 +317,12 @@ $("gbform").addEventListener("submit",function(ev){
 /* ---------- nixie counter + old-internet popups ---------- */
 /* count = the GLOBAL visitor tally from the server (display only); clicks = this
    browser's own click tally, which drives the random-popup cadence. */
-var count=0,clicks=0,nextPop=0;
+var count=0,clicks=0,nextPop=10+Math.floor(Math.random()*4); /* first popup at 10-13 clicks too */
 function drawNixie(){
   var s=String(count).padStart(6,"0"),box=$("nixie");box.innerHTML="";
   for(var i=0;i<s.length;i++){var d=document.createElement("span");d.className="d";d.textContent=s[i];box.appendChild(d);}
 }
-function rollNextPop(){nextPop=clicks+2+Math.floor(Math.random()*4);} /* every 2-5 clicks */
+function rollNextPop(){nextPop=clicks+10+Math.floor(Math.random()*4);} /* every 10-13 clicks */
 function showModal(key){
   $("modalimg").src=IMG[key];$("modalcap").textContent=CAPTIONS[key]||"";
   var m=$("modal");m.hidden=false;
@@ -341,7 +341,7 @@ function bumpCounter(){
     .then(function(r){return r.json();})
     .then(function(j){
       if(typeof j.count==="number"){count=j.count;drawNixie();}
-      if(j.reset){showModal("goatse");rollNextPop();return;} /* hit 420 -> reset */
+      if(j.goatse){showModal("goatse");rollNextPop();return;} /* multiples of 420 */
       maybeRandomPop();
     })
     .catch(function(){maybeRandomPop();}); /* offline: keep the egg working */

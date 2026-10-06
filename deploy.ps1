@@ -26,6 +26,11 @@
 .PARAMETER PullAll
   Pull both datasets in one go: guestbook JSON + probes CSV (ignores -OutFile,
   uses default timestamped names for each).
+.PARAMETER PullGuestbookPurge
+  Download the guestbook (JSON, incl. meta) AND THEN erase the entries on the Pi.
+  Destructive: stops the guestbook, exports from the DB, verifies the local file,
+  deletes all entries (visit counter kept), then restarts the service. The Pi is
+  only cleared after a good local download; on any failure nothing is deleted.
 .PARAMETER OutFile
   Destination for a single -Pull* export (default: <dataset>-<timestamp>.<ext>).
 .PARAMETER PiHost
@@ -45,6 +50,8 @@
 .EXAMPLE
   .\deploy.ps1 -PullAll
 .EXAMPLE
+  .\deploy.ps1 -PullGuestbookPurge -OutFile posts-final.json   # download, then wipe the Pi
+.EXAMPLE
   .\deploy.ps1 -Rollback
 #>
 [CmdletBinding()]
@@ -56,6 +63,7 @@ param(
   [switch]$PullJson,
   [switch]$PullProbes,
   [switch]$PullAll,
+  [switch]$PullGuestbookPurge,
   [string]$OutFile,
   [string]$PiHost,
   [string]$PiUser
@@ -79,7 +87,8 @@ if ($PSBoundParameters.Count -eq 0) {
   Write-Host "  5) Pull guestbook JSON (export posts + meta -> local JSON)"
   Write-Host "  6) Pull probe data    (export probe-requests -> local CSV)"
   Write-Host "  7) Pull ALL data      (guestbook JSON + probes CSV)"
-  Write-Host "  8) Rollback           (undo portal, hand wlan0 back)"
+  Write-Host "  8) Pull + PURGE gbook (download JSON, then ERASE entries on the Pi)"
+  Write-Host "  9) Rollback           (undo portal, hand wlan0 back)"
   Write-Host "  Q) Quit"
   Write-Host ""
   switch (Read-Host "  Choose") {
@@ -90,7 +99,8 @@ if ($PSBoundParameters.Count -eq 0) {
     '5'     { $PullJson = $true }
     '6'     { $PullProbes = $true }
     '7'     { $PullAll = $true }
-    '8'     { $Rollback = $true }
+    '8'     { $PullGuestbookPurge = $true }
+    '9'     { $Rollback = $true }
     'q'     { Write-Host "  Bye." -ForegroundColor DarkGray; exit 0 }
     default { Fail "Unknown choice." }
   }
@@ -307,7 +317,87 @@ print(devices)
   }
 }
 
+# --- Download the guestbook, THEN erase it on the Pi -------------------------
+# Safe ordering: stop the service (no new signs mid-export), export straight from
+# the DB (the HTTP /dump needs the service up, so we read sqlite3 directly and
+# mirror its JSON shape), verify the local file, and ONLY then delete. The
+# service is always restarted (success or failure); on any error nothing is
+# purged and the local download is kept.
+function Export-GuestbookPurge([string]$Out) {
+  Write-Host "Stopping guestbook (halting new writes)..." -ForegroundColor Cyan
+  & ssh $target "sudo systemctl stop guestbook"
+  if ($LASTEXITCODE -ne 0) { Fail "Could not stop the guestbook service; nothing exported or deleted." }
+
+  $purgeFailed = $false
+  try {
+    # Export every entry incl. parsed meta — same shape as /guestbook/dump.
+    $pyDump = @'
+import sqlite3, json
+DB  = "/var/lib/portal/guestbook.db"
+OUT = "/tmp/guestbook_dump.json"
+con = sqlite3.connect(DB); con.row_factory = sqlite3.Row
+rows = []
+for r in con.execute("SELECT id, created_at, name, message, meta FROM entries ORDER BY id"):
+    row = {"id": r["id"], "created_at": r["created_at"], "name": r["name"], "message": r["message"]}
+    try:    row["meta"] = json.loads(r["meta"]) if r["meta"] else None
+    except Exception: row["meta"] = None
+    rows.append(row)
+with open(OUT, "w", encoding="utf-8") as f:
+    json.dump(rows, f, ensure_ascii=False, indent=2)
+print(len(rows))
+'@
+    Write-Host "Exporting entries from the DB..." -ForegroundColor Cyan
+    $count = ($pyDump | & ssh $target "sudo python3 - && sudo chmod 644 /tmp/guestbook_dump.json") | Select-Object -Last 1
+    if ($LASTEXITCODE -ne 0) { throw "Export on the Pi failed (exit $LASTEXITCODE). Nothing deleted." }
+    & scp -q "${target}:/tmp/guestbook_dump.json" $Out
+    if ($LASTEXITCODE -ne 0) { throw "scp of the export failed (exit $LASTEXITCODE). Nothing deleted." }
+    # The dump is root-owned (made by `sudo python3`), so needs sudo to remove.
+    & ssh $target "sudo rm -f /tmp/guestbook_dump.json" | Out-Null
+
+    # Guard: never purge unless we have a real local file in hand.
+    if (-not (Test-Path $Out) -or (Get-Item $Out).Length -eq 0) {
+      throw "Local export '$Out' missing or empty. Refusing to purge the Pi."
+    }
+    $n = 0; [void][int]::TryParse(($count | Out-String).Trim(), [ref]$n)
+
+    if ($n -eq 0) {
+      Write-Host "Exported 0 entries — nothing to purge." -ForegroundColor Yellow
+    } else {
+      $pyPurge = @'
+import sqlite3
+con = sqlite3.connect("/var/lib/portal/guestbook.db")
+n = con.execute("SELECT COUNT(*) FROM entries").fetchone()[0]
+con.execute("DELETE FROM entries")
+try:    con.execute("DELETE FROM sqlite_sequence WHERE name='entries'")
+except Exception: pass
+con.commit()
+con.execute("VACUUM"); con.commit()
+print(n)
+'@
+      Write-Host "Purging $n entries on the Pi (visit counter kept)..." -ForegroundColor Yellow
+      $deleted = ($pyPurge | & ssh $target "sudo python3 -") | Select-Object -Last 1
+      if ($LASTEXITCODE -ne 0) { throw "Purge failed (exit $LASTEXITCODE). Your download is safe at $Out." }
+      Write-Host "Deleted $deleted entries on the Pi." -ForegroundColor Green
+    }
+  }
+  catch {
+    $purgeFailed = $true
+    Write-Host $_.Exception.Message -ForegroundColor Red
+  }
+  finally {
+    Write-Host "Restarting guestbook..." -ForegroundColor Cyan
+    & ssh $target "sudo systemctl start guestbook" | Out-Null
+  }
+  if ($purgeFailed) { exit 1 }
+  Write-Host "Saved $Out; the Pi's guestbook is now cleared." -ForegroundColor Green
+}
+
 # --- Pull dispatch ------------------------------------------------------------
+if ($PullGuestbookPurge) {
+  if (-not $OutFile) { $OutFile = Join-Path $scriptDir ("guestbook-final-{0:yyyyMMdd-HHmmss}.json" -f (Get-Date)) }
+  Export-GuestbookPurge $OutFile
+  exit 0
+}
 if ($PullGuestbook) {
   if (-not $OutFile) { $OutFile = Join-Path $scriptDir ("guestbook-{0:yyyyMMdd-HHmmss}.csv" -f (Get-Date)) }
   Export-GuestbookCsv $OutFile
