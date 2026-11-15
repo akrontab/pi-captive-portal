@@ -3,6 +3,35 @@
 Isolated Wi-Fi AP on a Raspberry Pi 2 Model B that serves one local page to
 every client — a walled garden, no internet upstream. hostapd + dnsmasq + nginx.
 
+## Features
+
+- **Captive-portal pop-up on join.** Wildcard DNS and an HTTP redirect answer
+  every phone and laptop's connectivity check (`/generate_204` and friends), so
+  the OS opens the portal sheet by itself. HTTPS is rejected so devices don't
+  skip it. There's no upstream; nothing gets out.
+- **A 90s hyperpop/glitchcore splash page.** One self-contained
+  `www/index.html` with a retro nixie hit counter, floating friend faces, and
+  easter eggs to find. Design notes: `docs/90s-hyperpop-restyle.md`.
+- **Embedded guestbook.** Visitors sign it from the splash page (Flask +
+  gunicorn + SQLite). Posts survive redeploys and can be pulled to Windows as
+  CSV/JSON with one command, or read over HTTP at `/guestbook/dump`.
+- **Rotating SSID.** The network name changes on a timer (default every 15 min)
+  from a pool in `ssids.txt`. The USB radio can only broadcast one network at a
+  time, so this stands in for multi-SSID bait networks; see `docs/multi-ssid.md`.
+- **Built to sit on a hostile network.** It's made to run at a hacker conference:
+  parameterised SQL, inert stored XSS, CSV-injection escaping, key-only SSH, and
+  management restricted to the wired port. See `docs/security-hardening.md`.
+- **Probe-request logging (optional).** With a second USB radio in monitor
+  mode, it logs nearby devices and the network names they're searching for into
+  SQLite. Off by default; see `docs/probe-logging.md`.
+- **Failure forensics.** Persistent journald plus a 60-second power/USB health
+  logger (under-voltage, throttling, USB attach/detach), so a crash or power cut
+  leaves evidence. Example: [`radio-failure/`](radio-failure/radio-failure.md).
+- **One-command deploy from Windows.** `deploy.ps1` pushes and runs the
+  idempotent `setup.sh` over SSH. Quick-push modes handle page-only or
+  guestbook-only changes, and there's a full rollback. Every setting lives in
+  `portal.env`.
+
 **Hardware:** Pi 2 Model B running Raspberry Pi OS (Trixie) Lite **armhf
 (32-bit)**. The Pi 2B has **no built-in Wi-Fi**, so the AP radio is a USB adapter
 (`rt2800usb`) that shows up as `wlan0`. Ethernet is the management link. If you
