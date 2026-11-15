@@ -62,6 +62,95 @@ That's it. Now `GET /guestbook/entries` returns `"server_uptime_s": 275079`, the
 page starts its client-side ticker from that baseline, and I can watch it climb
 `...39s → 40s → 41s` in Chrome. Ship it.
 
+## Sample test harness
+
+Here's the whole throwaway dev server, fleshed out to something you can actually
+run. Drop it at the repo root as `dev-server.py` and `python dev-server.py`. It's
+Windows-friendly and never touches the Pi.
+
+Two things it has to get right, both because `guestbook/app.py` does its work at
+**import time**: it reads `GUESTBOOK_DB` from the environment when the module
+loads, and it calls `init_db()` on the spot. So the fake DB path has to be set
+*before* `exec_module`, and it needs a real parent directory (`init_db()` runs
+`os.makedirs(os.path.dirname(DB_PATH))`, which blows up on a bare filename).
+
+```python
+#!/usr/bin/env python3
+"""dev-server.py — run the guestbook app on Windows to eyeball the uptime ticker.
+
+Not shipped to the Pi. Stands in for nginx + gunicorn: serves the portal page
+and the guestbook routes on localhost, with _server_uptime_s() monkeypatched so
+the footer ticker actually renders off-Linux (no /proc/uptime here).
+
+    python dev-server.py      # then open http://127.0.0.1:8099/
+"""
+import importlib.util
+import os
+import tempfile
+from pathlib import Path
+
+REPO   = Path(__file__).resolve().parent
+APP_PY = REPO / "guestbook" / "app.py"
+INDEX  = REPO / "www" / "index.html"
+
+# app.py reads GUESTBOOK_DB at import and calls init_db() immediately, so point
+# it at a throwaway DB — with a real parent dir — BEFORE loading the module.
+os.environ["GUESTBOOK_DB"] = str(Path(tempfile.gettempdir()) / "portal-dev" / "guestbook.db")
+
+# Load guestbook/app.py as a module object we can reach into.
+spec = importlib.util.spec_from_file_location("gb", APP_PY)
+gb = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(gb)
+
+# The whole point: fake a Linux uptime so the ticker has a baseline off-Linux.
+# Rebinds the module-global name the route resolves at call time (see below).
+gb._server_uptime_s = lambda: 275079            # ~3d 4h 24m 39s
+
+# nginx serves the portal page in prod; here the dev server stands in for it so
+# the page's fetch("/guestbook/entries") has a same-origin backend to hit.
+# Added before the first request, so Flask's post-serve route lock never applies.
+@gb.app.route("/")
+def _dev_index():
+    return INDEX.read_text(encoding="utf-8")
+
+if __name__ == "__main__":
+    # Seed a couple of entries so the feed isn't empty (optional, dev-only).
+    with gb.get_db() as c:
+        if c.execute("SELECT COUNT(*) FROM entries").fetchone()[0] == 0:
+            c.executemany(
+                "INSERT INTO entries (name, message, created_at) VALUES (?, ?, ?)",
+                [("ac1d",   "first!!",      "2026-01-01T00:00:00"),
+                 ("phr34k", "<3 this box",  "2026-01-01T00:01:00")])
+
+    print(f"dev portal on http://127.0.0.1:8099/   (DB: {os.environ['GUESTBOOK_DB']}, uptime faked)")
+    # use_reloader=False: the reloader re-execs this file, which would re-run the
+    # import + monkeypatch in a child process — harmless here, but noise you don't
+    # need while staring at a counter.
+    gb.app.run(host="127.0.0.1", port=8099, use_reloader=False, debug=True)
+```
+
+Open `http://127.0.0.1:8099/`, and the footer ticks up from the faked baseline.
+Want a different starting value? Change the one lambda — `lambda: 0` to watch it
+count from boot, or point it at a real file (`lambda: int(float(open("uptime.txt")
+.read()))`) if you'd rather drive it from outside the process. Nothing in
+`app.py` changes either way.
+
+To sanity-check just the JSON without a browser:
+
+```console
+$ curl -s http://127.0.0.1:8099/guestbook/entries | python -m json.tool
+{
+    "count": 2,
+    "entries": [ ... ],
+    "server_uptime_s": 275079
+}
+```
+
+If `server_uptime_s` comes back `null`, the patch didn't take — you're hitting
+the real `_server_uptime_s()` (usually because the rebind ran against a *different*
+import of the module than the one Flask is serving; keep it to the single `gb`
+object like above).
+
 ## Why this actually works (the Python bit)
 
 The interesting part is *why* reassigning `gb._server_uptime_s` changes what the
