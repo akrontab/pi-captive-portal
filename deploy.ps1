@@ -250,12 +250,16 @@ function Export-GuestbookCsv([string]$Out) {
 import sqlite3, csv
 DB = "/var/lib/portal/guestbook.db"
 OUT = "/tmp/guestbook_export.csv"
+def s(v):
+    # Formula injection: a cell starting = + - @ (or a control char) can execute
+    # when opened in Excel/Sheets. name/message are attacker-controlled.
+    return "'" + v if isinstance(v, str) and v[:1] in ("=", "+", "-", "@", "\t", "\r") else v
 con = sqlite3.connect(DB)
 with open(OUT, "w", newline="", encoding="utf-8") as f:
     w = csv.writer(f)
     w.writerow(["id", "created_at", "name", "message"])
     for row in con.execute("SELECT id, created_at, name, message FROM entries ORDER BY id"):
-        w.writerow(row)
+        w.writerow([s(x) for x in row])
 print(con.execute("SELECT COUNT(*) FROM entries").fetchone()[0])
 '@
   Write-Host "Exporting guestbook entries on the Pi..." -ForegroundColor Cyan
@@ -303,7 +307,10 @@ if os.path.exists(DB):
 with open(OUT, "w", newline="", encoding="utf-8") as f:
     w = csv.writer(f)
     w.writerow(cols)
-    w.writerows(rows)
+    # Formula injection: the probed-SSID field is set by anyone in radio range.
+    def s(v):
+        return "'" + v if isinstance(v, str) and v[:1] in ("=", "+", "-", "@", "\t", "\r") else v
+    w.writerows([s(x) for x in r] for r in rows)
 print(devices)
 '@
   Write-Host "Exporting probe data on the Pi..." -ForegroundColor Cyan

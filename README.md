@@ -22,8 +22,10 @@ every client — a walled garden, no internet upstream. hostapd + dnsmasq + ngin
   parameterised SQL, inert stored XSS, CSV-injection escaping, and a sandboxed
   guestbook service. See `docs/security-hardening.md`.
 - **SSH only from the Pi's Ethernet port.** The firewall drops port 22 on the
-  Wi-Fi side, so nobody connected to the portal can even reach SSH. Login is
-  key-only (password auth is off) and happens over the wired port.
+  Wi-Fi side — over **both IPv4 and IPv6** (the AP radio gets no v6 address and
+  an `ip6tables` backstop drops the rest) — so nobody connected to the portal
+  can even reach SSH. Login is key-only (password auth is off), over the wired
+  port. The IPv6 path and its PoC: `docs/ipv6-sshd-bypass.md`.
 - **Probe-request logging (optional).** With a second USB radio in monitor
   mode, it logs nearby devices and the network names they're searching for into
   SQLite. Off by default; see `docs/probe-logging.md`.

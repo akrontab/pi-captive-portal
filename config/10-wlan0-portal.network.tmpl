@@ -5,3 +5,9 @@ Name=@WLAN_IF@
 Address=@PORTAL_IP@/@PREFIX@
 # Assign the address before hostapd brings up carrier.
 ConfigureWithoutCarrier=yes
+# No IPv6 on the hostile client radio. Without this, networkd hands the AP an
+# fe80:: link-local address and sshd (which listens on IPv6) becomes reachable
+# from the portal Wi-Fi over v6, bypassing the IPv4-only firewall. The portal is
+# IPv4-only by design, so drop link-local addressing and router-advertisements.
+LinkLocalAddressing=no
+IPv6AcceptRA=no

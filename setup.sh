@@ -294,7 +294,14 @@ install_guestbook() {
   # DB lives outside the app dir so redeploys never clobber it. This is the ONLY
   # path the service can write. Migrate DB files from the old www-data owner.
   install -d -o guestbook -g guestbook -m 750 /var/lib/portal
-  chown guestbook:guestbook /var/lib/portal/guestbook.db* 2>/dev/null || true
+  # chown -h and a regular-file guard: /var/lib/portal is writable by the
+  # guestbook account, so a compromised app could plant a symlink here (e.g.
+  # guestbook.db -> /etc/shadow) and have this chown hand it over. -h never
+  # follows a link; the test skips anything that isn't a real file.
+  for f in /var/lib/portal/guestbook.db /var/lib/portal/guestbook.db-wal /var/lib/portal/guestbook.db-shm; do
+    [[ -f "$f" && ! -L "$f" ]] && chown -h guestbook:guestbook "$f"
+  done
+  true
 
   # Service config env file (systemd EnvironmentFile). systemd reads it as root
   # before dropping privileges, so the service user never needs to own it.
@@ -306,6 +313,14 @@ ENVEOF
   chown root:root /etc/guestbook.env
   chmod 600 /etc/guestbook.env
 
+  # One-time migration: earlier installs made /opt/guestbook (and its venv)
+  # owned by www-data, i.e. writable by the web account. Copying fresh code in
+  # as root would still follow any symlink planted there, and a backdoored venv
+  # package would survive. If it isn't already root-owned, wipe and rebuild.
+  if [[ -e /opt/guestbook && "$(stat -c %U /opt/guestbook 2>/dev/null)" != "root" ]]; then
+    echo "      /opt/guestbook not root-owned -> rebuilding from scratch"
+    rm -rf /opt/guestbook
+  fi
   mkdir -p /opt/guestbook
   cp -f "${SCRIPT_DIR}/guestbook/app.py" /opt/guestbook/
   cp -f "${SCRIPT_DIR}/guestbook/requirements.txt" /opt/guestbook/
@@ -400,8 +415,43 @@ COMMIT
 COMMIT
 RULES
   iptables-restore < /etc/iptables/rules.v4
+
+  # IPv6: the v4 rules above do nothing for it. systemd-networkd still gives
+  # ${WLAN_IF} an fe80:: link-local address, and stock sshd listens on IPv6, so
+  # a portal client could reach port 22 over v6 (find the Pi with
+  # `ping6 ff02::1%wlan0`) — bypassing the "SSH only over Ethernet" guarantee.
+  # The .network file disables link-local on the AP radio; this is the firewall
+  # backstop. Mirror the v4 policy: allow loopback + return + DHCPv6/DNS, drop
+  # the rest from ${WLAN_IF} (ICMPv6 ND is permitted so link-local neighbours
+  # still resolve, but there's no global v6 on the segment anyway).
+  cat > /etc/iptables/rules.v6 <<RULES6
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+-A INPUT -i lo -j ACCEPT
+-A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+# ICMPv6 (neighbour discovery etc.) must not be blanket-dropped on v6.
+-A INPUT -i ${WLAN_IF} -p ipv6-icmp -j ACCEPT
+-A INPUT -i ${WLAN_IF} -p udp --dport 547 -j ACCEPT
+-A INPUT -i ${WLAN_IF} -p udp --dport 53 -j ACCEPT
+-A INPUT -i ${WLAN_IF} -p tcp --dport 53 -j ACCEPT
+-A INPUT -i ${WLAN_IF} -p tcp --dport 80 -j ACCEPT
+# Everything else from the hostile client network — SSH (22) included — is dropped.
+-A INPUT -i ${WLAN_IF} -j DROP
+-A FORWARD -i ${WLAN_IF} -j DROP
+COMMIT
+RULES6
+  # If IPv6 is disabled at the kernel level, ip6tables-restore fails — but then
+  # there's no v6 address or v6 sshd socket either, so the bypass can't exist.
+  # Don't let that abort the install (set -e); warn and move on.
+  if ! ip6tables-restore < /etc/iptables/rules.v6 2>/dev/null; then
+    echo "      WARN: ip6tables-restore failed (IPv6 disabled in kernel?) — v6 rules skipped"
+  fi
+
   # Nowhere to forward to; stray traffic dies at the Pi.
   sysctl -q -w net.ipv4.ip_forward=0
+  sysctl -q -w net.ipv6.conf.all.forwarding=0 2>/dev/null || true
 }
 
 start_services() {
@@ -462,13 +512,18 @@ install_probe() {
   # Own DB dir (also declared as the unit's StateDirectory). Migrate a DB left in
   # the old shared /var/lib/portal, which now belongs to the guestbook account.
   install -d -o portal-probe -g portal-probe -m 750 /var/lib/portal-probe
-  if [[ -f /var/lib/portal/probes.db && ! -e /var/lib/portal-probe/probes.db ]]; then
+  # Same symlink hazard as the guestbook DB: /var/lib/portal is writable by an
+  # unprivileged service, so only migrate real files (never a planted symlink).
+  if [[ -f /var/lib/portal/probes.db && ! -L /var/lib/portal/probes.db && ! -e /var/lib/portal-probe/probes.db ]]; then
     systemctl stop portal-probe-logger.service 2>/dev/null || true
     for f in /var/lib/portal/probes.db /var/lib/portal/probes.db-wal /var/lib/portal/probes.db-shm; do
-      [[ -e "$f" ]] && mv "$f" /var/lib/portal-probe/
+      [[ -f "$f" && ! -L "$f" ]] && mv "$f" /var/lib/portal-probe/
     done
   fi
-  chown portal-probe:portal-probe /var/lib/portal-probe/probes.db* 2>/dev/null || true
+  for f in /var/lib/portal-probe/probes.db /var/lib/portal-probe/probes.db-wal /var/lib/portal-probe/probes.db-shm; do
+    [[ -f "$f" && ! -L "$f" ]] && chown -h portal-probe:portal-probe "$f"
+  done
+  true
 
   cat > /etc/portal-probe.env <<PROBEENV
 MONITOR_IF=${MONITOR_IF}
@@ -614,7 +669,9 @@ do_rollback() {
   systemctl daemon-reload
   systemctl reload NetworkManager 2>/dev/null || true
   iptables -F; iptables -t nat -F
+  ip6tables -F 2>/dev/null || true
   : > /etc/iptables/rules.v4 || true
+  : > /etc/iptables/rules.v6 || true
   netfilter-persistent save 2>/dev/null || true
   systemctl restart nginx 2>/dev/null || true
   echo "Rolled back. ${WLAN_IF} returned to NetworkManager."

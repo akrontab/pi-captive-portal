@@ -41,8 +41,20 @@ Inbound on `wlan0` is locked to only what portal clients need:
   doesn't hang and we never MITM TLS);
 - **drop everything else** — SSH (`22`), gunicorn (`8080`), and all other ports.
 
+**IPv6 counts too.** The IPv4 rules above do nothing for IPv6, and sshd listens
+on both. systemd-networkd would otherwise give `wlan0` an `fe80::` link-local
+address, so a portal client could reach port 22 over v6 and walk straight past
+the v4 firewall. Two defences, both in `setup.sh` / the `.network` template:
+- `LinkLocalAddressing=no` + `IPv6AcceptRA=no` on the AP radio — the portal is
+  IPv4-only, so the interface gets no v6 address at all;
+- an `ip6tables` ruleset (`/etc/iptables/rules.v6`) mirroring the v4 policy:
+  allow loopback/return/ICMPv6/DHCPv6/DNS/HTTP, **drop the rest incl. `22`**.
+
+The full walk-through of the bypass, with a lite PoC, is in
+[`ipv6-sshd-bypass.md`](ipv6-sshd-bypass.md).
+
 SSH/management stays reachable only over the **wired interface**, which is left
-untouched. `ip_forward` stays `0` (nothing is routed off the portal).
+untouched. `ip_forward` (v4 and v6) stays `0` (nothing is routed off the portal).
 
 ## Least privilege: who runs as what
 Goal: keep root out of everything that doesn't strictly need it. Each service
