@@ -276,38 +276,59 @@ configure_portal_page() {
   install -m 644 "${SCRIPT_DIR}/www/"* /var/www/portal/
 }
 
+# Create a locked, home-less system account for a service (idempotent). Each
+# service gets its own so a compromise of one doesn't reach another's files.
+ensure_sysuser() {
+  id -u "$1" >/dev/null 2>&1 || useradd --system --no-create-home     --home-dir /nonexistent --shell /usr/sbin/nologin "$1"
+}
+
 install_guestbook() {
   echo "[guestbook] Installing Flask/gunicorn guestbook..."
   # iw: used by the Wi-Fi station-stats sidecar for device fingerprinting.
   apt-get install -y -qq python3 python3-venv iw
-  # DB lives outside the app dir so redeploys never clobber it.
-  install -d -o www-data -g www-data /var/lib/portal
+  # Dedicated unprivileged account: the guestbook no longer shares www-data with
+  # nginx, so a hole in one doesn't hand over the other's files.
+  ensure_sysuser guestbook
+  ensure_sysuser portal-stations
 
-  # Service config env file (systemd EnvironmentFile), owned by the service user.
+  # DB lives outside the app dir so redeploys never clobber it. This is the ONLY
+  # path the service can write. Migrate DB files from the old www-data owner.
+  install -d -o guestbook -g guestbook -m 750 /var/lib/portal
+  chown guestbook:guestbook /var/lib/portal/guestbook.db* 2>/dev/null || true
+
+  # Service config env file (systemd EnvironmentFile). systemd reads it as root
+  # before dropping privileges, so the service user never needs to own it.
   ( umask 077
     cat > /etc/guestbook.env <<ENVEOF
 GUESTBOOK_DB=/var/lib/portal/guestbook.db
 ENVEOF
   )
-  chown www-data:www-data /etc/guestbook.env
+  chown root:root /etc/guestbook.env
   chmod 600 /etc/guestbook.env
 
   mkdir -p /opt/guestbook
   cp -f "${SCRIPT_DIR}/guestbook/app.py" /opt/guestbook/
   cp -f "${SCRIPT_DIR}/guestbook/requirements.txt" /opt/guestbook/
-  cp -f "${SCRIPT_DIR}/guestbook/portal-stations.py" /opt/guestbook/
   rm -rf /opt/guestbook/templates
   cp -rf "${SCRIPT_DIR}/guestbook/templates" /opt/guestbook/
 
   [[ -d /opt/guestbook/.venv ]] || python3 -m venv /opt/guestbook/.venv
   /opt/guestbook/.venv/bin/pip install --quiet --upgrade pip
   /opt/guestbook/.venv/bin/pip install --quiet -r /opt/guestbook/requirements.txt
-  chown -R www-data:www-data /opt/guestbook
+  # App code + venv are root-owned and read-only to the service: a compromised
+  # guestbook can't rewrite its own code or plant a persistent backdoor.
+  chown -R root:root /opt/guestbook
+  chmod -R u=rwX,go=rX /opt/guestbook
 
   cp -f "${SCRIPT_DIR}/guestbook/guestbook.service" /etc/systemd/system/guestbook.service
 
-  # Wi-Fi station-stats sidecar: runs as root on a timer, writes a world-readable
-  # snapshot the (unprivileged) web app reads. Keeps privilege out of the app.
+  # Wi-Fi station-stats sidecar: runs on a timer as its own account holding only
+  # CAP_NET_ADMIN, and writes a world-readable snapshot the web app reads. Keeps
+  # privilege out of the app. Installed root-owned OUTSIDE /opt/guestbook: it holds
+  # a capability, so it must never sit anywhere the guestbook account could write
+  # (it used to, as root: that was a root escalation).
+  install -o root -g root -m 755 "${SCRIPT_DIR}/guestbook/portal-stations.py" /opt/portal-stations.py
+  rm -f /opt/guestbook/portal-stations.py
   cp -f "${SCRIPT_DIR}/guestbook/portal-stations.service" /etc/systemd/system/portal-stations.service
   cp -f "${SCRIPT_DIR}/guestbook/portal-stations.timer"   /etc/systemd/system/portal-stations.timer
 
@@ -437,16 +458,30 @@ install_probe() {
     return 0
   fi
 
+  ensure_sysuser portal-probe
+  # Own DB dir (also declared as the unit's StateDirectory). Migrate a DB left in
+  # the old shared /var/lib/portal, which now belongs to the guestbook account.
+  install -d -o portal-probe -g portal-probe -m 750 /var/lib/portal-probe
+  if [[ -f /var/lib/portal/probes.db && ! -e /var/lib/portal-probe/probes.db ]]; then
+    systemctl stop portal-probe-logger.service 2>/dev/null || true
+    for f in /var/lib/portal/probes.db /var/lib/portal/probes.db-wal /var/lib/portal/probes.db-shm; do
+      [[ -e "$f" ]] && mv "$f" /var/lib/portal-probe/
+    done
+  fi
+  chown portal-probe:portal-probe /var/lib/portal-probe/probes.db* 2>/dev/null || true
+
   cat > /etc/portal-probe.env <<PROBEENV
 MONITOR_IF=${MONITOR_IF}
-PROBE_DB=/var/lib/portal/probes.db
+PROBE_DB=/var/lib/portal-probe/probes.db
 PROBE_CHANNELS=${PROBE_CHANNELS}
 PROBE_HOP=${PROBE_HOP}
 PROBE_HOP_INTERVAL=${PROBE_HOP_INTERVAL}
 PROBE_COMMIT_INTERVAL=${PROBE_COMMIT_INTERVAL}
 PROBEENV
-  chmod 600 /etc/portal-probe.env
-  install -m 755 "${SCRIPT_DIR}/probe/portal-probe-logger.py" /opt/portal-probe-logger.py
+  # The logger reads this itself (not via systemd), so its account needs read.
+  chown root:portal-probe /etc/portal-probe.env
+  chmod 640 /etc/portal-probe.env
+  install -o root -g root -m 755 "${SCRIPT_DIR}/probe/portal-probe-logger.py" /opt/portal-probe-logger.py
 
   # Keep the monitor radio out of NetworkManager's hands (like the AP radio).
   cat > /etc/NetworkManager/conf.d/99-portal-probe-unmanaged.conf <<NMCONF
@@ -460,7 +495,7 @@ NMCONF
   systemctl daemon-reload
   systemctl enable --now portal-probe-logger.service
   echo "      probe logging: ON, monitor=${MONITOR_IF} channels=${PROBE_CHANNELS}"
-  echo "      view: sudo python3 /opt/portal-probe-logger.py --report"
+  echo "      view: sudo -u portal-probe python3 /opt/portal-probe-logger.py --report"
 }
 
 configure_logging() {
@@ -494,7 +529,9 @@ JOURNALD
   fi
 
   if [[ "$HEALTH_LOG" == "1" ]]; then
-    install -m 755 "${SCRIPT_DIR}/health/portal-health.sh" /opt/portal-health.sh
+    ensure_sysuser portal-health
+    install -o root -g root -m 755 "${SCRIPT_DIR}/health/portal-health.sh" /opt/portal-health.sh
+    rm -f /run/portal-health.last   # old root-owned state path
     cp -f "${SCRIPT_DIR}/health/portal-health.service" /etc/systemd/system/portal-health.service
     cp -f "${SCRIPT_DIR}/health/portal-health.timer"   /etc/systemd/system/portal-health.timer
     systemctl daemon-reload
@@ -540,6 +577,7 @@ do_rollback() {
   systemctl disable --now portal-stations.timer 2>/dev/null || true
   rm -f /etc/systemd/system/guestbook.service
   rm -f /etc/systemd/system/portal-stations.service /etc/systemd/system/portal-stations.timer
+  rm -f /opt/portal-stations.py
   systemctl disable --now portal-ssid-rotate.timer 2>/dev/null || true
   rm -f /etc/systemd/system/portal-ssid-rotate.service /etc/systemd/system/portal-ssid-rotate.timer
   rm -f /opt/portal-ssid-rotate.py /etc/portal-ssid.env /etc/portal-ssids.txt
@@ -549,10 +587,11 @@ do_rollback() {
   systemctl disable --now portal-probe-logger.service 2>/dev/null || true
   rm -f /etc/systemd/system/portal-probe-logger.service /opt/portal-probe-logger.py
   rm -f /etc/portal-probe.env /etc/NetworkManager/conf.d/99-portal-probe-unmanaged.conf
-  # /var/lib/portal/probes.db is left in place (like the guestbook DB).
+  # /var/lib/portal-probe/probes.db is left in place (like the guestbook DB).
   systemctl disable --now portal-health.timer 2>/dev/null || true
   rm -f /etc/systemd/system/portal-health.service /etc/systemd/system/portal-health.timer
   rm -f /opt/portal-health.sh /run/portal-health.last
+  rm -rf /run/portal-health
   # Journal returns to the Pi OS default (volatile). /var/log/journal is left in
   # place so collected history is not destroyed by a rollback.
   rm -f /etc/systemd/journald.conf.d/50-portal-persistent.conf
@@ -560,8 +599,10 @@ do_rollback() {
   # Undo the passwordless-sudo drop-in this setup installed (deploy infra, not
   # portal runtime — a fresh `setup.sh install` re-adds it via `ssh -t`).
   rm -f /etc/sudoers.d/011_pi-nopasswd
-  # /opt/guestbook and /var/lib/portal (the DB) are left in place on purpose so
-  # a rollback never destroys signed entries. Remove them by hand if you mean to.
+  # /opt/guestbook, /var/lib/portal (the DB) and the per-service system users
+  # (guestbook, portal-stations, portal-probe, portal-health; they own the DB
+  # files) are left in place on purpose so a rollback never
+  # destroys signed entries. Remove them by hand if you mean to.
   systemctl disable --now hostapd dnsmasq 2>/dev/null || true
   rm -f /etc/NetworkManager/conf.d/99-portal-unmanaged.conf
   rm -f "/etc/systemd/network/10-${WLAN_IF}-portal.network"

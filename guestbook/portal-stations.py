@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Snapshot Wi-Fi station stats to a world-readable JSON for the guestbook app.
 
-`iw ... station dump` needs root, so this runs (as root) on a systemd timer and
-writes /run/portal/stations.json (0644). The web app, which runs unprivileged,
+`iw ... station dump` is privileged, so this runs on a systemd timer as the
+unprivileged `portal-stations` account holding only CAP_NET_ADMIN, and writes
+/run/portal/stations.json (0644). The web app, which runs unprivileged,
 just reads that file — no privilege in the request path.
 """
 import json

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Power / USB health snapshot for post-mortem analysis. Runs as root on a timer
-# (portal-health.timer); output goes to the journal under SyslogIdentifier
+# Power / USB health snapshot for post-mortem analysis. Runs on a timer as the
+# unprivileged `portal-health` account, video group only (portal-health.timer); output goes to the journal under SyslogIdentifier
 # portal-health. With the persistent journal on, that history survives reboots
 # and power loss, so a radio that drops off the bus leaves a trail.
 #
@@ -12,7 +12,7 @@
 # counters changed since the last run; otherwise <6> (info).
 
 set -u
-STATE="${PORTAL_HEALTH_STATE:-/run/portal-health.last}"
+STATE="${PORTAL_HEALTH_STATE:-/run/portal-health/last}"
 
 throttled=$(vcgencmd get_throttled 2>/dev/null | cut -d= -f2)
 throttled=${throttled:-unknown}

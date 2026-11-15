@@ -44,11 +44,44 @@ Inbound on `wlan0` is locked to only what portal clients need:
 SSH/management stays reachable only over the **wired interface**, which is left
 untouched. `ip_forward` stays `0` (nothing is routed off the portal).
 
-## systemd sandbox (`guestbook/guestbook.service`)
-Runs as `www-data` with `NoNewPrivileges`, `PrivateTmp`, `ProtectSystem=full`
-(+ `ReadWritePaths=/var/lib/portal`), `ProtectHome`, and kernel/cgroup/SUID
-protections. `RestrictAddressFamilies` and `SystemCallFilter` are deliberately
-NOT set — they'd break the `ip neigh` netlink call and the gunicorn socket.
+## Least privilege: who runs as what
+Goal: keep root out of everything that doesn't strictly need it. Each service
+has its own locked system account (no shell, no home) so a compromise of one
+can't read or change another's files. All code under `/opt` is root-owned and
+read-only to the services that run it.
+
+| Service | Runs as | Capabilities | Writable |
+|---|---|---|---|
+| nginx workers | `www-data` | none | nothing (`/var/www/portal` is root-owned) |
+| `guestbook` (gunicorn) | `guestbook` | none | `/var/lib/portal` only |
+| `portal-stations` (10s timer) | `portal-stations` | `CAP_NET_ADMIN` | `/run/portal` only |
+| `portal-health` (60s timer) | `portal-health` (+`video` for `vcgencmd`) | none | `/run/portal-health` only |
+| `portal-probe-logger` | `portal-probe` | `CAP_NET_ADMIN`, `CAP_NET_RAW` | `/var/lib/portal-probe` only |
+| `portal-ssid-rotate` | root (uid 0) | `CAP_NET_ADMIN` only | `/etc/hostapd` only |
+| hostapd, dnsmasq, nginx master | root (distro units) | distro defaults | distro defaults |
+
+Every custom unit also sets `NoNewPrivileges`, `PrivateTmp`, `ProtectHome`,
+`ProtectSystem=strict`, and kernel/cgroup/SUID protections.
+
+**Why this layout.** Previously the guestbook ran as `www-data`, owned
+`/opt/guestbook`, and that folder also held `portal-stations.py`, which ran
+**as root** every 10s. Code execution in the guestbook could rewrite that script
+and become root within seconds. Now the app can't write its own code, and the
+sidecar lives root-owned at `/opt/portal-stations.py` with only one capability.
+
+**SSID rotator stays uid 0** because it rewrites the root-owned hostapd config
+and asks PID 1 to restart hostapd. Its capability bounding set is cut to
+`CAP_NET_ADMIN` (for `iw dev … del`), so even as uid 0 it can't override file
+permissions, load modules, or change ownership.
+
+**Operator reads run as the service, not root.** `deploy.ps1`'s guestbook/probe
+exports and purge run `sudo -u guestbook` / `sudo -u portal-probe`, and the
+probe report is `sudo -u portal-probe python3 /opt/portal-probe-logger.py
+--report`. Running SQLite as root could leave root-owned `-wal`/`-shm` (or a
+fresh root-owned DB) that the service then can't write.
+
+`RestrictAddressFamilies` and `SystemCallFilter` are deliberately NOT set on the
+guestbook — they'd break the `ip neigh` netlink call and the gunicorn socket.
 
 ## SSH & sudo (management plane)
 Management is over the **wired** interface only — the host firewall hides `22`

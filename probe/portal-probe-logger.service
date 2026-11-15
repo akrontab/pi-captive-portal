@@ -6,6 +6,27 @@ After=network.target
 
 [Service]
 Type=simple
+# Not root: a dedicated account holding only what monitor-mode capture needs.
+# CAP_NET_ADMIN for `ip link` / `iw set type|channel`; CAP_NET_RAW for tcpdump.
+# Ambient caps pass down to those child processes. The only writable path is
+# its own DB dir, /var/lib/portal-probe.
+User=portal-probe
+Group=portal-probe
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_RAW
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW
+StateDirectory=portal-probe
+StateDirectoryMode=0750
+ProtectSystem=strict
+RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_PACKET AF_INET AF_INET6
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+LockPersonality=true
 ExecStart=/usr/bin/python3 /opt/portal-probe-logger.py
 Restart=on-failure
 RestartSec=5

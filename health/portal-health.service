@@ -5,3 +5,24 @@ Description=Log power/USB health snapshot (throttle flags, USB devices, over-cur
 Type=oneshot
 ExecStart=/opt/portal-health.sh
 SyslogIdentifier=portal-health
+# Not root: vcgencmd only needs the video group (/dev/vcio), and everything
+# else it reads is world-readable sysfs. No capabilities at all.
+User=portal-health
+Group=portal-health
+SupplementaryGroups=video
+CapabilityBoundingSet=
+Environment=PORTAL_HEALTH_STATE=/run/portal-health/last
+RuntimeDirectory=portal-health
+RuntimeDirectoryPreserve=yes
+ProtectSystem=strict
+ProtectKernelTunables=true
+RestrictAddressFamilies=AF_UNIX
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+LockPersonality=true

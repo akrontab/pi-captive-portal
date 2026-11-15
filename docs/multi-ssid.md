@@ -21,8 +21,10 @@ Broadcast several Wi-Fi SSIDs from the one radio, and (optionally) reshuffle the
   for a random selection from the bait pool, writes the live
   **`/etc/hostapd/hostapd.conf`** (0600), and restarts hostapd. Config comes from
   **`/etc/portal-ssid.env`** (written by `setup.sh`).
-- **`ssid/portal-ssid-rotate.{service,timer}`** run the engine as root on a timer
-  when rotation is enabled. `setup.sh` rewrites `OnUnitActiveSec` to
+- **`ssid/portal-ssid-rotate.{service,timer}`** run the engine on a timer when
+  rotation is enabled. It stays uid 0 (it rewrites the hostapd config and
+  restarts hostapd) but keeps only `CAP_NET_ADMIN` and a read-only filesystem
+  except `/etc/hostapd`. `setup.sh` rewrites `OnUnitActiveSec` to
   `SSID_ROTATE_INTERVAL`.
 
 The primary "Portal" BSS is the interface stanza, so it is never rotated — only

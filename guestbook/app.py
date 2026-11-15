@@ -1,7 +1,8 @@
 """Minimal 90s-style guestbook: Flask + stdlib sqlite3, no ORM.
 
 Served behind nginx at /guestbook (see config/nginx-portal.conf.tmpl), run by
-gunicorn under systemd as www-data (see guestbook.service). The DB path and
+gunicorn under systemd as the unprivileged `guestbook` account (see
+guestbook.service). The DB path and
 limits are env-overridable so nothing is hardcoded to one deployment.
 """
 import csv

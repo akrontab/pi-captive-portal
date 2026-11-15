@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 Type=simple
-User=www-data
-Group=www-data
+User=guestbook
+Group=guestbook
 WorkingDirectory=/opt/guestbook
 # Secrets/config (GUESTBOOK_DB, GUESTBOOK_DUMP_KEY) — written 0600 by setup.sh.
 # Leading '-' so a missing file doesn't fail the unit.
@@ -17,10 +17,15 @@ RestartSec=2
 # Hardening — hostile client network. The app only needs its own dirs; it also
 # shells out to `ip neigh` (netlink) and reads /run + /var/lib/misc, so we avoid
 # RestrictAddressFamilies / SystemCallFilter which would break those.
+# The whole filesystem is read-only except the DB dir (and a private /tmp, which
+# gunicorn uses for worker heartbeats). /opt/guestbook is root-owned besides.
 NoNewPrivileges=true
 PrivateTmp=true
-ProtectSystem=full
+ProtectSystem=strict
 ReadWritePaths=/var/lib/portal
+UMask=0027
+# App dir is read-only, so don't try to write __pycache__ into it.
+Environment=PYTHONDONTWRITEBYTECODE=1
 ProtectHome=true
 ProtectKernelTunables=true
 ProtectKernelModules=true

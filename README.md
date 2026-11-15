@@ -177,8 +177,8 @@ reinstall Python deps.)
 
 A 90s-style SQLite guestbook, off unless `GUESTBOOK=1` in `portal.env`.
 
-- Flask + gunicorn on `127.0.0.1:8080`, run by systemd as `www-data`
-  (`guestbook.service`); nginx reverse-proxies `/guestbook` to it.
+- Flask + gunicorn on `127.0.0.1:8080`, run by systemd as its own
+  unprivileged `guestbook` account (`guestbook.service`); nginx reverse-proxies `/guestbook` to it.
 - SQLite DB at `/var/lib/portal/guestbook.db` — kept outside the app dir so
   redeploys and rollbacks never wipe signed entries.
 - Output is HTML-escaped (Jinja autoescape) and SQL is parameterised; name and
@@ -210,7 +210,7 @@ To disable later: set `GUESTBOOK=0` and re-run `.\deploy.ps1`, or
 `-PullJson` curls the `/guestbook/dump` endpoint on the Pi (via localhost, so it
 works regardless of client-network rules) and pulls the JSON — every entry with
 its full captured `meta` block. `-PullProbes` exports the probe DB
-(`/var/lib/portal/probes.db`, `probes` joined with `devices`) to a CSV — one row
+(`/var/lib/portal-probe/probes.db`, `probes` joined with `devices`) to a CSV — one row
 per `(device, requested SSID)` with vendor, randomized-MAC flag, counts, and
 signal; it degrades to a header-only file if probe logging was never enabled.
 `-PullAll` grabs the guestbook JSON and the probes CSV in one run. All are
@@ -247,9 +247,10 @@ Passively logs 802.11 probe-requests — each nearby device's MAC and the SSIDs
 it's searching for — on a **dedicated monitor radio** (the AP radio can't also
 monitor). **OFF by default** (`PROBE_LOG=0`); enable it only once a second Wi-Fi
 adapter is present as `MONITOR_IF` (the intended split: AR9271 = AP, rt2800usb =
-monitor). Standalone root daemon (`portal-probe-logger.service`), tcpdump-based
-capture, SQLite at `/var/lib/portal/probes.db`. View with
-`sudo python3 /opt/portal-probe-logger.py --report`. Full write-up and the
+monitor). Standalone daemon (`portal-probe-logger.service`) running as its own
+`portal-probe` account with only the two network capabilities it needs,
+tcpdump-based capture, SQLite at `/var/lib/portal-probe/probes.db`. View with
+`sudo -u portal-probe python3 /opt/portal-probe-logger.py --report`. Full write-up and the
 privacy note: `docs/probe-logging.md`.
 
 ### When the second radio (AR9271) arrives — do this
@@ -301,7 +302,7 @@ and the existing **rt2800usb becomes the probe monitor**. Steps:
    sudo journalctl -u hostapd | grep AP-ENABLED       # one line PER bait BSS now
    # from a phone/laptop: scan and confirm Portal + all baits are visible
    systemctl status portal-probe-logger
-   sudo python3 /opt/portal-probe-logger.py --report  # devices + probed SSIDs
+   sudo -u portal-probe python3 /opt/portal-probe-logger.py --report  # devices + probed SSIDs
    ```
    If fewer than 7 baits beacon, lower `SSID_BAIT_COUNT` to what the chip
    actually broadcasts. If a bait fails, check `docs/multi-ssid-adapter-upgrade.md`.

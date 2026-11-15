@@ -42,7 +42,7 @@ two USB Wi-Fi radios want a powered hub; pin interface names by MAC (a systemd
 reads tcpdump's **pcap stream** on stdout and parses each frame itself (radiotap
 signal → 802.11 addr2 → SSID tag), so it doesn't depend on tcpdump's text output.
 A background thread channel-hops via `iw dev <mon> set channel`. Writes go to
-SQLite (`/var/lib/portal/probes.db`, WAL, batched commits to spare the SD card),
+SQLite (`/var/lib/portal-probe/probes.db`, WAL, batched commits to spare the SD card),
 upserting per device and per `(device, SSID)`.
 
 No web app, no root in the web tier — it's a standalone root daemon, same pattern
@@ -63,7 +63,7 @@ Then `./deploy.ps1` (or `sudo ./setup.sh` on the Pi). Check it:
 
 ```sh
 systemctl status portal-probe-logger
-sudo python3 /opt/portal-probe-logger.py --report      # summary from the DB
+sudo -u portal-probe python3 /opt/portal-probe-logger.py --report      # summary from the DB
 ```
 
 `--report` prints device count, randomized-MAC share, the top SSIDs devices are

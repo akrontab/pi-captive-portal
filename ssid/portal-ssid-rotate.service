@@ -5,4 +5,21 @@ Wants=hostapd.service
 
 [Service]
 Type=oneshot
+# Stays uid 0: it rewrites the root-owned hostapd config and asks PID 1 to
+# restart hostapd. But it keeps only CAP_NET_ADMIN (for `iw dev ... del`) and
+# sees a read-only filesystem except /etc/hostapd.
+CapabilityBoundingSet=CAP_NET_ADMIN
+ProtectSystem=strict
+ReadWritePaths=/etc/hostapd
+ProtectKernelTunables=true
+RestrictAddressFamilies=AF_UNIX AF_NETLINK
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+LockPersonality=true
 ExecStart=/usr/bin/python3 /opt/portal-ssid-rotate.py

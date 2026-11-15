@@ -20,7 +20,8 @@ parse its pcap stream ourselves so we don't depend on tcpdump's text format.
 
 Config: /etc/portal-probe.env (KEY=VALUE); real env vars override. Keys:
 MONITOR_IF, PROBE_DB, PROBE_CHANNELS, PROBE_HOP, PROBE_HOP_INTERVAL,
-PROBE_COMMIT_INTERVAL. Runs as root (monitor mode + channel set need it).
+PROBE_COMMIT_INTERVAL. Runs as the unprivileged `portal-probe` account with only
+CAP_NET_ADMIN (monitor mode, channel set) and CAP_NET_RAW (tcpdump).
 
 Flags: --report (print a summary from the DB and exit), --selftest (parse a
 synthetic frame, no root/hardware needed).
@@ -73,7 +74,7 @@ def load_config():
         if k in os.environ:
             cfg[k] = os.environ[k]
     cfg.setdefault("MONITOR_IF", "wlan1")
-    cfg.setdefault("PROBE_DB", "/var/lib/portal/probes.db")
+    cfg.setdefault("PROBE_DB", "/var/lib/portal-probe/probes.db")
     cfg.setdefault("PROBE_CHANNELS", "1,6,11")
     cfg.setdefault("PROBE_HOP", "1")
     cfg.setdefault("PROBE_HOP_INTERVAL", "0.5")

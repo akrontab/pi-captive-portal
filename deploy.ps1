@@ -222,7 +222,8 @@ sudo mkdir -p /opt/guestbook &&
 sudo cp -f $remoteTmp/app.py $remoteTmp/requirements.txt /opt/guestbook/ &&
 sudo rm -rf /opt/guestbook/templates &&
 sudo cp -rf $remoteTmp/templates /opt/guestbook/ &&
-sudo chown -R www-data:www-data /opt/guestbook &&
+sudo chown -R root:root /opt/guestbook &&
+sudo chmod -R u=rwX,go=rX /opt/guestbook &&
 sudo systemctl restart guestbook &&
 rm -rf $remoteTmp
 "@
@@ -242,7 +243,8 @@ if ($Guestbook) {
 # --- Data-pull helpers (guestbook CSV/JSON, probe CSV) ------------------------
 # Each connects to the Pi, exports to a temp file there, scp's it back, cleans up.
 function Export-GuestbookCsv([string]$Out) {
-  # Read via sqlite3 (through WAL) with sudo, write a temp CSV on the Pi.
+  # Read via sqlite3 (through WAL) as the guestbook account, not root, so any
+  # -wal/-shm file it creates stays owned by the service. Write a temp CSV.
   # Passed over stdin to avoid PowerShell/remote quoting pain.
   $py = @'
 import sqlite3, csv
@@ -257,7 +259,7 @@ with open(OUT, "w", newline="", encoding="utf-8") as f:
 print(con.execute("SELECT COUNT(*) FROM entries").fetchone()[0])
 '@
   Write-Host "Exporting guestbook entries on the Pi..." -ForegroundColor Cyan
-  $count = ($py | & ssh $target "sudo python3 - && sudo chmod 644 /tmp/guestbook_export.csv") | Select-Object -Last 1
+  $count = ($py | & ssh $target "sudo rm -f /tmp/guestbook_export.csv && cd / && sudo -u guestbook python3 -I - && sudo chmod 644 /tmp/guestbook_export.csv") | Select-Object -Last 1
   if ($LASTEXITCODE -ne 0) { Fail "Export on the Pi failed (exit $LASTEXITCODE). Is the guestbook installed?" }
   & scp -q "${target}:/tmp/guestbook_export.csv" $Out
   if ($LASTEXITCODE -ne 0) { Fail "scp of the export failed (exit $LASTEXITCODE)." }
@@ -283,7 +285,7 @@ function Export-ProbeData([string]$Out) {
   # Degrades gracefully if probe logging was never enabled (no DB / no tables).
   $py = @'
 import sqlite3, csv, os
-DB = "/var/lib/portal/probes.db"
+DB = "/var/lib/portal-probe/probes.db"
 OUT = "/tmp/probes_export.csv"
 cols = ["mac", "vendor", "randomized", "ssid", "count",
         "first_seen", "last_seen", "last_signal"]
@@ -305,7 +307,7 @@ with open(OUT, "w", newline="", encoding="utf-8") as f:
 print(devices)
 '@
   Write-Host "Exporting probe data on the Pi..." -ForegroundColor Cyan
-  $count = ($py | & ssh $target "sudo python3 - && sudo chmod 644 /tmp/probes_export.csv") | Select-Object -Last 1
+  $count = ($py | & ssh $target "sudo rm -f /tmp/probes_export.csv && cd / && if id -u portal-probe >/dev/null 2>&1; then sudo -u portal-probe python3 -I -; else sudo python3 -I -; fi && sudo chmod 644 /tmp/probes_export.csv") | Select-Object -Last 1
   if ($LASTEXITCODE -ne 0) { Fail "Probe export on the Pi failed (exit $LASTEXITCODE)." }
   & scp -q "${target}:/tmp/probes_export.csv" $Out
   if ($LASTEXITCODE -ne 0) { Fail "scp of the probe export failed (exit $LASTEXITCODE)." }
@@ -347,11 +349,11 @@ with open(OUT, "w", encoding="utf-8") as f:
 print(len(rows))
 '@
     Write-Host "Exporting entries from the DB..." -ForegroundColor Cyan
-    $count = ($pyDump | & ssh $target "sudo python3 - && sudo chmod 644 /tmp/guestbook_dump.json") | Select-Object -Last 1
+    $count = ($pyDump | & ssh $target "sudo rm -f /tmp/guestbook_dump.json && cd / && sudo -u guestbook python3 -I - && sudo chmod 644 /tmp/guestbook_dump.json") | Select-Object -Last 1
     if ($LASTEXITCODE -ne 0) { throw "Export on the Pi failed (exit $LASTEXITCODE). Nothing deleted." }
     & scp -q "${target}:/tmp/guestbook_dump.json" $Out
     if ($LASTEXITCODE -ne 0) { throw "scp of the export failed (exit $LASTEXITCODE). Nothing deleted." }
-    # The dump is root-owned (made by `sudo python3`), so needs sudo to remove.
+    # The dump is owned by the guestbook account, so needs sudo to remove.
     & ssh $target "sudo rm -f /tmp/guestbook_dump.json" | Out-Null
 
     # Guard: never purge unless we have a real local file in hand.
@@ -375,7 +377,7 @@ con.execute("VACUUM"); con.commit()
 print(n)
 '@
       Write-Host "Purging $n entries on the Pi (visit counter kept)..." -ForegroundColor Yellow
-      $deleted = ($pyPurge | & ssh $target "sudo python3 -") | Select-Object -Last 1
+      $deleted = ($pyPurge | & ssh $target "cd / && sudo -u guestbook python3 -I -") | Select-Object -Last 1
       if ($LASTEXITCODE -ne 0) { throw "Purge failed (exit $LASTEXITCODE). Your download is safe at $Out." }
       Write-Host "Deleted $deleted entries on the Pi." -ForegroundColor Green
     }

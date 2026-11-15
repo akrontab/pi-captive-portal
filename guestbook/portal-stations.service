@@ -4,4 +4,26 @@ After=hostapd.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/python3 /opt/guestbook/portal-stations.py wlan0
+# Not root: a dedicated account holding only CAP_NET_ADMIN, which covers
+# `iw ... station dump`. Nothing else in the sandbox is writable except
+# /run/portal (the snapshot the guestbook reads).
+User=portal-stations
+Group=portal-stations
+AmbientCapabilities=CAP_NET_ADMIN
+CapabilityBoundingSet=CAP_NET_ADMIN
+RuntimeDirectory=portal
+RuntimeDirectoryMode=0755
+RuntimeDirectoryPreserve=yes
+ProtectSystem=strict
+ProtectKernelTunables=true
+RestrictAddressFamilies=AF_UNIX AF_NETLINK
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+LockPersonality=true
+ExecStart=/usr/bin/python3 /opt/portal-stations.py wlan0
