@@ -1,10 +1,21 @@
 # pi-captive-portal
 
-Isolated Wi-Fi AP on a Raspberry Pi 3 that serves one local page to every
-client — a walled garden, no internet upstream. hostapd + dnsmasq + nginx.
+Isolated Wi-Fi AP on a Raspberry Pi 2 Model B that serves one local page to
+every client — a walled garden, no internet upstream. hostapd + dnsmasq + nginx.
+
+**Hardware:** Pi 2 Model B running Raspberry Pi OS (Trixie) Lite **armhf
+(32-bit)**. The Pi 2B has **no built-in Wi-Fi**, so the AP radio is a USB adapter
+(`rt2800usb`) that shows up as `wlan0`. Ethernet is the management link. If you
+run more than one USB radio, use a **powered USB hub**: the Pi 2B can't supply
+two adapters from its own ports.
 
 Full annotated walkthrough of every step lives in
-[`pi3-captive-portal.md`](pi3-captive-portal.md). This README is the scripted path.
+[`pi2-captive-portal.md`](pi2-captive-portal.md). This README is the scripted path.
+
+## See it in action
+
+- [Demo 1 (YouTube Short)](https://youtube.com/shorts/lY3wrJ3sY7c)
+- [Demo 2 (YouTube Short)](https://youtube.com/shorts/QkFL4eGP6MY)
 
 ## Layout
 
@@ -15,6 +26,7 @@ Full annotated walkthrough of every step lives in
 | `setup.sh` | Runs **on the Pi** as root. Idempotent. `install` / `rollback`. |
 | `config/*.tmpl` | hostapd, dnsmasq, networkd, nginx — `@TOKEN@` rendered from `portal.env`. |
 | `www/index.html` | The served portal page (single self-contained file). |
+| `health/` | Power/USB health logger (systemd timer) for failure forensics. |
 
 `portal.env` is the single source of truth: the IP set there is rendered into
 every config file, so nothing drifts and each piece stays swappable.
@@ -44,14 +56,15 @@ How it works, best-first:
    is actually reachable. The best guess prefers an SSH-open, mDNS-named host.
 
 Read-only — it changes nothing on your machine or the Pi. Note it identifies a
-Pi by the interface that's on the network: a Pi on Wi-Fi shows its Wi-Fi MAC,
-on Ethernet its (different) Ethernet MAC — both are Pi OUIs.
+Pi by the interface that's on the network. On the Pi 2B that's the onboard
+Ethernet (`b8:27:eb`, a Pi OUI). A USB Wi-Fi adapter carries **its own vendor's
+MAC**, so a Pi 2B reached over Wi-Fi won't match an OUI; only mDNS will find it.
 
 ## Use it (from Windows)
 
 > **Connect the Pi over Ethernet first.** `setup.sh` takes `wlan0` away from
 > NetworkManager — do this over Wi-Fi and you lose the box mid-run. Use
-> `find-pi.ps1` to confirm which interface it's on (Wi-Fi MAC vs Ethernet MAC).
+> `find-pi.ps1` to confirm it's on Ethernet (a `b8:27:eb` Pi OUI match).
 
 ```powershell
 cd C:\Users\Aaron\repo\pi-captive-portal
@@ -279,4 +292,51 @@ curl -sI http://127.0.0.1/generate_204   # 302
 
 Join the SSID from a phone; the captive-portal sheet should appear in a few
 seconds. If not, load `http://neverssl.com` manually. Known limits (HTTPS
-interception, Android Private DNS) are documented in `pi3-captive-portal.md`.
+interception, Android Private DNS) are documented in `pi2-captive-portal.md`.
+
+## Logs & failure analysis
+
+Raspberry Pi OS keeps the systemd journal **in RAM only**
+(`/usr/lib/systemd/journald.conf.d/40-rpi-volatile-storage.conf`), so every
+log is lost on reboot or power cut, which is exactly when you need it. That is
+why the AR9271 failure in [`radio-failure/`](radio-failure/radio-failure.md) has
+no logs from the moment it died. `setup.sh` now fixes that by default:
+
+| `portal.env` knob | Default | Effect |
+|---|---|---|
+| `PERSISTENT_LOGS` | `1` | Drop-in `/etc/systemd/journald.conf.d/50-portal-persistent.conf` sets `Storage=persistent`; journal lives in `/var/log/journal`. |
+| `JOURNAL_MAX_USE` | `200M` | Disk cap for the journal (oldest entries rotate out). |
+| `JOURNAL_SYNC_INTERVAL` | `30s` | Max log lost to a sudden power cut (journald default is 5min). |
+| `HEALTH_LOG` | `1` | `portal-health.timer` logs throttle/under-voltage flags, temp, core volts, USB devices (port, ID, speed), hub over-current counters and `wlan*` interfaces every 60s. |
+
+Health lines are tagged warning when the board reports under-voltage or
+throttling, or when a USB device appears/disappears or an over-current counter
+moves, so the useful ones filter out easily. Kernel messages (USB disconnects,
+`Undervoltage detected!`, driver errors) are in the same journal.
+
+```bash
+journalctl --list-boots                          # every boot, now kept across power cycles
+journalctl -b -1 -e                              # end of the PREVIOUS boot (what happened before it died)
+journalctl -b -1 -k                              # previous boot, kernel only
+journalctl -t portal-health -p warning           # power/USB events only
+journalctl -t portal-health --since "2 hours ago"
+journalctl -k | grep -iE "voltage|usb|over-?current|ath9k|rt2800"
+```
+
+Pull a boot's logs to Windows for analysis:
+
+```powershell
+ssh pi.local "sudo journalctl -b -1 -o short-iso --no-pager" > prev-boot.log
+```
+
+**Clock caveat:** the Pi has no battery-backed RTC. At boot the clock starts
+from the last time `systemd-timesyncd` synced, then jumps once NTP syncs, so
+early-boot timestamps can read days in the past. `journalctl` keys entries by
+boot ID and monotonic time, so per-boot ordering is still correct; use
+`-o short-monotonic` when wall-clock time looks wrong.
+
+Not covered by logging: `max_usb_current=1` in `config.txt` (applies to the
+Pi 2B and B+; lifts the shared USB current limit from 600mA to 1.2A). That's a
+power change, not a logging one; it's left to you. It needs a supply that can
+deliver it (2.5A recommended), and a powered hub is still the safer fix for two
+radios.

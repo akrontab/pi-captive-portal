@@ -423,7 +423,7 @@ if ($PullAll) {
 }
 
 # --- Stage payload with LF line endings so bash on the Pi is happy ---
-$items = @('setup.sh','portal.env','config','www','guestbook','ssid','probe')
+$items = @('setup.sh','portal.env','config','www','guestbook','ssid','probe','health')
 # ssids.txt (bait pool) is optional + git-ignored; ship it only when present.
 if (Test-Path (Join-Path $scriptDir 'ssids.txt')) { $items += 'ssids.txt' }
 foreach ($i in $items) {

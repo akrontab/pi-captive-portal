@@ -1,0 +1,26 @@
+== /etc/systemd/network/10-wlan0-pin.link
+# Pin wlan0 to its radio by burned-in MAC — survives reboot / USB reorder / hub.
+# Managed by setup.sh from WLAN_IF_MAC=00:11:7f:20:f0:5e in portal.env; edit there, not here.
+[Match]
+PermanentMACAddress=00:11:7f:20:f0:5e
+
+[Link]
+Name=wlan0
+== /etc/systemd/network/10-wlan0-portal.network
+[Match]
+Name=wlan0
+
+[Network]
+Address=192.168.4.1/24
+# Assign the address before hostapd brings up carrier.
+ConfigureWithoutCarrier=yes
+== /etc/systemd/network/10-wlan1-pin.link
+# Pin wlan1 to its radio by burned-in MAC — survives reboot / USB reorder / hub.
+# Managed by setup.sh from MONITOR_IF_MAC=00:0f:60:03:cb:13 in portal.env; edit there, not here.
+[Match]
+PermanentMACAddress=00:0f:60:03:cb:13
+
+[Link]
+Name=wlan1
+== /etc/systemd/network/73-usb-net-by-mac.link
+== /etc/systemd/network/99-default.link

@@ -1,0 +1,29 @@
+2026-10-22T11:53:16-06:00
+ 11:53:16 up 21 min,  1 user,  load average: 0.58, 0.36, 0.27
+-- throttled
+throttled=0x0
+temp=39.0'C
+volt=1.3125V
+-- lsusb
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 001 Device 002: ID 0424:9514 Microchip Technology, Inc. (formerly SMSC) SMC9514 Hub
+Bus 001 Device 003: ID 0424:ec00 Microchip Technology, Inc. (formerly SMSC) SMSC9512/9514 Fast Ethernet Adapter
+Bus 001 Device 004: ID 148f:5370 Ralink Technology, Corp. RT5370 Wireless Adapter
+/:  Bus 001.Port 001: Dev 001, Class=root_hub, Driver=dwc_otg/1p, 480M
+    |__ Port 001: Dev 002, If 0, Class=Hub, Driver=hub/5p, 480M
+        |__ Port 001: Dev 003, If 0, Class=Vendor Specific Class, Driver=smsc95xx, 480M
+        |__ Port 005: Dev 004, If 0, Class=Vendor Specific Class, Driver=rt2800usb, 480M
+-- hub ports
+/sys/bus/usb/devices/1-1:1.0/1-1-port1 oc=0 state=configured
+/sys/bus/usb/devices/1-1:1.0/1-1-port2 oc=0 state=not attached
+/sys/bus/usb/devices/1-1:1.0/1-1-port3 oc=0 state=not attached
+/sys/bus/usb/devices/1-1:1.0/1-1-port4 oc=0 state=not attached
+/sys/bus/usb/devices/1-1:1.0/1-1-port5 oc=0 state=configured
+-- links
+lo               UNKNOWN        00:00:00:00:00:00 <LOOPBACK,UP,LOWER_UP> 
+eth0             UP             b8:27:eb:cd:ad:43 <BROADCAST,MULTICAST,UP,LOWER_UP> 
+wlan1            UP             00:0f:60:03:cb:13 <BROADCAST,MULTICAST,UP,LOWER_UP> 
+-- services
+bash: line 1: iw: command not found
+activating
+failed

@@ -5,7 +5,7 @@
 #   sudo ./setup.sh rollback   # undo: restore NetworkManager, drop services/rules
 #
 # Reads ./portal.env for all tunables and renders config/*.tmpl into place.
-# See pi3-captive-portal.md for the annotated manual version of every step.
+# See pi2-captive-portal.md for the annotated manual version of every step.
 #
 # WARNING: this takes wlan0 away from NetworkManager. Run it over ETHERNET or a
 # directly attached keyboard, never over the Wi-Fi you're about to repurpose.
@@ -56,6 +56,13 @@ PROBE_CHANNELS="${PROBE_CHANNELS:-1,6,11}"
 PROBE_HOP="${PROBE_HOP:-1}"
 PROBE_HOP_INTERVAL="${PROBE_HOP_INTERVAL:-0.5}"
 PROBE_COMMIT_INTERVAL="${PROBE_COMMIT_INTERVAL:-5}"
+# Forensics: keep the journal across reboots (Raspberry Pi OS defaults to a
+# RAM-only journal, which loses every log on reboot or power loss) and log a
+# power/USB health snapshot every minute. See README "Logs & failure analysis".
+PERSISTENT_LOGS="${PERSISTENT_LOGS:-1}"
+JOURNAL_MAX_USE="${JOURNAL_MAX_USE:-200M}"
+JOURNAL_SYNC_INTERVAL="${JOURNAL_SYNC_INTERVAL:-30s}"
+HEALTH_LOG="${HEALTH_LOG:-1}"
 
 # Portal subnet as CIDR (network address / prefix), derived from PORTAL_IP+PREFIX.
 # Used to let the guestbook dump endpoint be reached from portal clients.
@@ -456,8 +463,56 @@ NMCONF
   echo "      view: sudo python3 /opt/portal-probe-logger.py --report"
 }
 
+configure_logging() {
+  echo "[0b/10] Persistent logs + power/USB health logger..."
+  # Raspberry Pi OS ships /usr/lib/systemd/journald.conf.d/40-rpi-volatile-storage.conf
+  # (Storage=volatile). A later-sorting drop-in in /etc overrides it.
+  local dropin=/etc/systemd/journald.conf.d/50-portal-persistent.conf
+  if [[ "$PERSISTENT_LOGS" == "1" ]]; then
+    install -d /etc/systemd/journald.conf.d
+    # SyncIntervalSec: how much un-flushed log a sudden power cut can lose
+    # (default 5min). Shorter costs a little SD-card wear.
+    cat > "$dropin" <<JOURNALD
+[Journal]
+Storage=persistent
+SystemMaxUse=${JOURNAL_MAX_USE}
+SyncIntervalSec=${JOURNAL_SYNC_INTERVAL}
+JOURNALD
+    install -d -m 2755 -g systemd-journal /var/log/journal
+    systemd-tmpfiles --create --prefix /var/log/journal
+    systemctl restart systemd-journald
+    journalctl --flush
+    echo "      journal: persistent (/var/log/journal, max ${JOURNAL_MAX_USE})"
+  else
+    # Back to the Pi OS default (RAM only). Existing /var/log/journal files are
+    # left in place; they may be evidence.
+    if [[ -f "$dropin" ]]; then
+      rm -f "$dropin"
+      systemctl restart systemd-journald
+    fi
+    echo "      journal: volatile (PERSISTENT_LOGS=0)"
+  fi
+
+  if [[ "$HEALTH_LOG" == "1" ]]; then
+    install -m 755 "${SCRIPT_DIR}/health/portal-health.sh" /opt/portal-health.sh
+    cp -f "${SCRIPT_DIR}/health/portal-health.service" /etc/systemd/system/portal-health.service
+    cp -f "${SCRIPT_DIR}/health/portal-health.timer"   /etc/systemd/system/portal-health.timer
+    systemctl daemon-reload
+    systemctl enable --now portal-health.timer
+    echo "      health log: ON (journalctl -t portal-health)"
+  else
+    systemctl disable --now portal-health.timer 2>/dev/null || true
+    rm -f /etc/systemd/system/portal-health.service /etc/systemd/system/portal-health.timer \
+          /opt/portal-health.sh
+    systemctl daemon-reload
+    echo "      health log: OFF (HEALTH_LOG=0)"
+  fi
+}
+
 do_install() {
   [[ "$NOPASSWD_SUDO" == "1" ]] && install_sudoers
+  # First, so the rest of the install (and any failure in it) is captured.
+  configure_logging
   install_packages
   radio_country
   pin_interfaces
@@ -495,6 +550,13 @@ do_rollback() {
   rm -f /etc/systemd/system/portal-probe-logger.service /opt/portal-probe-logger.py
   rm -f /etc/portal-probe.env /etc/NetworkManager/conf.d/99-portal-probe-unmanaged.conf
   # /var/lib/portal/probes.db is left in place (like the guestbook DB).
+  systemctl disable --now portal-health.timer 2>/dev/null || true
+  rm -f /etc/systemd/system/portal-health.service /etc/systemd/system/portal-health.timer
+  rm -f /opt/portal-health.sh /run/portal-health.last
+  # Journal returns to the Pi OS default (volatile). /var/log/journal is left in
+  # place so collected history is not destroyed by a rollback.
+  rm -f /etc/systemd/journald.conf.d/50-portal-persistent.conf
+  systemctl restart systemd-journald 2>/dev/null || true
   # Undo the passwordless-sudo drop-in this setup installed (deploy infra, not
   # portal runtime — a fresh `setup.sh install` re-adds it via `ssh -t`).
   rm -f /etc/sudoers.d/011_pi-nopasswd

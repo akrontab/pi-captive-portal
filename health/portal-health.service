@@ -1,0 +1,7 @@
+[Unit]
+Description=Log power/USB health snapshot (throttle flags, USB devices, over-current)
+
+[Service]
+Type=oneshot
+ExecStart=/opt/portal-health.sh
+SyslogIdentifier=portal-health

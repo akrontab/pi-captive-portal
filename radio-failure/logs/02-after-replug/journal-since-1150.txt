@@ -1,0 +1,888 @@
+2026-10-22T11:50:08-06:00 pi systemd[1]: Starting portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook...
+2026-10-22T11:50:08-06:00 pi systemd[1]: portal-stations.service: Deactivated successfully.
+2026-10-22T11:50:08-06:00 pi systemd[1]: Finished portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook.
+2026-10-22T11:50:20-06:00 pi systemd[1]: Starting portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook...
+2026-10-22T11:50:21-06:00 pi systemd[1]: portal-stations.service: Deactivated successfully.
+2026-10-22T11:50:21-06:00 pi systemd[1]: Finished portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook.
+2026-10-22T11:50:32-06:00 pi systemd[1]: Starting portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook...
+2026-10-22T11:50:32-06:00 pi systemd[1]: portal-stations.service: Deactivated successfully.
+2026-10-22T11:50:32-06:00 pi systemd[1]: Finished portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook.
+2026-10-22T11:50:44-06:00 pi systemd[1]: Starting portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook...
+2026-10-22T11:50:44-06:00 pi systemd[1]: portal-stations.service: Deactivated successfully.
+2026-10-22T11:50:44-06:00 pi systemd[1]: Finished portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook.
+2026-10-22T11:50:56-06:00 pi systemd[1]: Starting portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook...
+2026-10-22T11:50:56-06:00 pi systemd[1]: portal-stations.service: Deactivated successfully.
+2026-10-22T11:50:56-06:00 pi systemd[1]: Finished portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook.
+2026-10-22T11:51:08-06:00 pi systemd[1]: Starting portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook...
+2026-10-22T11:51:08-06:00 pi systemd[1]: portal-stations.service: Deactivated successfully.
+2026-10-22T11:51:08-06:00 pi systemd[1]: Finished portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook.
+2026-10-22T11:51:20-06:00 pi systemd[1]: Starting portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook...
+2026-10-22T11:51:21-06:00 pi systemd[1]: portal-stations.service: Deactivated successfully.
+2026-10-22T11:51:21-06:00 pi systemd[1]: Finished portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook.
+2026-10-22T11:51:30-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:51:31-06:00 pi (hostapd)[3006]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:51:31-06:00 pi hostapd[3006]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:51:31-06:00 pi hostapd[3006]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:51:31-06:00 pi hostapd[3006]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:51:31-06:00 pi hostapd[3006]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:51:31-06:00 pi hostapd[3006]: nl80211 driver initialization failed.
+2026-10-22T11:51:31-06:00 pi hostapd[3006]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:51:31-06:00 pi hostapd[3006]: wlan0: AP-DISABLED
+2026-10-22T11:51:31-06:00 pi hostapd[3006]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:51:31-06:00 pi hostapd[3006]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:51:31-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:51:31-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:51:31-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:51:31-06:00 pi systemd[1]: Starting portal-ssid-rotate.service - Rotate captive-portal bait SSIDs and restart hostapd...
+2026-10-22T11:51:31-06:00 pi systemd[1]: Starting portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook...
+2026-10-22T11:51:31-06:00 pi systemd[1]: Stopped hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:51:31-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:51:31-06:00 pi systemd[1]: portal-stations.service: Deactivated successfully.
+2026-10-22T11:51:31-06:00 pi systemd[1]: Finished portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook.
+2026-10-22T11:51:32-06:00 pi (hostapd)[3023]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:51:32-06:00 pi hostapd[3023]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:51:32-06:00 pi hostapd[3023]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:51:32-06:00 pi hostapd[3023]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:51:32-06:00 pi hostapd[3023]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:51:32-06:00 pi hostapd[3023]: nl80211 driver initialization failed.
+2026-10-22T11:51:32-06:00 pi hostapd[3023]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:51:32-06:00 pi hostapd[3023]: wlan0: AP-DISABLED
+2026-10-22T11:51:32-06:00 pi hostapd[3023]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:51:32-06:00 pi hostapd[3023]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:51:32-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:51:32-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:51:32-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:51:32-06:00 pi systemctl[3018]: Job for hostapd.service failed because the control process exited with error code.
+2026-10-22T11:51:32-06:00 pi systemctl[3018]: See "systemctl status hostapd.service" and "journalctl -xeu hostapd.service" for details.
+2026-10-22T11:51:32-06:00 pi python3[3014]: [portal-ssid] single rotating SSID -> 'zer0c00ls hideout' (pool=9)
+2026-10-22T11:51:32-06:00 pi systemd[1]: portal-ssid-rotate.service: Deactivated successfully.
+2026-10-22T11:51:32-06:00 pi systemd[1]: Finished portal-ssid-rotate.service - Rotate captive-portal bait SSIDs and restart hostapd.
+2026-10-22T11:51:34-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 1.
+2026-10-22T11:51:34-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:51:35-06:00 pi (hostapd)[3034]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:51:35-06:00 pi hostapd[3034]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:51:35-06:00 pi hostapd[3034]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:51:35-06:00 pi hostapd[3034]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:51:35-06:00 pi hostapd[3034]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:51:35-06:00 pi hostapd[3034]: nl80211 driver initialization failed.
+2026-10-22T11:51:35-06:00 pi hostapd[3034]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:51:35-06:00 pi hostapd[3034]: wlan0: AP-DISABLED
+2026-10-22T11:51:35-06:00 pi hostapd[3034]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:51:35-06:00 pi hostapd[3034]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:51:35-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:51:35-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:51:35-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:51:37-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 2.
+2026-10-22T11:51:37-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:51:37-06:00 pi (hostapd)[3044]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:51:37-06:00 pi hostapd[3044]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:51:37-06:00 pi hostapd[3044]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:51:37-06:00 pi hostapd[3044]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:51:37-06:00 pi hostapd[3044]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:51:37-06:00 pi hostapd[3044]: nl80211 driver initialization failed.
+2026-10-22T11:51:37-06:00 pi hostapd[3044]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:51:37-06:00 pi hostapd[3044]: wlan0: AP-DISABLED
+2026-10-22T11:51:37-06:00 pi hostapd[3044]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:51:37-06:00 pi hostapd[3044]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:51:37-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:51:37-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:51:37-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:51:39-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 3.
+2026-10-22T11:51:39-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:51:40-06:00 pi (hostapd)[3054]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:51:40-06:00 pi hostapd[3054]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:51:40-06:00 pi hostapd[3054]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:51:40-06:00 pi hostapd[3054]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:51:40-06:00 pi hostapd[3054]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:51:40-06:00 pi hostapd[3054]: nl80211 driver initialization failed.
+2026-10-22T11:51:40-06:00 pi hostapd[3054]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:51:40-06:00 pi hostapd[3054]: wlan0: AP-DISABLED
+2026-10-22T11:51:40-06:00 pi hostapd[3054]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:51:40-06:00 pi hostapd[3054]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:51:40-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:51:40-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:51:40-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:51:42-06:00 pi systemd[1]: Starting portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook...
+2026-10-22T11:51:42-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 4.
+2026-10-22T11:51:42-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:51:42-06:00 pi systemd[1]: portal-stations.service: Deactivated successfully.
+2026-10-22T11:51:42-06:00 pi systemd[1]: Finished portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook.
+2026-10-22T11:51:43-06:00 pi (hostapd)[3070]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:51:43-06:00 pi hostapd[3070]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:51:43-06:00 pi hostapd[3070]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:51:43-06:00 pi hostapd[3070]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:51:43-06:00 pi hostapd[3070]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:51:43-06:00 pi hostapd[3070]: nl80211 driver initialization failed.
+2026-10-22T11:51:43-06:00 pi hostapd[3070]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:51:43-06:00 pi hostapd[3070]: wlan0: AP-DISABLED
+2026-10-22T11:51:43-06:00 pi hostapd[3070]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:51:43-06:00 pi hostapd[3070]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:51:43-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:51:43-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:51:43-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:51:45-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 5.
+2026-10-22T11:51:45-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:51:46-06:00 pi (hostapd)[3080]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:51:46-06:00 pi hostapd[3080]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:51:46-06:00 pi hostapd[3080]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:51:46-06:00 pi hostapd[3080]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:51:46-06:00 pi hostapd[3080]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:51:46-06:00 pi hostapd[3080]: nl80211 driver initialization failed.
+2026-10-22T11:51:46-06:00 pi hostapd[3080]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:51:46-06:00 pi hostapd[3080]: wlan0: AP-DISABLED
+2026-10-22T11:51:46-06:00 pi hostapd[3080]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:51:46-06:00 pi hostapd[3080]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:51:46-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:51:46-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:51:46-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:51:48-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 6.
+2026-10-22T11:51:48-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:51:48-06:00 pi (hostapd)[3090]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:51:48-06:00 pi hostapd[3090]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:51:48-06:00 pi hostapd[3090]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:51:48-06:00 pi hostapd[3090]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:51:48-06:00 pi hostapd[3090]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:51:48-06:00 pi hostapd[3090]: nl80211 driver initialization failed.
+2026-10-22T11:51:48-06:00 pi hostapd[3090]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:51:48-06:00 pi hostapd[3090]: wlan0: AP-DISABLED
+2026-10-22T11:51:48-06:00 pi hostapd[3090]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:51:48-06:00 pi hostapd[3090]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:51:48-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:51:48-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:51:48-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:51:50-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 7.
+2026-10-22T11:51:50-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:51:51-06:00 pi (hostapd)[3100]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:51:51-06:00 pi hostapd[3100]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:51:51-06:00 pi hostapd[3100]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:51:51-06:00 pi hostapd[3100]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:51:51-06:00 pi hostapd[3100]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:51:51-06:00 pi hostapd[3100]: nl80211 driver initialization failed.
+2026-10-22T11:51:51-06:00 pi hostapd[3100]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:51:51-06:00 pi hostapd[3100]: wlan0: AP-DISABLED
+2026-10-22T11:51:51-06:00 pi hostapd[3100]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:51:51-06:00 pi hostapd[3100]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:51:51-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:51:51-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:51:51-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:51:53-06:00 pi systemd[1]: Starting portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook...
+2026-10-22T11:51:53-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 8.
+2026-10-22T11:51:53-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:51:54-06:00 pi systemd[1]: portal-stations.service: Deactivated successfully.
+2026-10-22T11:51:54-06:00 pi systemd[1]: Finished portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook.
+2026-10-22T11:51:54-06:00 pi (hostapd)[3115]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:51:54-06:00 pi hostapd[3115]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:51:54-06:00 pi hostapd[3115]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:51:54-06:00 pi hostapd[3115]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:51:54-06:00 pi hostapd[3115]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:51:54-06:00 pi hostapd[3115]: nl80211 driver initialization failed.
+2026-10-22T11:51:54-06:00 pi hostapd[3115]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:51:54-06:00 pi hostapd[3115]: wlan0: AP-DISABLED
+2026-10-22T11:51:54-06:00 pi hostapd[3115]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:51:54-06:00 pi hostapd[3115]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:51:54-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:51:54-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:51:54-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:51:56-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 9.
+2026-10-22T11:51:56-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:51:57-06:00 pi (hostapd)[3126]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:51:57-06:00 pi hostapd[3126]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:51:57-06:00 pi hostapd[3126]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:51:57-06:00 pi hostapd[3126]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:51:57-06:00 pi hostapd[3126]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:51:57-06:00 pi hostapd[3126]: nl80211 driver initialization failed.
+2026-10-22T11:51:57-06:00 pi hostapd[3126]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:51:57-06:00 pi hostapd[3126]: wlan0: AP-DISABLED
+2026-10-22T11:51:57-06:00 pi hostapd[3126]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:51:57-06:00 pi hostapd[3126]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:51:57-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:51:57-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:51:57-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:51:59-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 10.
+2026-10-22T11:51:59-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:52:00-06:00 pi (hostapd)[3136]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:52:00-06:00 pi hostapd[3136]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:00-06:00 pi hostapd[3136]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:52:00-06:00 pi hostapd[3136]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:52:00-06:00 pi hostapd[3136]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:00-06:00 pi hostapd[3136]: nl80211 driver initialization failed.
+2026-10-22T11:52:00-06:00 pi hostapd[3136]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:52:00-06:00 pi hostapd[3136]: wlan0: AP-DISABLED
+2026-10-22T11:52:00-06:00 pi hostapd[3136]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:52:00-06:00 pi hostapd[3136]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:52:00-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:52:00-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:52:00-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:52:02-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 11.
+2026-10-22T11:52:02-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:52:03-06:00 pi (hostapd)[3147]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:52:03-06:00 pi hostapd[3147]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:03-06:00 pi hostapd[3147]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:52:03-06:00 pi hostapd[3147]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:52:03-06:00 pi hostapd[3147]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:03-06:00 pi hostapd[3147]: nl80211 driver initialization failed.
+2026-10-22T11:52:03-06:00 pi hostapd[3147]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:52:03-06:00 pi hostapd[3147]: wlan0: AP-DISABLED
+2026-10-22T11:52:03-06:00 pi hostapd[3147]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:52:03-06:00 pi hostapd[3147]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:52:03-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:52:03-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:52:03-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:52:04-06:00 pi systemd[1]: Starting portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook...
+2026-10-22T11:52:04-06:00 pi systemd[1]: portal-stations.service: Deactivated successfully.
+2026-10-22T11:52:04-06:00 pi systemd[1]: Finished portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook.
+2026-10-22T11:52:05-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 12.
+2026-10-22T11:52:05-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:52:05-06:00 pi (hostapd)[3162]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:52:05-06:00 pi hostapd[3162]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:05-06:00 pi hostapd[3162]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:52:05-06:00 pi hostapd[3162]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:52:05-06:00 pi hostapd[3162]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:05-06:00 pi hostapd[3162]: nl80211 driver initialization failed.
+2026-10-22T11:52:05-06:00 pi hostapd[3162]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:52:05-06:00 pi hostapd[3162]: wlan0: AP-DISABLED
+2026-10-22T11:52:05-06:00 pi hostapd[3162]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:52:05-06:00 pi hostapd[3162]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:52:05-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:52:05-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:52:05-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:52:07-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 13.
+2026-10-22T11:52:07-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:52:08-06:00 pi (hostapd)[3172]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:52:08-06:00 pi hostapd[3172]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:08-06:00 pi hostapd[3172]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:52:08-06:00 pi hostapd[3172]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:52:08-06:00 pi hostapd[3172]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:08-06:00 pi hostapd[3172]: nl80211 driver initialization failed.
+2026-10-22T11:52:08-06:00 pi hostapd[3172]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:52:08-06:00 pi hostapd[3172]: wlan0: AP-DISABLED
+2026-10-22T11:52:08-06:00 pi hostapd[3172]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:52:08-06:00 pi hostapd[3172]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:52:08-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:52:08-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:52:08-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:52:10-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 14.
+2026-10-22T11:52:10-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:52:11-06:00 pi (hostapd)[3182]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:52:11-06:00 pi hostapd[3182]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:11-06:00 pi hostapd[3182]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:52:11-06:00 pi hostapd[3182]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:52:11-06:00 pi hostapd[3182]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:11-06:00 pi hostapd[3182]: nl80211 driver initialization failed.
+2026-10-22T11:52:11-06:00 pi hostapd[3182]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:52:11-06:00 pi hostapd[3182]: wlan0: AP-DISABLED
+2026-10-22T11:52:11-06:00 pi hostapd[3182]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:52:11-06:00 pi hostapd[3182]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:52:11-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:52:11-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:52:11-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:52:13-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 15.
+2026-10-22T11:52:13-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:52:14-06:00 pi (hostapd)[3192]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:52:14-06:00 pi hostapd[3192]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:14-06:00 pi hostapd[3192]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:52:14-06:00 pi hostapd[3192]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:52:14-06:00 pi hostapd[3192]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:14-06:00 pi hostapd[3192]: nl80211 driver initialization failed.
+2026-10-22T11:52:14-06:00 pi hostapd[3192]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:52:14-06:00 pi hostapd[3192]: wlan0: AP-DISABLED
+2026-10-22T11:52:14-06:00 pi hostapd[3192]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:52:14-06:00 pi hostapd[3192]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:52:14-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:52:14-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:52:14-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:52:15-06:00 pi systemd[1]: Starting portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook...
+2026-10-22T11:52:15-06:00 pi systemd[1]: portal-stations.service: Deactivated successfully.
+2026-10-22T11:52:15-06:00 pi systemd[1]: Finished portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook.
+2026-10-22T11:52:16-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 16.
+2026-10-22T11:52:16-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:52:16-06:00 pi (hostapd)[3207]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:52:16-06:00 pi hostapd[3207]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:16-06:00 pi hostapd[3207]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:52:16-06:00 pi hostapd[3207]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:52:16-06:00 pi hostapd[3207]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:16-06:00 pi hostapd[3207]: nl80211 driver initialization failed.
+2026-10-22T11:52:16-06:00 pi hostapd[3207]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:52:16-06:00 pi hostapd[3207]: wlan0: AP-DISABLED
+2026-10-22T11:52:16-06:00 pi hostapd[3207]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:52:16-06:00 pi hostapd[3207]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:52:16-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:52:16-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:52:16-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:52:18-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 17.
+2026-10-22T11:52:18-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:52:19-06:00 pi (hostapd)[3217]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:52:19-06:00 pi hostapd[3217]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:19-06:00 pi hostapd[3217]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:52:19-06:00 pi hostapd[3217]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:52:19-06:00 pi hostapd[3217]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:19-06:00 pi hostapd[3217]: nl80211 driver initialization failed.
+2026-10-22T11:52:19-06:00 pi hostapd[3217]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:52:19-06:00 pi hostapd[3217]: wlan0: AP-DISABLED
+2026-10-22T11:52:19-06:00 pi hostapd[3217]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:52:19-06:00 pi hostapd[3217]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:52:19-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:52:19-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:52:19-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:52:21-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 18.
+2026-10-22T11:52:21-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:52:22-06:00 pi (hostapd)[3227]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:52:22-06:00 pi hostapd[3227]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:22-06:00 pi hostapd[3227]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:52:22-06:00 pi hostapd[3227]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:52:22-06:00 pi hostapd[3227]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:22-06:00 pi hostapd[3227]: nl80211 driver initialization failed.
+2026-10-22T11:52:22-06:00 pi hostapd[3227]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:52:22-06:00 pi hostapd[3227]: wlan0: AP-DISABLED
+2026-10-22T11:52:22-06:00 pi hostapd[3227]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:52:22-06:00 pi hostapd[3227]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:52:22-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:52:22-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:52:22-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:52:24-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 19.
+2026-10-22T11:52:24-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:52:25-06:00 pi (hostapd)[3237]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:52:25-06:00 pi hostapd[3237]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:25-06:00 pi hostapd[3237]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:52:25-06:00 pi hostapd[3237]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:52:25-06:00 pi hostapd[3237]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:25-06:00 pi hostapd[3237]: nl80211 driver initialization failed.
+2026-10-22T11:52:25-06:00 pi hostapd[3237]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:52:25-06:00 pi hostapd[3237]: wlan0: AP-DISABLED
+2026-10-22T11:52:25-06:00 pi hostapd[3237]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:52:25-06:00 pi hostapd[3237]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:52:25-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:52:25-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:52:25-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:52:26-06:00 pi systemd[1]: Starting portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook...
+2026-10-22T11:52:26-06:00 pi systemd[1]: portal-stations.service: Deactivated successfully.
+2026-10-22T11:52:26-06:00 pi systemd[1]: Finished portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook.
+2026-10-22T11:52:27-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 20.
+2026-10-22T11:52:27-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:52:27-06:00 pi (hostapd)[3252]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:52:27-06:00 pi hostapd[3252]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:27-06:00 pi hostapd[3252]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:52:27-06:00 pi hostapd[3252]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:52:27-06:00 pi hostapd[3252]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:27-06:00 pi hostapd[3252]: nl80211 driver initialization failed.
+2026-10-22T11:52:27-06:00 pi hostapd[3252]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:52:27-06:00 pi hostapd[3252]: wlan0: AP-DISABLED
+2026-10-22T11:52:27-06:00 pi hostapd[3252]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:52:27-06:00 pi hostapd[3252]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:52:27-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:52:27-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:52:27-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:52:29-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 21.
+2026-10-22T11:52:29-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:52:30-06:00 pi (hostapd)[3262]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:52:30-06:00 pi hostapd[3262]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:30-06:00 pi hostapd[3262]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:52:30-06:00 pi hostapd[3262]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:52:30-06:00 pi hostapd[3262]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:30-06:00 pi hostapd[3262]: nl80211 driver initialization failed.
+2026-10-22T11:52:30-06:00 pi hostapd[3262]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:52:30-06:00 pi hostapd[3262]: wlan0: AP-DISABLED
+2026-10-22T11:52:30-06:00 pi hostapd[3262]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:52:30-06:00 pi hostapd[3262]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:52:30-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:52:30-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:52:30-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:52:31-06:00 pi sshd-session[3270]: Accepted publickey for pi from 192.168.40.91 port 30220 ssh2: ED25519 SHA256:8bT4k9TymucBMyhAIiICNVyWXBYf4aAmYH03CExSJGA
+2026-10-22T11:52:31-06:00 pi sshd-session[3270]: pam_unix(sshd:session): session opened for user pi(uid=1000) by pi(uid=0)
+2026-10-22T11:52:31-06:00 pi systemd-logind[528]: New session 18 of user pi.
+2026-10-22T11:52:31-06:00 pi systemd[1]: Created slice user-1000.slice - User Slice of UID 1000.
+2026-10-22T11:52:31-06:00 pi systemd[1]: Starting user-runtime-dir@1000.service - User Runtime Directory /run/user/1000...
+2026-10-22T11:52:31-06:00 pi systemd[1]: Finished user-runtime-dir@1000.service - User Runtime Directory /run/user/1000.
+2026-10-22T11:52:31-06:00 pi systemd[1]: Starting user@1000.service - User Manager for UID 1000...
+2026-10-22T11:52:31-06:00 pi (systemd)[3275]: pam_unix(systemd-user:session): session opened for user pi(uid=1000) by pi(uid=0)
+2026-10-22T11:52:31-06:00 pi systemd-logind[528]: New session 19 of user pi.
+2026-10-22T11:52:32-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 22.
+2026-10-22T11:52:32-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Queued start job for default target default.target.
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Created slice app.slice - User Application Slice.
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Reached target paths.target - Paths.
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Reached target timers.target - Timers.
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Starting dbus.socket - D-Bus User Message Bus Socket...
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Listening on dirmngr.socket - GnuPG network certificate management daemon.
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Listening on gpg-agent-browser.socket - GnuPG cryptographic agent and passphrase cache (access for web browsers).
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Listening on gpg-agent-extra.socket - GnuPG cryptographic agent and passphrase cache (restricted).
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Starting gpg-agent-ssh.socket - GnuPG cryptographic agent (ssh-agent emulation)...
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Starting gpg-agent.socket - GnuPG cryptographic agent and passphrase cache...
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Listening on keyboxd.socket - GnuPG public key management service.
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Starting ssh-agent.socket - OpenSSH Agent socket...
+2026-10-22T11:52:33-06:00 pi (hostapd)[3288]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Listening on dbus.socket - D-Bus User Message Bus Socket.
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Listening on gpg-agent-ssh.socket - GnuPG cryptographic agent (ssh-agent emulation).
+2026-10-22T11:52:33-06:00 pi hostapd[3288]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:33-06:00 pi hostapd[3288]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:52:33-06:00 pi hostapd[3288]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Listening on gpg-agent.socket - GnuPG cryptographic agent and passphrase cache.
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Listening on ssh-agent.socket - OpenSSH Agent socket.
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Reached target sockets.target - Sockets.
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Reached target basic.target - Basic System.
+2026-10-22T11:52:33-06:00 pi systemd[1]: Started user@1000.service - User Manager for UID 1000.
+2026-10-22T11:52:33-06:00 pi hostapd[3288]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:33-06:00 pi hostapd[3288]: nl80211 driver initialization failed.
+2026-10-22T11:52:33-06:00 pi hostapd[3288]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:52:33-06:00 pi hostapd[3288]: wlan0: AP-DISABLED
+2026-10-22T11:52:33-06:00 pi hostapd[3288]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:52:33-06:00 pi hostapd[3288]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Started mpris-proxy.service - Bluetooth mpris proxy.
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Reached target default.target - Main User Target.
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Startup finished in 1.729s.
+2026-10-22T11:52:33-06:00 pi systemd[1]: Started session-18.scope - Session 18 of User pi.
+2026-10-22T11:52:33-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:52:33-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:52:33-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Created slice session.slice - User Core Session Slice.
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Starting dbus.service - D-Bus User Message Bus...
+2026-10-22T11:52:33-06:00 pi systemd[3275]: Started dbus.service - D-Bus User Message Bus.
+2026-10-22T11:52:34-06:00 pi kernel: usb 1-1.2: new full-speed USB device number 5 using dwc_otg
+2026-10-22T11:52:35-06:00 pi dbus-daemon[524]: [system] Activating via systemd: service name='org.freedesktop.timedate1' unit='dbus-org.freedesktop.timedate1.service' requested by ':1.70' (uid=1000 pid=3343 comm="timedatectl")
+2026-10-22T11:52:35-06:00 pi systemd[1]: Starting systemd-timedated.service - Time & Date Service...
+2026-10-22T11:52:35-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 23.
+2026-10-22T11:52:35-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:52:35-06:00 pi systemd[1]: Started systemd-timedated.service - Time & Date Service.
+2026-10-22T11:52:35-06:00 pi dbus-daemon[524]: [system] Successfully activated service 'org.freedesktop.timedate1'
+2026-10-22T11:52:35-06:00 pi sshd-session[3312]: Received disconnect from 192.168.40.91 port 30220:11: disconnected by user
+2026-10-22T11:52:35-06:00 pi sshd-session[3312]: Disconnected from user pi 192.168.40.91 port 30220
+2026-10-22T11:52:35-06:00 pi sshd-session[3270]: pam_unix(sshd:session): session closed for user pi
+2026-10-22T11:52:36-06:00 pi systemd[1]: session-18.scope: Deactivated successfully.
+2026-10-22T11:52:36-06:00 pi systemd[1]: session-18.scope: Consumed 1.049s CPU time.
+2026-10-22T11:52:36-06:00 pi systemd-logind[528]: Session 18 logged out. Waiting for processes to exit.
+2026-10-22T11:52:36-06:00 pi systemd-logind[528]: Removed session 18.
+2026-10-22T11:52:36-06:00 pi (hostapd)[3347]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:52:36-06:00 pi hostapd[3347]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:36-06:00 pi hostapd[3347]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:52:36-06:00 pi hostapd[3347]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:52:36-06:00 pi hostapd[3347]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:36-06:00 pi hostapd[3347]: nl80211 driver initialization failed.
+2026-10-22T11:52:36-06:00 pi hostapd[3347]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:52:36-06:00 pi hostapd[3347]: wlan0: AP-DISABLED
+2026-10-22T11:52:36-06:00 pi hostapd[3347]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:52:36-06:00 pi hostapd[3347]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:52:36-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:52:36-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:52:36-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:52:36-06:00 pi sshd-session[3350]: Accepted publickey for pi from 192.168.40.91 port 30221 ssh2: ED25519 SHA256:8bT4k9TymucBMyhAIiICNVyWXBYf4aAmYH03CExSJGA
+2026-10-22T11:52:36-06:00 pi sshd-session[3350]: pam_unix(sshd:session): session opened for user pi(uid=1000) by pi(uid=0)
+2026-10-22T11:52:36-06:00 pi systemd-logind[528]: New session 20 of user pi.
+2026-10-22T11:52:36-06:00 pi systemd[1]: Started session-20.scope - Session 20 of User pi.
+2026-10-22T11:52:37-06:00 pi sudo[3366]:       pi : PWD=/home/pi ; USER=root ; COMMAND=/usr/bin/dmesg -T
+2026-10-22T11:52:37-06:00 pi sudo[3366]: pam_unix(sudo:session): session opened for user root(uid=0) by pi(uid=1000)
+2026-10-22T11:52:37-06:00 pi sudo[3366]: pam_unix(sudo:session): session closed for user root
+2026-10-22T11:52:37-06:00 pi sshd-session[3365]: Received disconnect from 192.168.40.91 port 30221:11: disconnected by user
+2026-10-22T11:52:37-06:00 pi sshd-session[3365]: Disconnected from user pi 192.168.40.91 port 30221
+2026-10-22T11:52:37-06:00 pi sshd-session[3350]: pam_unix(sshd:session): session closed for user pi
+2026-10-22T11:52:37-06:00 pi systemd[1]: session-20.scope: Deactivated successfully.
+2026-10-22T11:52:37-06:00 pi systemd-logind[528]: Session 20 logged out. Waiting for processes to exit.
+2026-10-22T11:52:37-06:00 pi systemd[1]: Starting portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook...
+2026-10-22T11:52:37-06:00 pi systemd-logind[528]: Removed session 20.
+2026-10-22T11:52:37-06:00 pi sshd-session[3371]: Accepted publickey for pi from 192.168.40.91 port 1457 ssh2: ED25519 SHA256:8bT4k9TymucBMyhAIiICNVyWXBYf4aAmYH03CExSJGA
+2026-10-22T11:52:37-06:00 pi sshd-session[3371]: pam_unix(sshd:session): session opened for user pi(uid=1000) by pi(uid=0)
+2026-10-22T11:52:37-06:00 pi systemd-logind[528]: New session 21 of user pi.
+2026-10-22T11:52:37-06:00 pi systemd[1]: Started session-21.scope - Session 21 of User pi.
+2026-10-22T11:52:37-06:00 pi systemd[1]: portal-stations.service: Deactivated successfully.
+2026-10-22T11:52:37-06:00 pi systemd[1]: Finished portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook.
+2026-10-22T11:52:38-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 24.
+2026-10-22T11:52:38-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:52:38-06:00 pi sudo[3384]:       pi : PWD=/home/pi ; USER=root ; COMMAND=/usr/bin/journalctl -b -o short-iso --no-pager
+2026-10-22T11:52:38-06:00 pi sudo[3384]: pam_unix(sudo:session): session opened for user root(uid=0) by pi(uid=1000)
+2026-10-22T11:52:39-06:00 pi (hostapd)[3388]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:52:39-06:00 pi hostapd[3388]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:39-06:00 pi hostapd[3388]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:52:39-06:00 pi hostapd[3388]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:52:39-06:00 pi hostapd[3388]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:39-06:00 pi hostapd[3388]: nl80211 driver initialization failed.
+2026-10-22T11:52:39-06:00 pi hostapd[3388]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:52:39-06:00 pi hostapd[3388]: wlan0: AP-DISABLED
+2026-10-22T11:52:39-06:00 pi hostapd[3388]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:52:39-06:00 pi hostapd[3388]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:52:39-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:52:39-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:52:39-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:52:39-06:00 pi sudo[3384]: pam_unix(sudo:session): session closed for user root
+2026-10-22T11:52:39-06:00 pi sshd-session[3383]: Received disconnect from 192.168.40.91 port 1457:11: disconnected by user
+2026-10-22T11:52:39-06:00 pi sshd-session[3383]: Disconnected from user pi 192.168.40.91 port 1457
+2026-10-22T11:52:39-06:00 pi sshd-session[3371]: pam_unix(sshd:session): session closed for user pi
+2026-10-22T11:52:39-06:00 pi systemd[1]: session-21.scope: Deactivated successfully.
+2026-10-22T11:52:39-06:00 pi systemd[1]: session-21.scope: Consumed 1.557s CPU time.
+2026-10-22T11:52:39-06:00 pi systemd-logind[528]: Session 21 logged out. Waiting for processes to exit.
+2026-10-22T11:52:39-06:00 pi systemd-logind[528]: Removed session 21.
+2026-10-22T11:52:39-06:00 pi sshd-session[3398]: Accepted publickey for pi from 192.168.40.91 port 1458 ssh2: ED25519 SHA256:8bT4k9TymucBMyhAIiICNVyWXBYf4aAmYH03CExSJGA
+2026-10-22T11:52:39-06:00 pi sshd-session[3398]: pam_unix(sshd:session): session opened for user pi(uid=1000) by pi(uid=0)
+2026-10-22T11:52:39-06:00 pi systemd-logind[528]: New session 22 of user pi.
+2026-10-22T11:52:39-06:00 pi systemd[1]: Started session-22.scope - Session 22 of User pi.
+2026-10-22T11:52:40-06:00 pi sudo[3407]:       pi : PWD=/home/pi ; USER=root ; COMMAND=/usr/bin/journalctl --list-boots --no-pager
+2026-10-22T11:52:40-06:00 pi sudo[3407]: pam_unix(sudo:session): session opened for user root(uid=0) by pi(uid=1000)
+2026-10-22T11:52:40-06:00 pi sudo[3407]: pam_unix(sudo:session): session closed for user root
+2026-10-22T11:52:40-06:00 pi sshd-session[3406]: Received disconnect from 192.168.40.91 port 1458:11: disconnected by user
+2026-10-22T11:52:40-06:00 pi sshd-session[3406]: Disconnected from user pi 192.168.40.91 port 1458
+2026-10-22T11:52:40-06:00 pi sshd-session[3398]: pam_unix(sshd:session): session closed for user pi
+2026-10-22T11:52:40-06:00 pi systemd[1]: session-22.scope: Deactivated successfully.
+2026-10-22T11:52:40-06:00 pi systemd-logind[528]: Session 22 logged out. Waiting for processes to exit.
+2026-10-22T11:52:40-06:00 pi systemd-logind[528]: Removed session 22.
+2026-10-22T11:52:40-06:00 pi sshd-session[3411]: Accepted publickey for pi from 192.168.40.91 port 43714 ssh2: ED25519 SHA256:8bT4k9TymucBMyhAIiICNVyWXBYf4aAmYH03CExSJGA
+2026-10-22T11:52:40-06:00 pi sshd-session[3411]: pam_unix(sshd:session): session opened for user pi(uid=1000) by pi(uid=0)
+2026-10-22T11:52:40-06:00 pi systemd-logind[528]: New session 23 of user pi.
+2026-10-22T11:52:40-06:00 pi systemd[1]: Started session-23.scope - Session 23 of User pi.
+2026-10-22T11:52:41-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 25.
+2026-10-22T11:52:41-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:52:41-06:00 pi sshd-session[3420]: Received disconnect from 192.168.40.91 port 43714:11: disconnected by user
+2026-10-22T11:52:41-06:00 pi sshd-session[3420]: Disconnected from user pi 192.168.40.91 port 43714
+2026-10-22T11:52:41-06:00 pi sshd-session[3411]: pam_unix(sshd:session): session closed for user pi
+2026-10-22T11:52:41-06:00 pi systemd[1]: session-23.scope: Deactivated successfully.
+2026-10-22T11:52:41-06:00 pi systemd-logind[528]: Session 23 logged out. Waiting for processes to exit.
+2026-10-22T11:52:41-06:00 pi systemd-logind[528]: Removed session 23.
+2026-10-22T11:52:42-06:00 pi sshd-session[3424]: Accepted publickey for pi from 192.168.40.91 port 43715 ssh2: ED25519 SHA256:8bT4k9TymucBMyhAIiICNVyWXBYf4aAmYH03CExSJGA
+2026-10-22T11:52:42-06:00 pi sshd-session[3424]: pam_unix(sshd:session): session opened for user pi(uid=1000) by pi(uid=0)
+2026-10-22T11:52:42-06:00 pi (hostapd)[3427]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:52:42-06:00 pi systemd-logind[528]: New session 24 of user pi.
+2026-10-22T11:52:42-06:00 pi systemd[1]: Started session-24.scope - Session 24 of User pi.
+2026-10-22T11:52:42-06:00 pi hostapd[3427]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:42-06:00 pi hostapd[3427]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:52:42-06:00 pi hostapd[3427]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:52:42-06:00 pi hostapd[3427]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:42-06:00 pi hostapd[3427]: nl80211 driver initialization failed.
+2026-10-22T11:52:42-06:00 pi hostapd[3427]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:52:42-06:00 pi hostapd[3427]: wlan0: AP-DISABLED
+2026-10-22T11:52:42-06:00 pi hostapd[3427]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:52:42-06:00 pi hostapd[3427]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:52:42-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:52:42-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:52:42-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:52:42-06:00 pi sshd-session[3441]: Received disconnect from 192.168.40.91 port 43715:11: disconnected by user
+2026-10-22T11:52:42-06:00 pi sshd-session[3441]: Disconnected from user pi 192.168.40.91 port 43715
+2026-10-22T11:52:42-06:00 pi sshd-session[3424]: pam_unix(sshd:session): session closed for user pi
+2026-10-22T11:52:42-06:00 pi systemd[1]: session-24.scope: Deactivated successfully.
+2026-10-22T11:52:42-06:00 pi systemd-logind[528]: Session 24 logged out. Waiting for processes to exit.
+2026-10-22T11:52:42-06:00 pi systemd-logind[528]: Removed session 24.
+2026-10-22T11:52:43-06:00 pi sshd-session[3449]: Accepted publickey for pi from 192.168.40.91 port 43716 ssh2: ED25519 SHA256:8bT4k9TymucBMyhAIiICNVyWXBYf4aAmYH03CExSJGA
+2026-10-22T11:52:43-06:00 pi sshd-session[3449]: pam_unix(sshd:session): session opened for user pi(uid=1000) by pi(uid=0)
+2026-10-22T11:52:43-06:00 pi systemd-logind[528]: New session 25 of user pi.
+2026-10-22T11:52:43-06:00 pi systemd[1]: Started session-25.scope - Session 25 of User pi.
+2026-10-22T11:52:43-06:00 pi sudo[3458]:       pi : PWD=/home/pi ; USER=root ; COMMAND=/usr/bin/sh -c 'zcat /var/log/cloud-init.log.1.gz; cat /var/log/cloud-init.log'
+2026-10-22T11:52:43-06:00 pi sudo[3458]: pam_unix(sudo:session): session opened for user root(uid=0) by pi(uid=1000)
+2026-10-22T11:52:44-06:00 pi sudo[3458]: pam_unix(sudo:session): session closed for user root
+2026-10-22T11:52:44-06:00 pi sshd-session[3457]: Received disconnect from 192.168.40.91 port 43716:11: disconnected by user
+2026-10-22T11:52:44-06:00 pi sshd-session[3457]: Disconnected from user pi 192.168.40.91 port 43716
+2026-10-22T11:52:44-06:00 pi sshd-session[3449]: pam_unix(sshd:session): session closed for user pi
+2026-10-22T11:52:44-06:00 pi systemd[1]: session-25.scope: Deactivated successfully.
+2026-10-22T11:52:44-06:00 pi systemd-logind[528]: Session 25 logged out. Waiting for processes to exit.
+2026-10-22T11:52:44-06:00 pi systemd-logind[528]: Removed session 25.
+2026-10-22T11:52:44-06:00 pi sshd-session[3464]: Accepted publickey for pi from 192.168.40.91 port 43717 ssh2: ED25519 SHA256:8bT4k9TymucBMyhAIiICNVyWXBYf4aAmYH03CExSJGA
+2026-10-22T11:52:44-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 26.
+2026-10-22T11:52:44-06:00 pi sshd-session[3464]: pam_unix(sshd:session): session opened for user pi(uid=1000) by pi(uid=0)
+2026-10-22T11:52:44-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:52:44-06:00 pi systemd-logind[528]: New session 26 of user pi.
+2026-10-22T11:52:44-06:00 pi systemd[1]: Started session-26.scope - Session 26 of User pi.
+2026-10-22T11:52:45-06:00 pi (hostapd)[3469]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:52:45-06:00 pi hostapd[3469]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:45-06:00 pi hostapd[3469]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:52:45-06:00 pi hostapd[3469]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:52:45-06:00 pi hostapd[3469]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:45-06:00 pi hostapd[3469]: nl80211 driver initialization failed.
+2026-10-22T11:52:45-06:00 pi hostapd[3469]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:52:45-06:00 pi hostapd[3469]: wlan0: AP-DISABLED
+2026-10-22T11:52:45-06:00 pi hostapd[3469]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:52:45-06:00 pi hostapd[3469]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:52:45-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:52:45-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:52:45-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:52:45-06:00 pi sudo[3483]:       pi : PWD=/home/pi ; USER=root ; COMMAND=/usr/bin/sh -c 'cat /var/log/nginx/access.log.1; echo ==== error.log.1; cat /var/log/nginx/error.log.1'
+2026-10-22T11:52:45-06:00 pi sudo[3483]: pam_unix(sudo:session): session opened for user root(uid=0) by pi(uid=1000)
+2026-10-22T11:52:45-06:00 pi sudo[3483]: pam_unix(sudo:session): session closed for user root
+2026-10-22T11:52:45-06:00 pi sshd-session[3482]: Received disconnect from 192.168.40.91 port 43717:11: disconnected by user
+2026-10-22T11:52:45-06:00 pi sshd-session[3482]: Disconnected from user pi 192.168.40.91 port 43717
+2026-10-22T11:52:45-06:00 pi sshd-session[3464]: pam_unix(sshd:session): session closed for user pi
+2026-10-22T11:52:45-06:00 pi systemd[1]: session-26.scope: Deactivated successfully.
+2026-10-22T11:52:45-06:00 pi systemd-logind[528]: Session 26 logged out. Waiting for processes to exit.
+2026-10-22T11:52:45-06:00 pi systemd-logind[528]: Removed session 26.
+2026-10-22T11:52:47-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 27.
+2026-10-22T11:52:47-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:52:47-06:00 pi (hostapd)[3491]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:52:47-06:00 pi hostapd[3491]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:47-06:00 pi hostapd[3491]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:52:47-06:00 pi hostapd[3491]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:52:47-06:00 pi hostapd[3491]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:47-06:00 pi hostapd[3491]: nl80211 driver initialization failed.
+2026-10-22T11:52:47-06:00 pi hostapd[3491]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:52:47-06:00 pi hostapd[3491]: wlan0: AP-DISABLED
+2026-10-22T11:52:47-06:00 pi hostapd[3491]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:52:47-06:00 pi hostapd[3491]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:52:47-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:52:47-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:52:47-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:52:47-06:00 pi systemd[1]: Starting portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook...
+2026-10-22T11:52:48-06:00 pi systemd[1]: portal-stations.service: Deactivated successfully.
+2026-10-22T11:52:48-06:00 pi systemd[1]: Finished portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook.
+2026-10-22T11:52:49-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 28.
+2026-10-22T11:52:49-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:52:50-06:00 pi (hostapd)[3506]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:52:50-06:00 pi hostapd[3506]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:50-06:00 pi hostapd[3506]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:52:50-06:00 pi hostapd[3506]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:52:50-06:00 pi hostapd[3506]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:50-06:00 pi hostapd[3506]: nl80211 driver initialization failed.
+2026-10-22T11:52:50-06:00 pi hostapd[3506]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:52:50-06:00 pi hostapd[3506]: wlan0: AP-DISABLED
+2026-10-22T11:52:50-06:00 pi hostapd[3506]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:52:50-06:00 pi hostapd[3506]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:52:50-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:52:50-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:52:50-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:52:52-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 29.
+2026-10-22T11:52:52-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:52:53-06:00 pi (hostapd)[3516]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:52:53-06:00 pi hostapd[3516]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:53-06:00 pi hostapd[3516]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:52:53-06:00 pi hostapd[3516]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:52:53-06:00 pi hostapd[3516]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:53-06:00 pi hostapd[3516]: nl80211 driver initialization failed.
+2026-10-22T11:52:53-06:00 pi hostapd[3516]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:52:53-06:00 pi hostapd[3516]: wlan0: AP-DISABLED
+2026-10-22T11:52:53-06:00 pi hostapd[3516]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:52:53-06:00 pi hostapd[3516]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:52:53-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:52:53-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:52:53-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:52:55-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 30.
+2026-10-22T11:52:55-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:52:55-06:00 pi systemd[1]: Stopping user@1000.service - User Manager for UID 1000...
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Activating special unit exit.target...
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Stopped target default.target - Main User Target.
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Stopping mpris-proxy.service - Bluetooth mpris proxy...
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Stopped mpris-proxy.service - Bluetooth mpris proxy.
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Stopping dbus.service - D-Bus User Message Bus...
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Stopped dbus.service - D-Bus User Message Bus.
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Removed slice session.slice - User Core Session Slice.
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Stopped target basic.target - Basic System.
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Stopped target paths.target - Paths.
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Stopped target sockets.target - Sockets.
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Stopped target timers.target - Timers.
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Closed dbus.socket - D-Bus User Message Bus Socket.
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Closed dirmngr.socket - GnuPG network certificate management daemon.
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Closed gpg-agent-browser.socket - GnuPG cryptographic agent and passphrase cache (access for web browsers).
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Closed gpg-agent-extra.socket - GnuPG cryptographic agent and passphrase cache (restricted).
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Stopping gpg-agent-ssh.socket - GnuPG cryptographic agent (ssh-agent emulation)...
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Stopping gpg-agent.socket - GnuPG cryptographic agent and passphrase cache...
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Closed keyboxd.socket - GnuPG public key management service.
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Stopping ssh-agent.socket - OpenSSH Agent socket...
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Closed gpg-agent-ssh.socket - GnuPG cryptographic agent (ssh-agent emulation).
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Closed ssh-agent.socket - OpenSSH Agent socket.
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Closed gpg-agent.socket - GnuPG cryptographic agent and passphrase cache.
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Removed slice app.slice - User Application Slice.
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Reached target shutdown.target - Shutdown.
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Finished systemd-exit.service - Exit the Session.
+2026-10-22T11:52:55-06:00 pi systemd[3275]: Reached target exit.target - Exit the Session.
+2026-10-22T11:52:55-06:00 pi (sd-pam)[3277]: pam_unix(systemd-user:session): session closed for user pi
+2026-10-22T11:52:55-06:00 pi systemd-logind[528]: Removed session 19.
+2026-10-22T11:52:55-06:00 pi systemd[1]: user@1000.service: Deactivated successfully.
+2026-10-22T11:52:55-06:00 pi systemd[1]: Stopped user@1000.service - User Manager for UID 1000.
+2026-10-22T11:52:55-06:00 pi systemd[1]: user@1000.service: Consumed 2.942s CPU time.
+2026-10-22T11:52:56-06:00 pi systemd[1]: Stopping user-runtime-dir@1000.service - User Runtime Directory /run/user/1000...
+2026-10-22T11:52:56-06:00 pi (hostapd)[3539]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:52:56-06:00 pi systemd[1]: run-user-1000.mount: Deactivated successfully.
+2026-10-22T11:52:56-06:00 pi systemd[1]: user-runtime-dir@1000.service: Deactivated successfully.
+2026-10-22T11:52:56-06:00 pi systemd[1]: Stopped user-runtime-dir@1000.service - User Runtime Directory /run/user/1000.
+2026-10-22T11:52:56-06:00 pi systemd[1]: Removed slice user-1000.slice - User Slice of UID 1000.
+2026-10-22T11:52:56-06:00 pi systemd[1]: user-1000.slice: Consumed 10.231s CPU time.
+2026-10-22T11:52:56-06:00 pi hostapd[3539]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:56-06:00 pi hostapd[3539]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:52:56-06:00 pi hostapd[3539]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:52:56-06:00 pi hostapd[3539]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:56-06:00 pi hostapd[3539]: nl80211 driver initialization failed.
+2026-10-22T11:52:56-06:00 pi hostapd[3539]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:52:56-06:00 pi hostapd[3539]: wlan0: AP-DISABLED
+2026-10-22T11:52:56-06:00 pi hostapd[3539]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:52:56-06:00 pi hostapd[3539]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:52:56-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:52:56-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:52:56-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:52:58-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 31.
+2026-10-22T11:52:58-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:52:59-06:00 pi (hostapd)[3553]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:52:59-06:00 pi hostapd[3553]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:59-06:00 pi hostapd[3553]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:52:59-06:00 pi hostapd[3553]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:52:59-06:00 pi hostapd[3553]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:52:59-06:00 pi hostapd[3553]: nl80211 driver initialization failed.
+2026-10-22T11:52:59-06:00 pi hostapd[3553]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:52:59-06:00 pi hostapd[3553]: wlan0: AP-DISABLED
+2026-10-22T11:52:59-06:00 pi hostapd[3553]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:52:59-06:00 pi hostapd[3553]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:52:59-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:52:59-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:52:59-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:52:59-06:00 pi systemd[1]: Starting portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook...
+2026-10-22T11:52:59-06:00 pi systemd[1]: portal-stations.service: Deactivated successfully.
+2026-10-22T11:52:59-06:00 pi systemd[1]: Finished portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook.
+2026-10-22T11:53:01-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 32.
+2026-10-22T11:53:01-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:53:01-06:00 pi (hostapd)[3569]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:53:01-06:00 pi hostapd[3569]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:53:01-06:00 pi hostapd[3569]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:53:01-06:00 pi hostapd[3569]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:53:01-06:00 pi hostapd[3569]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:53:01-06:00 pi hostapd[3569]: nl80211 driver initialization failed.
+2026-10-22T11:53:01-06:00 pi hostapd[3569]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:53:01-06:00 pi hostapd[3569]: wlan0: AP-DISABLED
+2026-10-22T11:53:01-06:00 pi hostapd[3569]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:53:01-06:00 pi hostapd[3569]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:53:01-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:53:01-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:53:01-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:53:03-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 33.
+2026-10-22T11:53:03-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:53:04-06:00 pi (hostapd)[3579]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:53:04-06:00 pi hostapd[3579]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:53:04-06:00 pi hostapd[3579]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:53:04-06:00 pi hostapd[3579]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:53:04-06:00 pi hostapd[3579]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:53:04-06:00 pi hostapd[3579]: nl80211 driver initialization failed.
+2026-10-22T11:53:04-06:00 pi hostapd[3579]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:53:04-06:00 pi hostapd[3579]: wlan0: AP-DISABLED
+2026-10-22T11:53:04-06:00 pi hostapd[3579]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:53:04-06:00 pi hostapd[3579]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:53:04-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:53:04-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:53:04-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:53:06-06:00 pi systemd[1]: systemd-timedated.service: Deactivated successfully.
+2026-10-22T11:53:06-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 34.
+2026-10-22T11:53:06-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:53:07-06:00 pi (hostapd)[3592]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:53:07-06:00 pi hostapd[3592]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:53:07-06:00 pi hostapd[3592]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:53:07-06:00 pi hostapd[3592]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:53:07-06:00 pi hostapd[3592]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:53:07-06:00 pi hostapd[3592]: nl80211 driver initialization failed.
+2026-10-22T11:53:07-06:00 pi hostapd[3592]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:53:07-06:00 pi hostapd[3592]: wlan0: AP-DISABLED
+2026-10-22T11:53:07-06:00 pi hostapd[3592]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:53:07-06:00 pi hostapd[3592]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:53:07-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:53:07-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:53:07-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:53:09-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 35.
+2026-10-22T11:53:09-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:53:10-06:00 pi (hostapd)[3602]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:53:10-06:00 pi hostapd[3602]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:53:10-06:00 pi hostapd[3602]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:53:10-06:00 pi hostapd[3602]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:53:10-06:00 pi hostapd[3602]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:53:10-06:00 pi hostapd[3602]: nl80211 driver initialization failed.
+2026-10-22T11:53:10-06:00 pi hostapd[3602]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:53:10-06:00 pi hostapd[3602]: wlan0: AP-DISABLED
+2026-10-22T11:53:10-06:00 pi hostapd[3602]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:53:10-06:00 pi hostapd[3602]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:53:10-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:53:10-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:53:10-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:53:10-06:00 pi systemd[1]: Starting portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook...
+2026-10-22T11:53:10-06:00 pi systemd[1]: portal-stations.service: Deactivated successfully.
+2026-10-22T11:53:10-06:00 pi systemd[1]: Finished portal-stations.service - Snapshot Wi-Fi station stats for the portal guestbook.
+2026-10-22T11:53:12-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 36.
+2026-10-22T11:53:12-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:53:12-06:00 pi (hostapd)[3617]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:53:12-06:00 pi hostapd[3617]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:53:12-06:00 pi hostapd[3617]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:53:12-06:00 pi hostapd[3617]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:53:12-06:00 pi hostapd[3617]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:53:12-06:00 pi hostapd[3617]: nl80211 driver initialization failed.
+2026-10-22T11:53:12-06:00 pi hostapd[3617]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:53:12-06:00 pi hostapd[3617]: wlan0: AP-DISABLED
+2026-10-22T11:53:12-06:00 pi hostapd[3617]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:53:12-06:00 pi hostapd[3617]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:53:12-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:53:12-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:53:12-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:53:13-06:00 pi sshd-session[3625]: Accepted publickey for pi from 192.168.40.91 port 43718 ssh2: ED25519 SHA256:8bT4k9TymucBMyhAIiICNVyWXBYf4aAmYH03CExSJGA
+2026-10-22T11:53:13-06:00 pi sshd-session[3625]: pam_unix(sshd:session): session opened for user pi(uid=1000) by pi(uid=0)
+2026-10-22T11:53:13-06:00 pi systemd-logind[528]: New session 27 of user pi.
+2026-10-22T11:53:13-06:00 pi systemd[1]: Created slice user-1000.slice - User Slice of UID 1000.
+2026-10-22T11:53:13-06:00 pi systemd[1]: Starting user-runtime-dir@1000.service - User Runtime Directory /run/user/1000...
+2026-10-22T11:53:14-06:00 pi systemd[1]: Finished user-runtime-dir@1000.service - User Runtime Directory /run/user/1000.
+2026-10-22T11:53:14-06:00 pi systemd[1]: Starting user@1000.service - User Manager for UID 1000...
+2026-10-22T11:53:14-06:00 pi (systemd)[3630]: pam_unix(systemd-user:session): session opened for user pi(uid=1000) by pi(uid=0)
+2026-10-22T11:53:14-06:00 pi systemd-logind[528]: New session 28 of user pi.
+2026-10-22T11:53:14-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 37.
+2026-10-22T11:53:14-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:53:15-06:00 pi (hostapd)[3639]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:53:15-06:00 pi hostapd[3639]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:53:15-06:00 pi hostapd[3639]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:53:15-06:00 pi hostapd[3639]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:53:15-06:00 pi hostapd[3639]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:53:15-06:00 pi hostapd[3639]: nl80211 driver initialization failed.
+2026-10-22T11:53:15-06:00 pi hostapd[3639]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:53:15-06:00 pi hostapd[3639]: wlan0: AP-DISABLED
+2026-10-22T11:53:15-06:00 pi hostapd[3639]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:53:15-06:00 pi hostapd[3639]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:53:15-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:53:15-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:53:15-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:53:15-06:00 pi systemd[3630]: Queued start job for default target default.target.
+2026-10-22T11:53:15-06:00 pi systemd[3630]: Created slice app.slice - User Application Slice.
+2026-10-22T11:53:15-06:00 pi systemd[3630]: Reached target paths.target - Paths.
+2026-10-22T11:53:15-06:00 pi systemd[3630]: Reached target timers.target - Timers.
+2026-10-22T11:53:15-06:00 pi systemd[3630]: Starting dbus.socket - D-Bus User Message Bus Socket...
+2026-10-22T11:53:15-06:00 pi systemd[3630]: Listening on dirmngr.socket - GnuPG network certificate management daemon.
+2026-10-22T11:53:15-06:00 pi systemd[3630]: Listening on gpg-agent-browser.socket - GnuPG cryptographic agent and passphrase cache (access for web browsers).
+2026-10-22T11:53:15-06:00 pi systemd[3630]: Listening on gpg-agent-extra.socket - GnuPG cryptographic agent and passphrase cache (restricted).
+2026-10-22T11:53:15-06:00 pi systemd[3630]: Starting gpg-agent-ssh.socket - GnuPG cryptographic agent (ssh-agent emulation)...
+2026-10-22T11:53:15-06:00 pi systemd[3630]: Starting gpg-agent.socket - GnuPG cryptographic agent and passphrase cache...
+2026-10-22T11:53:15-06:00 pi systemd[3630]: Listening on keyboxd.socket - GnuPG public key management service.
+2026-10-22T11:53:15-06:00 pi systemd[3630]: Starting ssh-agent.socket - OpenSSH Agent socket...
+2026-10-22T11:53:15-06:00 pi systemd[3630]: Listening on gpg-agent-ssh.socket - GnuPG cryptographic agent (ssh-agent emulation).
+2026-10-22T11:53:15-06:00 pi systemd[3630]: Listening on dbus.socket - D-Bus User Message Bus Socket.
+2026-10-22T11:53:15-06:00 pi systemd[3630]: Listening on gpg-agent.socket - GnuPG cryptographic agent and passphrase cache.
+2026-10-22T11:53:15-06:00 pi systemd[3630]: Listening on ssh-agent.socket - OpenSSH Agent socket.
+2026-10-22T11:53:15-06:00 pi systemd[3630]: Reached target sockets.target - Sockets.
+2026-10-22T11:53:15-06:00 pi systemd[3630]: Reached target basic.target - Basic System.
+2026-10-22T11:53:15-06:00 pi systemd[1]: Started user@1000.service - User Manager for UID 1000.
+2026-10-22T11:53:15-06:00 pi systemd[3630]: Started mpris-proxy.service - Bluetooth mpris proxy.
+2026-10-22T11:53:15-06:00 pi systemd[3630]: Reached target default.target - Main User Target.
+2026-10-22T11:53:15-06:00 pi systemd[3630]: Startup finished in 1.753s.
+2026-10-22T11:53:16-06:00 pi systemd[1]: Started session-27.scope - Session 27 of User pi.
+2026-10-22T11:53:16-06:00 pi systemd[3630]: Created slice session.slice - User Core Session Slice.
+2026-10-22T11:53:16-06:00 pi systemd[3630]: Starting dbus.service - D-Bus User Message Bus...
+2026-10-22T11:53:16-06:00 pi systemd[3630]: Started dbus.service - D-Bus User Message Bus.
+2026-10-22T11:53:16-06:00 pi sshd-session[3667]: Received disconnect from 192.168.40.91 port 43718:11: disconnected by user
+2026-10-22T11:53:16-06:00 pi sshd-session[3667]: Disconnected from user pi 192.168.40.91 port 43718
+2026-10-22T11:53:16-06:00 pi sshd-session[3625]: pam_unix(sshd:session): session closed for user pi
+2026-10-22T11:53:16-06:00 pi systemd[1]: session-27.scope: Deactivated successfully.
+2026-10-22T11:53:16-06:00 pi systemd-logind[528]: Session 27 logged out. Waiting for processes to exit.
+2026-10-22T11:53:16-06:00 pi systemd-logind[528]: Removed session 27.
+2026-10-22T11:53:17-06:00 pi sshd-session[3690]: Accepted publickey for pi from 192.168.40.91 port 43719 ssh2: ED25519 SHA256:8bT4k9TymucBMyhAIiICNVyWXBYf4aAmYH03CExSJGA
+2026-10-22T11:53:17-06:00 pi sshd-session[3690]: pam_unix(sshd:session): session opened for user pi(uid=1000) by pi(uid=0)
+2026-10-22T11:53:17-06:00 pi systemd-logind[528]: New session 29 of user pi.
+2026-10-22T11:53:17-06:00 pi systemd[1]: Started session-29.scope - Session 29 of User pi.
+2026-10-22T11:53:17-06:00 pi systemd[1]: hostapd.service: Scheduled restart job, restart counter is at 38.
+2026-10-22T11:53:17-06:00 pi systemd[1]: Starting hostapd.service - Access point and authentication server for Wi-Fi and Ethernet...
+2026-10-22T11:53:18-06:00 pi sudo[3700]:       pi : PWD=/home/pi ; USER=root ; COMMAND=/usr/bin/dmesg -T
+2026-10-22T11:53:18-06:00 pi sudo[3700]: pam_unix(sudo:session): session opened for user root(uid=0) by pi(uid=1000)
+2026-10-22T11:53:18-06:00 pi sudo[3700]: pam_unix(sudo:session): session closed for user root
+2026-10-22T11:53:18-06:00 pi sshd-session[3699]: Received disconnect from 192.168.40.91 port 43719:11: disconnected by user
+2026-10-22T11:53:18-06:00 pi sshd-session[3699]: Disconnected from user pi 192.168.40.91 port 43719
+2026-10-22T11:53:18-06:00 pi sshd-session[3690]: pam_unix(sshd:session): session closed for user pi
+2026-10-22T11:53:18-06:00 pi systemd[1]: session-29.scope: Deactivated successfully.
+2026-10-22T11:53:18-06:00 pi systemd-logind[528]: Session 29 logged out. Waiting for processes to exit.
+2026-10-22T11:53:18-06:00 pi systemd-logind[528]: Removed session 29.
+2026-10-22T11:53:18-06:00 pi (hostapd)[3706]: hostapd.service: Referenced but unset environment variable evaluates to an empty string: DAEMON_OPTS
+2026-10-22T11:53:18-06:00 pi hostapd[3706]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:53:18-06:00 pi hostapd[3706]: nl80211: Driver does not support authentication/association or connect commands
+2026-10-22T11:53:18-06:00 pi hostapd[3706]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+2026-10-22T11:53:18-06:00 pi hostapd[3706]: Could not read interface wlan0 flags: No such device
+2026-10-22T11:53:18-06:00 pi hostapd[3706]: nl80211 driver initialization failed.
+2026-10-22T11:53:18-06:00 pi hostapd[3706]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:53:18-06:00 pi hostapd[3706]: wlan0: AP-DISABLED
+2026-10-22T11:53:18-06:00 pi hostapd[3706]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:53:18-06:00 pi hostapd[3706]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:53:18-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:53:18-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:53:18-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+2026-10-22T11:53:18-06:00 pi sshd-session[3704]: Accepted publickey for pi from 192.168.40.91 port 43720 ssh2: ED25519 SHA256:8bT4k9TymucBMyhAIiICNVyWXBYf4aAmYH03CExSJGA
+2026-10-22T11:53:18-06:00 pi sshd-session[3704]: pam_unix(sshd:session): session opened for user pi(uid=1000) by pi(uid=0)
+2026-10-22T11:53:18-06:00 pi systemd-logind[528]: New session 30 of user pi.
+2026-10-22T11:53:18-06:00 pi systemd[1]: Started session-30.scope - Session 30 of User pi.
+2026-10-22T11:53:19-06:00 pi sudo[3722]:       pi : PWD=/home/pi ; USER=root ; COMMAND=/usr/bin/journalctl -b -o short-iso --no-pager --since '2026-10-22 11:50'
+2026-10-22T11:53:19-06:00 pi sudo[3722]: pam_unix(sudo:session): session opened for user root(uid=0) by pi(uid=1000)

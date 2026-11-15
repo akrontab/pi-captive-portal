@@ -1,18 +1,20 @@
-# Captive Portal on Raspberry Pi 3
+# Captive Portal on Raspberry Pi 2 Model B
 
 Isolated Wi-Fi AP that serves a single local page to every client. No internet
 upstream — this is a walled garden, not a gateway.
 
-**Target:** Raspberry Pi OS (Trixie) Lite, 64-bit, on a Pi 3B / 3B+
+**Target:** Raspberry Pi OS (Trixie) Lite, **armhf (32-bit)**, on a Pi 2 Model B
 **Network:** `192.168.4.0/24`, Pi at `192.168.4.1`
-**Radio:** built-in `wlan0`, 2.4 GHz
+**Radio:** USB Wi-Fi adapter as `wlan0` (`rt2800usb` on the deployed rig), 2.4 GHz
 
-> **The actual deployed rig differs from this generic guide.** It's a **Raspberry
-> Pi 2 Model B** (no built-in Wi-Fi) running **Trixie armhf (32-bit)**, with the
-> AP radio on a **USB `rt2800usb` adapter** (`wlan0`). Everything below still
-> applies — `wlan0` is `wlan0` either way — but that adapter can't beacon more
-> than one BSS, which is why multi-SSID is parked; see
-> `docs/multi-ssid-adapter-upgrade.md`.
+> **The Pi 2B has no built-in Wi-Fi.** The AP radio has to be a USB adapter whose
+> chipset supports AP mode (`iw list` → *Supported interface modes* includes
+> `AP`). It shows up as `wlan0`, so every command below is the same as on a board
+> with onboard Wi-Fi. The deployed `rt2800usb` adapter can only beacon one BSS,
+> which is why multiple SSIDs are done as a single **rotating** SSID instead; see
+> `docs/multi-ssid-adapter-upgrade.md`. Use the 32-bit image. The original Pi 2B
+> (BCM2836, Cortex-A7) can't run the 64-bit OS, and on v1.2 boards (BCM2837) the
+> 64-bit image isn't officially supported.
 
 Do this over Ethernet or a directly attached keyboard. You will take `wlan0`
 away from NetworkManager partway through, and if that is your only link you
@@ -35,7 +37,8 @@ sudo systemctl stop hostapd dnsmasq nginx
 ```
 
 Unblock the radio and set a regulatory domain. Without a country code the
-Pi 3's driver refuses to bring the AP up, and the failure message is unhelpful:
+kernel's regulatory database keeps the radio on its most restrictive defaults
+and hostapd may refuse to bring the AP up, with an unhelpful failure message:
 
 ```bash
 sudo rfkill unblock wlan
@@ -121,9 +124,9 @@ sudo sed -i 's|^#*DAEMON_CONF=.*|DAEMON_CONF="/etc/hostapd/hostapd.conf"|' \
   /etc/default/hostapd
 ```
 
-**Channel choice:** pick 1, 6, or 11. The Pi 3B is 2.4 GHz only. The 3B+ has a
-5 GHz radio but AP mode there needs DFS handling and often just fails — stay on
-2.4 GHz.
+**Channel choice:** pick 1, 6, or 11. The `rt2800usb` and AR9271 adapters are
+2.4 GHz only. A dual-band USB adapter can do 5 GHz, but AP mode there needs DFS
+handling and often just fails — stay on 2.4 GHz.
 
 **If you want WPA2 instead of open:** add `wpa=2`, `wpa_passphrase=...`,
 `wpa_key_mgmt=WPA-PSK`, `rsn_pairwise=CCMP`. The portal still works; clients
@@ -349,9 +352,12 @@ MAC to an allowed ipset on button press, exempt that ipset from the DNAT and
 REJECT rules, and let the next OS probe reach the real internet and return its
 genuine 204. That success is what clears the portal state on the client.
 
-**Pi 3 capacity.** Roughly 10–15 concurrent clients on the built-in radio
-before throughput degrades noticeably. A USB Wi-Fi adapter with an AP-capable
-chipset (MT7612U, RTL8812AU) does considerably better if you need more.
+**Pi 2B capacity.** Budget for roughly 10–15 concurrent clients on a basic USB
+2.4 GHz adapter before throughput degrades noticeably. The Pi 2B's Ethernet and
+all four USB ports share a single USB 2.0 link, and the board is slow, but a
+single static page isn't the bottleneck; the radio is. A stronger AP-capable
+chipset (MT7612U, RTL8812AU) helps, but it draws more current, so put it on a
+**powered USB hub** (see `docs/multi-ssid-adapter-upgrade.md`).
 
 **Rolling it back:**
 

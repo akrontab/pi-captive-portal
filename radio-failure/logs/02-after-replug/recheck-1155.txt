@@ -1,0 +1,47 @@
+2026-10-22T11:53:32-06:00
+[Thu Oct 22 11:52:34 2026] usb 1-1.2: new full-speed USB device number 5 using dwc_otg
+-- lsusb
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 001 Device 002: ID 0424:9514 Microchip Technology, Inc. (formerly SMSC) SMC9514 Hub
+Bus 001 Device 003: ID 0424:ec00 Microchip Technology, Inc. (formerly SMSC) SMSC9512/9514 Fast Ethernet Adapter
+Bus 001 Device 004: ID 148f:5370 Ralink Technology, Corp. RT5370 Wireless Adapter
+1-1-port1 oc=0 state=configured
+1-1-port2 oc=0 state=not attached
+1-1-port3 oc=0 state=not attached
+1-1-port4 oc=0 state=not attached
+1-1-port5 oc=0 state=configured
+1-0:1.0
+1-1
+1-1.1
+1-1:1.0
+1-1.1:1.0
+1-1.5
+1-1.5:1.0
+usb1
+cat: /sys/bus/usb/devices/1-1.2/speed: No such file or directory
+cat: /sys/bus/usb/devices/1-1.2/idVendor: No such file or directory
+cat: /sys/bus/usb/devices/1-1.2/idProduct: No such file or directory
+-- hostapd
+● hostapd.service - Access point and authentication server for Wi-Fi and Ethernet
+     Loaded: loaded (/usr/lib/systemd/system/hostapd.service; enabled; preset: enabled)
+    Drop-In: /etc/systemd/system/hostapd.service.d
+             └─portal-cleanup.conf
+     Active: activating (auto-restart) (Result: exit-code) since Thu 2026-10-22 11:53:32 MDT; 886ms ago
+2026-10-22T11:53:32-06:00 pi hostapd[3810]: nl80211 driver initialization failed.
+2026-10-22T11:53:32-06:00 pi hostapd[3810]: wlan0: interface state UNINITIALIZED->DISABLED
+2026-10-22T11:53:32-06:00 pi hostapd[3810]: wlan0: AP-DISABLED
+2026-10-22T11:53:32-06:00 pi hostapd[3810]: wlan0: CTRL-EVENT-TERMINATING
+2026-10-22T11:53:32-06:00 pi hostapd[3810]: hostapd_free_hapd_data: Interface wlan0 wasn't started
+2026-10-22T11:53:32-06:00 pi systemd[1]: hostapd.service: Control process exited, code=exited, status=1/FAILURE
+2026-10-22T11:53:32-06:00 pi systemd[1]: hostapd.service: Failed with result 'exit-code'.
+2026-10-22T11:53:32-06:00 pi systemd[1]: Failed to start hostapd.service - Access point and authentication server for Wi-Fi and Ethernet.
+NEXT                            LEFT LAST                             PASSED UNIT                         ACTIVATES
+Thu 2026-10-22 11:53:42 MDT       8s Thu 2026-10-22 11:53:31 MDT      2s ago portal-stations.timer        portal-stations.service
+Thu 2026-10-22 12:06:31 MDT    12min Thu 2026-10-22 11:51:30 MDT 2min 3s ago portal-ssid-rotate.timer     portal-ssid-rotate.service
+Thu 2026-10-22 12:28:58 MDT    35min Wed 2026-10-07 00:15:59 MDT           - logrotate.timer              logrotate.service
+Thu 2026-10-22 12:56:51 MDT  1h 3min Mon 2026-10-05 01:32:07 MDT           - fstrim.timer                 fstrim.service
+Thu 2026-10-22 13:49:05 MDT 1h 55min Tue 2026-10-06 09:56:34 MDT           - man-db.timer                 man-db.service
+Thu 2026-10-22 14:31:23 MDT 2h 37min -                                     - rpi-zram-writeback.timer     rpi-zram-writeback.service
+Thu 2026-10-22 16:49:11 MDT 4h 55min Tue 2026-10-06 07:58:00 MDT           - apt-daily.timer              apt-daily.service
+Fri 2026-10-23 00:00:00 MDT      12h Thu 2026-10-22 11:32:27 MDT   21min ago dpkg-db-backup.timer         dpkg-db-backup.service
+Fri 2026-10-23 06:40:24 MDT      18h Thu 2026-10-22 11:40:36 MDT   12min ago apt-daily-upgrade.timer      apt-daily-upgrade.service

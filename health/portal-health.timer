@@ -1,0 +1,10 @@
+[Unit]
+Description=Power/USB health snapshot every 60s
+
+[Timer]
+OnBootSec=10
+OnUnitActiveSec=60
+AccuracySec=5s
+
+[Install]
+WantedBy=timers.target

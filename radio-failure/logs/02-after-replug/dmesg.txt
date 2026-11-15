@@ -1,0 +1,409 @@
+[Thu Oct 22 11:31:23 2026] Booting Linux on physical CPU 0xf00
+[Thu Oct 22 11:31:23 2026] Linux version 6.18.34+rpt-rpi-v7 (serge@raspberrypi.com) (arm-linux-gnueabihf-gcc-14 (Raspbian 14.2.0-19+rpi1) 14.2.0, GNU ld (GNU Binutils for Raspbian) 2.44) #1 SMP Raspbian 1:6.18.34-1+rpt1 (2026-06-09)
+[Thu Oct 22 11:31:23 2026] CPU: ARMv7 Processor [410fc075] revision 5 (ARMv7), cr=10c5387d
+[Thu Oct 22 11:31:23 2026] CPU: div instructions available: patching division code
+[Thu Oct 22 11:31:23 2026] CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing instruction cache
+[Thu Oct 22 11:31:23 2026] OF: fdt: Machine model: Raspberry Pi 2 Model B Rev 1.1
+[Thu Oct 22 11:31:23 2026] random: crng init done
+[Thu Oct 22 11:31:23 2026] Memory policy: Data cache writealloc
+[Thu Oct 22 11:31:23 2026] Reserved memory: created CMA memory pool at 0x1e000000, size 256 MiB
+[Thu Oct 22 11:31:23 2026] OF: reserved mem: initialized node linux,cma, compatible id shared-dma-pool
+[Thu Oct 22 11:31:23 2026] OF: reserved mem: 0x1e000000..0x2dffffff (262144 KiB) map reusable linux,cma
+[Thu Oct 22 11:31:23 2026] Zone ranges:
+[Thu Oct 22 11:31:23 2026]   DMA      [mem 0x0000000000000000-0x000000003b3fffff]
+[Thu Oct 22 11:31:23 2026]   Normal   empty
+[Thu Oct 22 11:31:23 2026] Movable zone start for each node
+[Thu Oct 22 11:31:23 2026] Early memory node ranges
+[Thu Oct 22 11:31:23 2026]   node   0: [mem 0x0000000000000000-0x000000003b3fffff]
+[Thu Oct 22 11:31:23 2026] Initmem setup node 0 [mem 0x0000000000000000-0x000000003b3fffff]
+[Thu Oct 22 11:31:23 2026] percpu: Embedded 19 pages/cpu s45644 r8192 d23988 u77824
+[Thu Oct 22 11:31:23 2026] pcpu-alloc: s45644 r8192 d23988 u77824 alloc=19*4096
+[Thu Oct 22 11:31:23 2026] pcpu-alloc: [0] 0 [0] 1 [0] 2 [0] 3 
+[Thu Oct 22 11:31:23 2026] Kernel command line: coherent_pool=1M snd_bcm2835.enable_headphones=0 cgroup_disable=memory snd_bcm2835.enable_headphones=1 snd_bcm2835.enable_hdmi=1 snd_bcm2835.enable_hdmi=0  vc_mem.mem_base=0x3ec00000 vc_mem.mem_size=0x40000000  console=ttyAMA0,115200 console=tty1 root=PARTUUID=7673bd70-02 rootfstype=ext4 fsck.repair=yes rootwait ds=nocloud;i=rpi-imager-1789182344136 cfg80211.ieee80211_regdom=US
+[Thu Oct 22 11:31:23 2026] cgroup: Disabling memory control group subsystem
+[Thu Oct 22 11:31:23 2026] Unknown kernel command line parameters "ds=nocloud;i=rpi-imager-1789182344136", will be passed to user space.
+[Thu Oct 22 11:31:23 2026] printk: log buffer data + meta data: 131072 + 409600 = 540672 bytes
+[Thu Oct 22 11:31:23 2026] Dentry cache hash table entries: 131072 (order: 7, 524288 bytes, linear)
+[Thu Oct 22 11:31:23 2026] Inode-cache hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[Thu Oct 22 11:31:23 2026] Built 1 zonelists, mobility grouping on.  Total pages: 242688
+[Thu Oct 22 11:31:23 2026] mem auto-init: stack:all(zero), heap alloc:off, heap free:off
+[Thu Oct 22 11:31:23 2026] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=4, Nodes=1
+[Thu Oct 22 11:31:23 2026] ftrace: allocating 38466 entries in 113 pages
+[Thu Oct 22 11:31:23 2026] ftrace: allocated 113 pages with 4 groups
+[Thu Oct 22 11:31:23 2026] rcu: Hierarchical RCU implementation.
+[Thu Oct 22 11:31:23 2026] 	Rude variant of Tasks RCU enabled.
+[Thu Oct 22 11:31:23 2026] 	Tracing variant of Tasks RCU enabled.
+[Thu Oct 22 11:31:23 2026] rcu: RCU calculated value of scheduler-enlistment delay is 10 jiffies.
+[Thu Oct 22 11:31:23 2026] RCU Tasks Rude: Setting shift to 2 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=4.
+[Thu Oct 22 11:31:23 2026] RCU Tasks Trace: Setting shift to 2 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=4.
+[Thu Oct 22 11:31:23 2026] NR_IRQS: 16, nr_irqs: 16, preallocated irqs: 16
+[Thu Oct 22 11:31:23 2026] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[Thu Oct 22 11:31:23 2026] arch_timer: cp15 timer running at 19.20MHz (phys).
+[Thu Oct 22 11:31:23 2026] clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0x46d987e47, max_idle_ns: 440795202767 ns
+[Thu Oct 22 11:31:23 2026] sched_clock: 56 bits at 19MHz, resolution 52ns, wraps every 4398046511078ns
+[Thu Oct 22 11:31:23 2026] Switching to timer-based delay loop, resolution 52ns
+[Thu Oct 22 11:31:23 2026] Console: colour dummy device 80x30
+[Thu Oct 22 11:31:23 2026] printk: legacy console [tty1] enabled
+[Thu Oct 22 11:31:23 2026] Calibrating delay loop (skipped), value calculated using timer frequency.. 38.40 BogoMIPS (lpj=192000)
+[Thu Oct 22 11:31:23 2026] CPU: Testing write buffer coherency: ok
+[Thu Oct 22 11:31:23 2026] pid_max: default: 32768 minimum: 301
+[Thu Oct 22 11:31:23 2026] LSM: initializing lsm=capability
+[Thu Oct 22 11:31:23 2026] Mount-cache hash table entries: 2048 (order: 1, 8192 bytes, linear)
+[Thu Oct 22 11:31:23 2026] Mountpoint-cache hash table entries: 2048 (order: 1, 8192 bytes, linear)
+[Thu Oct 22 11:31:23 2026] CPU0: update cpu_capacity 1024
+[Thu Oct 22 11:31:23 2026] CPU0: thread -1, cpu 0, socket 15, mpidr 80000f00
+[Thu Oct 22 11:31:23 2026] Setting up static identity map for 0x100000 - 0x10003c
+[Thu Oct 22 11:31:23 2026] rcu: Hierarchical SRCU implementation.
+[Thu Oct 22 11:31:23 2026] rcu: 	Max phase no-delay instances is 1000.
+[Thu Oct 22 11:31:23 2026] Timer migration: 1 hierarchy levels; 8 children per group; 1 crossnode level
+[Thu Oct 22 11:31:23 2026] smp: Bringing up secondary CPUs ...
+[Thu Oct 22 11:31:23 2026] CPU1: update cpu_capacity 1024
+[Thu Oct 22 11:31:23 2026] CPU1: thread -1, cpu 1, socket 15, mpidr 80000f01
+[Thu Oct 22 11:31:23 2026] CPU2: update cpu_capacity 1024
+[Thu Oct 22 11:31:23 2026] CPU2: thread -1, cpu 2, socket 15, mpidr 80000f02
+[Thu Oct 22 11:31:23 2026] CPU3: update cpu_capacity 1024
+[Thu Oct 22 11:31:23 2026] CPU3: thread -1, cpu 3, socket 15, mpidr 80000f03
+[Thu Oct 22 11:31:23 2026] smp: Brought up 1 node, 4 CPUs
+[Thu Oct 22 11:31:23 2026] SMP: Total of 4 processors activated (153.60 BogoMIPS).
+[Thu Oct 22 11:31:23 2026] CPU: All CPU(s) started in HYP mode.
+[Thu Oct 22 11:31:23 2026] CPU: Virtualization extensions available.
+[Thu Oct 22 11:31:23 2026] Memory: 661460K/970752K available (12288K kernel code, 1616K rwdata, 3700K rodata, 1024K init, 336K bss, 43580K reserved, 262144K cma-reserved)
+[Thu Oct 22 11:31:23 2026] devtmpfs: initialized
+[Thu Oct 22 11:31:23 2026] VFP support v0.3: implementor 41 architecture 2 part 30 variant 7 rev 5
+[Thu Oct 22 11:31:23 2026] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604462750000 ns
+[Thu Oct 22 11:31:23 2026] posixtimers hash table entries: 2048 (order: 2, 16384 bytes, linear)
+[Thu Oct 22 11:31:23 2026] futex hash table entries: 1024 (65536 bytes on 1 NUMA nodes, total 64 KiB, linear).
+[Thu Oct 22 11:31:23 2026] pinctrl core: initialized pinctrl subsystem
+[Thu Oct 22 11:31:23 2026] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[Thu Oct 22 11:31:23 2026] DMA: preallocated 1024 KiB pool for atomic coherent allocations
+[Thu Oct 22 11:31:23 2026] audit: initializing netlink subsys (disabled)
+[Thu Oct 22 11:31:23 2026] audit: type=2000 audit(0.030:1): state=initialized audit_enabled=0 res=1
+[Thu Oct 22 11:31:23 2026] thermal_sys: Registered thermal governor 'step_wise'
+[Thu Oct 22 11:31:23 2026] hw-breakpoint: found 5 (+1 reserved) breakpoint and 4 watchpoint registers.
+[Thu Oct 22 11:31:23 2026] hw-breakpoint: maximum watchpoint size is 8 bytes.
+[Thu Oct 22 11:31:23 2026] Serial: AMBA PL011 UART driver
+[Thu Oct 22 11:31:23 2026] bcm2835-mbox 3f00b880.mailbox: mailbox enabled
+[Thu Oct 22 11:31:23 2026] raspberrypi-firmware soc:firmware: Attached to firmware from 2026-05-21T11:21:57, variant start
+[Thu Oct 22 11:31:23 2026] raspberrypi-firmware soc:firmware: Firmware hash is 288930ab4712b99596f32732664aaaeb881ef1e0
+[Thu Oct 22 11:31:23 2026] kprobes: kprobe jump-optimization is enabled. All kprobes are optimized if possible.
+[Thu Oct 22 11:31:23 2026] bcm2835-dma 3f007000.dma-controller: DMA legacy API manager, dmachans=0x1
+[Thu Oct 22 11:31:23 2026] SCSI subsystem initialized
+[Thu Oct 22 11:31:23 2026] usbcore: registered new interface driver usbfs
+[Thu Oct 22 11:31:23 2026] usbcore: registered new interface driver hub
+[Thu Oct 22 11:31:23 2026] usbcore: registered new device driver usb
+[Thu Oct 22 11:31:23 2026] pps_core: LinuxPPS API ver. 1 registered
+[Thu Oct 22 11:31:23 2026] pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
+[Thu Oct 22 11:31:23 2026] PTP clock support registered
+[Thu Oct 22 11:31:23 2026] clocksource: Switched to clocksource arch_sys_counter
+[Thu Oct 22 11:31:23 2026] VFS: Disk quotas dquot_6.6.0
+[Thu Oct 22 11:31:23 2026] VFS: Dquot-cache hash table entries: 1024 (order 0, 4096 bytes)
+[Thu Oct 22 11:31:23 2026] NET: Registered PF_INET protocol family
+[Thu Oct 22 11:31:23 2026] IP idents hash table entries: 16384 (order: 5, 131072 bytes, linear)
+[Thu Oct 22 11:31:23 2026] tcp_listen_portaddr_hash hash table entries: 512 (order: 0, 4096 bytes, linear)
+[Thu Oct 22 11:31:23 2026] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[Thu Oct 22 11:31:23 2026] TCP established hash table entries: 8192 (order: 3, 32768 bytes, linear)
+[Thu Oct 22 11:31:23 2026] TCP bind hash table entries: 8192 (order: 5, 131072 bytes, linear)
+[Thu Oct 22 11:31:23 2026] TCP: Hash tables configured (established 8192 bind 8192)
+[Thu Oct 22 11:31:23 2026] UDP hash table entries: 512 (order: 3, 28672 bytes, linear)
+[Thu Oct 22 11:31:23 2026] UDP-Lite hash table entries: 512 (order: 3, 28672 bytes, linear)
+[Thu Oct 22 11:31:23 2026] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[Thu Oct 22 11:31:23 2026] RPC: Registered named UNIX socket transport module.
+[Thu Oct 22 11:31:23 2026] RPC: Registered udp transport module.
+[Thu Oct 22 11:31:23 2026] RPC: Registered tcp transport module.
+[Thu Oct 22 11:31:23 2026] RPC: Registered tcp-with-tls transport module.
+[Thu Oct 22 11:31:23 2026] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[Thu Oct 22 11:31:23 2026] Trying to unpack rootfs image as initramfs...
+[Thu Oct 22 11:31:24 2026] Freeing initrd memory: 13924K
+[Thu Oct 22 11:31:25 2026] Initialise system trusted keyrings
+[Thu Oct 22 11:31:25 2026] workingset: timestamp_bits=14 max_order=18 bucket_order=4
+[Thu Oct 22 11:31:25 2026] NFS: Registering the id_resolver key type
+[Thu Oct 22 11:31:25 2026] Key type id_resolver registered
+[Thu Oct 22 11:31:25 2026] Key type id_legacy registered
+[Thu Oct 22 11:31:25 2026] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+[Thu Oct 22 11:31:25 2026] nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
+[Thu Oct 22 11:31:25 2026] Key type asymmetric registered
+[Thu Oct 22 11:31:25 2026] Asymmetric key parser 'x509' registered
+[Thu Oct 22 11:31:25 2026] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 246)
+[Thu Oct 22 11:31:25 2026] io scheduler mq-deadline registered
+[Thu Oct 22 11:31:25 2026] io scheduler kyber registered
+[Thu Oct 22 11:31:25 2026] io scheduler bfq registered
+[Thu Oct 22 11:31:25 2026] pinctrl-bcm2835 3f200000.gpio: GPIO_OUT persistence: yes
+[Thu Oct 22 11:31:25 2026] ledtrig-cpu: registered to indicate activity on CPUs
+[Thu Oct 22 11:31:25 2026] simple-framebuffer 3eaa9000.framebuffer: framebuffer at 0x3eaa9000, 0x151800 bytes
+[Thu Oct 22 11:31:25 2026] simple-framebuffer 3eaa9000.framebuffer: format=a8r8g8b8, mode=720x480x32, linelength=2880
+[Thu Oct 22 11:31:25 2026] Console: switching to colour frame buffer device 90x30
+[Thu Oct 22 11:31:25 2026] simple-framebuffer 3eaa9000.framebuffer: fb0: simplefb registered!
+[Thu Oct 22 11:31:25 2026] bcm2835-rng 3f104000.rng: hwrng registered
+[Thu Oct 22 11:31:25 2026] vc-mem: phys_addr:0x00000000 mem_base=0x3ec00000 mem_size:0x40000000(1024 MiB)
+[Thu Oct 22 11:31:25 2026] brd: module loaded
+[Thu Oct 22 11:31:25 2026] loop: module loaded
+[Thu Oct 22 11:31:25 2026] Loading iSCSI transport class v2.0-870.
+[Thu Oct 22 11:31:25 2026] usbcore: registered new interface driver lan78xx
+[Thu Oct 22 11:31:25 2026] usbcore: registered new interface driver smsc95xx
+[Thu Oct 22 11:31:25 2026] dwc_otg: version 3.00a 10-AUG-2012 (platform bus)
+[Thu Oct 22 11:31:26 2026] Core Release: 2.80a
+[Thu Oct 22 11:31:26 2026] Setting default values for core params
+[Thu Oct 22 11:31:26 2026] Finished setting default values for core params
+[Thu Oct 22 11:31:26 2026] Using Buffer DMA mode
+[Thu Oct 22 11:31:26 2026] Periodic Transfer Interrupt Enhancement - disabled
+[Thu Oct 22 11:31:26 2026] Multiprocessor Interrupt Enhancement - disabled
+[Thu Oct 22 11:31:26 2026] OTG VER PARAM: 0, OTG VER FLAG: 0
+[Thu Oct 22 11:31:26 2026] Dedicated Tx FIFOs mode
+[Thu Oct 22 11:31:26 2026] INFO:: FIQ DMA bounce buffers: virt = 9e104000 dma = 0xde104000 len=9024
+[Thu Oct 22 11:31:26 2026] FIQ FSM acceleration enabled for :
+                           Non-periodic Split Transactions
+                           Periodic Split Transactions
+                           High-Speed Isochronous Endpoints
+                           Interrupt/Control Split Transaction hack enabled
+[Thu Oct 22 11:31:26 2026] dwc_otg: Microframe scheduler enabled
+[Thu Oct 22 11:31:26 2026] INFO:: FIQ on core 1
+[Thu Oct 22 11:31:26 2026] INFO:: FIQ ASM at 80949e04 length 36
+[Thu Oct 22 11:31:26 2026] INFO:: MPHI regs_base at bb810000
+[Thu Oct 22 11:31:26 2026] dwc_otg 3f980000.usb: DWC OTG Controller
+[Thu Oct 22 11:31:26 2026] dwc_otg 3f980000.usb: new USB bus registered, assigned bus number 1
+[Thu Oct 22 11:31:26 2026] dwc_otg 3f980000.usb: irq 89, io mem 0x00000000
+[Thu Oct 22 11:31:26 2026] Init: Port Power? op_state=1
+[Thu Oct 22 11:31:26 2026] Init: Power Port (0)
+[Thu Oct 22 11:31:26 2026] usb usb1: New USB device found, idVendor=1d6b, idProduct=0002, bcdDevice= 6.18
+[Thu Oct 22 11:31:26 2026] usb usb1: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+[Thu Oct 22 11:31:26 2026] usb usb1: Product: DWC OTG Controller
+[Thu Oct 22 11:31:26 2026] usb usb1: Manufacturer: Linux 6.18.34+rpt-rpi-v7 dwc_otg_hcd
+[Thu Oct 22 11:31:26 2026] usb usb1: SerialNumber: 3f980000.usb
+[Thu Oct 22 11:31:26 2026] hub 1-0:1.0: USB hub found
+[Thu Oct 22 11:31:26 2026] hub 1-0:1.0: 1 port detected
+[Thu Oct 22 11:31:26 2026] dwc_otg: FIQ enabled
+[Thu Oct 22 11:31:26 2026] dwc_otg: NAK holdoff enabled
+[Thu Oct 22 11:31:26 2026] dwc_otg: FIQ split-transaction FSM enabled
+[Thu Oct 22 11:31:26 2026] Module dwc_common_port init
+[Thu Oct 22 11:31:26 2026] usbcore: registered new interface driver usb-storage
+[Thu Oct 22 11:31:26 2026] mousedev: PS/2 mouse device common for all mice
+[Thu Oct 22 11:31:26 2026] sdhci: Secure Digital Host Controller Interface driver
+[Thu Oct 22 11:31:26 2026] sdhci: Copyright(c) Pierre Ossman
+[Thu Oct 22 11:31:26 2026] sdhci-pltfm: SDHCI platform and OF driver helper
+[Thu Oct 22 11:31:26 2026] hid: raw HID events driver (C) Jiri Kosina
+[Thu Oct 22 11:31:26 2026] usbcore: registered new interface driver usbhid
+[Thu Oct 22 11:31:26 2026] usbhid: USB HID core driver
+[Thu Oct 22 11:31:26 2026] hw perfevents: enabled with armv7_cortex_a7 PMU driver, 5 (8000000f) counters available
+[Thu Oct 22 11:31:26 2026] Initializing XFRM netlink socket
+[Thu Oct 22 11:31:26 2026] NET: Registered PF_PACKET protocol family
+[Thu Oct 22 11:31:26 2026] Key type dns_resolver registered
+[Thu Oct 22 11:31:26 2026] Registering SWP/SWPB emulation handler
+[Thu Oct 22 11:31:26 2026] registered taskstats version 1
+[Thu Oct 22 11:31:26 2026] Loading compiled-in X.509 certificates
+[Thu Oct 22 11:31:26 2026] Key type .fscrypt registered
+[Thu Oct 22 11:31:26 2026] Key type fscrypt-provisioning registered
+[Thu Oct 22 11:31:26 2026] uart-pl011 3f201000.serial: cts_event_workaround enabled
+[Thu Oct 22 11:31:26 2026] 3f201000.serial: ttyAMA0 at MMIO 0x3f201000 (irq = 114, base_baud = 0) is a PL011 rev2
+[Thu Oct 22 11:31:26 2026] printk: console [ttyAMA0] enabled
+[Thu Oct 22 11:31:26 2026] bcm2835-wdt bcm2835-wdt: Broadcom BCM2835 watchdog timer
+[Thu Oct 22 11:31:26 2026] bcm2835-power bcm2835-power: Broadcom BCM2835 power domains driver
+[Thu Oct 22 11:31:26 2026] of_cfs_init
+[Thu Oct 22 11:31:26 2026] of_cfs_init: OK
+[Thu Oct 22 11:31:26 2026] clk: Disabling unused clocks
+[Thu Oct 22 11:31:26 2026] PM: genpd: Disabling unused power domains
+[Thu Oct 22 11:31:26 2026] Indeed it is in host mode hprt0 = 00021501
+[Thu Oct 22 11:31:26 2026] sdhost-bcm2835 3f202000.mmc: loaded - DMA enabled (>1)
+[Thu Oct 22 11:31:26 2026] Freeing unused kernel image (initmem) memory: 1024K
+[Thu Oct 22 11:31:26 2026] Run /init as init process
+[Thu Oct 22 11:31:26 2026]   with arguments:
+[Thu Oct 22 11:31:26 2026]     /init
+[Thu Oct 22 11:31:26 2026]   with environment:
+[Thu Oct 22 11:31:26 2026]     HOME=/
+[Thu Oct 22 11:31:26 2026]     TERM=linux
+[Thu Oct 22 11:31:26 2026]     ds=nocloud;i=rpi-imager-1789182344136
+[Thu Oct 22 11:31:26 2026] usb 1-1: new high-speed USB device number 2 using dwc_otg
+[Thu Oct 22 11:31:26 2026] Indeed it is in host mode hprt0 = 00001101
+[Thu Oct 22 11:31:26 2026] mmc0: host does not support reading read-only switch, assuming write-enable
+[Thu Oct 22 11:31:26 2026] mmc0: new high speed SDHC card at address e624
+[Thu Oct 22 11:31:26 2026] mmcblk0: mmc0:e624 SU16G 14.8 GiB
+[Thu Oct 22 11:31:26 2026]  mmcblk0: p1 p2
+[Thu Oct 22 11:31:26 2026] mmcblk0: mmc0:e624 SU16G 14.8 GiB (quirks 0x00004000)
+[Thu Oct 22 11:31:26 2026] usb 1-1: New USB device found, idVendor=0424, idProduct=9514, bcdDevice= 2.00
+[Thu Oct 22 11:31:26 2026] usb 1-1: New USB device strings: Mfr=0, Product=0, SerialNumber=0
+[Thu Oct 22 11:31:26 2026] hub 1-1:1.0: USB hub found
+[Thu Oct 22 11:31:26 2026] hub 1-1:1.0: 5 ports detected
+[Thu Oct 22 11:31:27 2026] usb 1-1.1: new high-speed USB device number 3 using dwc_otg
+[Thu Oct 22 11:31:27 2026] usb 1-1.1: New USB device found, idVendor=0424, idProduct=ec00, bcdDevice= 2.00
+[Thu Oct 22 11:31:27 2026] usb 1-1.1: New USB device strings: Mfr=0, Product=0, SerialNumber=0
+[Thu Oct 22 11:31:27 2026] smsc95xx v2.0.0
+[Thu Oct 22 11:31:27 2026] SMSC LAN8700 usb-001:003:01: attached PHY driver (mii_bus:phy_addr=usb-001:003:01, irq=199)
+[Thu Oct 22 11:31:27 2026] smsc95xx 1-1.1:1.0 eth0: register 'smsc95xx' at usb-3f980000.usb-1.1, smsc95xx USB 2.0 Ethernet, b8:27:eb:cd:ad:43
+[Thu Oct 22 11:31:27 2026] usb 1-1.5: new high-speed USB device number 4 using dwc_otg
+[Thu Oct 22 11:31:28 2026] usb 1-1.5: New USB device found, idVendor=148f, idProduct=5370, bcdDevice= 1.01
+[Thu Oct 22 11:31:28 2026] usb 1-1.5: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+[Thu Oct 22 11:31:28 2026] usb 1-1.5: Product: 802.11 n WLAN
+[Thu Oct 22 11:31:28 2026] usb 1-1.5: Manufacturer: Ralink
+[Thu Oct 22 11:31:28 2026] usb 1-1.5: SerialNumber: 1.0
+[Thu Oct 22 11:31:30 2026] EXT4-fs (mmcblk0p2): orphan cleanup on readonly fs
+[Thu Oct 22 11:31:30 2026] EXT4-fs (mmcblk0p2): mounted filesystem e9ef4083-101b-46b4-b87d-de84fe1169f8 ro with ordered data mode. Quota mode: none.
+[Thu Oct 22 11:31:31 2026] systemd[1]: System time advanced to timestamp on /var/lib/systemd/timesync/clock: Wed 2026-10-07 00:55:38 MDT
+[Thu Oct 22 11:31:32 2026] NET: Registered PF_INET6 protocol family
+[Thu Oct 22 11:31:32 2026] Segment Routing with IPv6
+[Thu Oct 22 11:31:32 2026] In-situ OAM (IOAM) with IPv6
+[Thu Oct 22 11:31:32 2026] systemd[1]: systemd 257.9-1~deb13u1+rpi1 running in system mode (+PAM +AUDIT +SELINUX +APPARMOR +IMA +IPE +SMACK +SECCOMP +GCRYPT -GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +IPTC +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD -BPF_FRAMEWORK -BTF -XKBCOMMON -UTMP +SYSVINIT +LIBARCHIVE)
+[Thu Oct 22 11:31:32 2026] systemd[1]: Detected architecture arm.
+[Thu Oct 22 11:31:32 2026] systemd[1]: Hostname set to <pi>.
+[Thu Oct 22 11:31:32 2026] systemd[1]: Using hardware watchdog 'Broadcom BCM2835 Watchdog timer', version 0, device /dev/watchdog0
+[Thu Oct 22 11:31:32 2026] systemd[1]: Watchdog running with a hardware timeout of 1min.
+[Thu Oct 22 11:31:33 2026] zram_generator::config[188]: zram0: system has too much memory (920MB), limit is 0MB, ignoring.
+[Thu Oct 22 11:31:38 2026] raspberrypi-power soc:power: sync_state() pending due to 3fc00000.v3d
+[Thu Oct 22 11:31:38 2026] raspberrypi-power soc:power: sync_state() pending due to 3f902000.hdmi
+[Thu Oct 22 11:31:38 2026] systemd[1]: Queued start job for default target multi-user.target.
+[Thu Oct 22 11:31:38 2026] systemd[1]: Created slice system-getty.slice - Slice /system/getty.
+[Thu Oct 22 11:31:38 2026] systemd[1]: Created slice system-modprobe.slice - Slice /system/modprobe.
+[Thu Oct 22 11:31:38 2026] systemd[1]: Created slice system-rpi\x2dsetup\x2dloop.slice - Slice /system/rpi-setup-loop.
+[Thu Oct 22 11:31:38 2026] systemd[1]: Created slice system-serial\x2dgetty.slice - Slice /system/serial-getty.
+[Thu Oct 22 11:31:38 2026] systemd[1]: Created slice system-systemd\x2dfsck.slice - Slice /system/systemd-fsck.
+[Thu Oct 22 11:31:38 2026] systemd[1]: Created slice system-systemd\x2dzram\x2dsetup.slice - Slice /system/systemd-zram-setup.
+[Thu Oct 22 11:31:38 2026] systemd[1]: Created slice user.slice - User and Session Slice.
+[Thu Oct 22 11:31:38 2026] systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+[Thu Oct 22 11:31:38 2026] systemd[1]: Started systemd-ask-password-wall.path - Forward Password Requests to Wall Directory Watch.
+[Thu Oct 22 11:31:38 2026] systemd[1]: Set up automount proc-sys-fs-binfmt_misc.automount - Arbitrary Executable File Formats File System Automount Point.
+[Thu Oct 22 11:31:38 2026] systemd[1]: Expecting device dev-disk-by\x2dpartuuid-7673bd70\x2d01.device - /dev/disk/by-partuuid/7673bd70-01...
+[Thu Oct 22 11:31:38 2026] systemd[1]: Expecting device dev-ttyAMA0.device - /dev/ttyAMA0...
+[Thu Oct 22 11:31:38 2026] systemd[1]: Expecting device dev-zram0.device - /dev/zram0...
+[Thu Oct 22 11:31:38 2026] systemd[1]: Reached target paths.target - Path Units.
+[Thu Oct 22 11:31:38 2026] systemd[1]: Reached target remote-fs.target - Remote File Systems.
+[Thu Oct 22 11:31:38 2026] systemd[1]: Reached target slices.target - Slice Units.
+[Thu Oct 22 11:31:38 2026] systemd[1]: Listening on systemd-creds.socket - Credential Encryption/Decryption.
+[Thu Oct 22 11:31:38 2026] systemd[1]: Listening on systemd-initctl.socket - initctl Compatibility Named Pipe.
+[Thu Oct 22 11:31:38 2026] systemd[1]: Listening on systemd-journald-dev-log.socket - Journal Socket (/dev/log).
+[Thu Oct 22 11:31:38 2026] systemd[1]: Listening on systemd-journald.socket - Journal Sockets.
+[Thu Oct 22 11:31:38 2026] systemd[1]: Listening on systemd-networkd.socket - Network Service Netlink Socket.
+[Thu Oct 22 11:31:38 2026] systemd[1]: Listening on systemd-udevd-control.socket - udev Control Socket.
+[Thu Oct 22 11:31:38 2026] systemd[1]: Listening on systemd-udevd-kernel.socket - udev Kernel Socket.
+[Thu Oct 22 11:31:38 2026] systemd[1]: dev-hugepages.mount - Huge Pages File System was skipped because of an unmet condition check (ConditionPathExists=/sys/kernel/mm/hugepages).
+[Thu Oct 22 11:31:38 2026] systemd[1]: Mounting dev-mqueue.mount - POSIX Message Queue File System...
+[Thu Oct 22 11:31:38 2026] systemd[1]: Mounting run-lock.mount - Legacy Locks Directory /run/lock...
+[Thu Oct 22 11:31:38 2026] systemd[1]: Mounting sys-kernel-debug.mount - Kernel Debug File System...
+[Thu Oct 22 11:31:38 2026] systemd[1]: Mounting sys-kernel-tracing.mount - Kernel Trace File System...
+[Thu Oct 22 11:31:38 2026] systemd[1]: Starting keyboard-setup.service - Set the console keyboard layout...
+[Thu Oct 22 11:31:38 2026] systemd[1]: Starting kmod-static-nodes.service - Create List of Static Device Nodes...
+[Thu Oct 22 11:31:38 2026] systemd[1]: Starting modprobe@configfs.service - Load Kernel Module configfs...
+[Thu Oct 22 11:31:38 2026] systemd[1]: Starting modprobe@drm.service - Load Kernel Module drm...
+[Thu Oct 22 11:31:38 2026] systemd[1]: Starting modprobe@efi_pstore.service - Load Kernel Module efi_pstore...
+[Thu Oct 22 11:31:38 2026] systemd[1]: Starting modprobe@fuse.service - Load Kernel Module fuse...
+[Thu Oct 22 11:31:38 2026] systemd[1]: netplan-ovs-cleanup.service - OpenVSwitch configuration for cleanup was skipped because of an unmet condition check (ConditionFileIsExecutable=/usr/bin/ovs-vsctl).
+[Thu Oct 22 11:31:38 2026] systemd[1]: systemd-fsck-root.service - File System Check on Root Device was skipped because of an unmet condition check (ConditionPathExists=!/run/initramfs/fsck-root).
+[Thu Oct 22 11:31:38 2026] systemd[1]: systemd-hibernate-clear.service - Clear Stale Hibernate Storage Info was skipped because of an unmet condition check (ConditionPathExists=/sys/firmware/efi/efivars/HibernateLocation-8cf2644b-4b0b-428f-9387-6d876050dc67).
+[Thu Oct 22 11:31:38 2026] systemd[1]: Starting systemd-journald.service - Journal Service...
+[Thu Oct 22 11:31:39 2026] systemd[1]: Starting systemd-modules-load.service - Load Kernel Modules...
+[Thu Oct 22 11:31:39 2026] fuse: init (API version 7.45)
+[Thu Oct 22 11:31:39 2026] systemd[1]: Starting systemd-network-generator.service - Generate network units from Kernel command line...
+[Thu Oct 22 11:31:39 2026] systemd[1]: Starting systemd-remount-fs.service - Remount Root and Kernel File Systems...
+[Thu Oct 22 11:31:39 2026] systemd[1]: Starting systemd-udev-load-credentials.service - Load udev Rules from Credentials...
+[Thu Oct 22 11:31:39 2026] systemd[1]: Starting systemd-udev-trigger.service - Coldplug All udev Devices...
+[Thu Oct 22 11:31:39 2026] systemd[1]: Mounted dev-mqueue.mount - POSIX Message Queue File System.
+[Thu Oct 22 11:31:39 2026] systemd[1]: Mounted run-lock.mount - Legacy Locks Directory /run/lock.
+[Thu Oct 22 11:31:39 2026] systemd[1]: Mounted sys-kernel-debug.mount - Kernel Debug File System.
+[Thu Oct 22 11:31:39 2026] systemd[1]: Mounted sys-kernel-tracing.mount - Kernel Trace File System.
+[Thu Oct 22 11:31:39 2026] systemd[1]: Finished kmod-static-nodes.service - Create List of Static Device Nodes.
+[Thu Oct 22 11:31:39 2026] systemd[1]: modprobe@configfs.service: Deactivated successfully.
+[Thu Oct 22 11:31:39 2026] systemd[1]: Finished modprobe@configfs.service - Load Kernel Module configfs.
+[Thu Oct 22 11:31:39 2026] systemd[1]: modprobe@drm.service: Deactivated successfully.
+[Thu Oct 22 11:31:39 2026] systemd[1]: Finished modprobe@drm.service - Load Kernel Module drm.
+[Thu Oct 22 11:31:39 2026] systemd[1]: modprobe@efi_pstore.service: Deactivated successfully.
+[Thu Oct 22 11:31:39 2026] zram: Added device: zram0
+[Thu Oct 22 11:31:39 2026] systemd-journald[271]: Collecting audit messages is disabled.
+[Thu Oct 22 11:31:39 2026] systemd[1]: Finished modprobe@efi_pstore.service - Load Kernel Module efi_pstore.
+[Thu Oct 22 11:31:39 2026] EXT4-fs (mmcblk0p2): re-mounted e9ef4083-101b-46b4-b87d-de84fe1169f8 r/w.
+[Thu Oct 22 11:31:39 2026] systemd[1]: modprobe@fuse.service: Deactivated successfully.
+[Thu Oct 22 11:31:39 2026] systemd[1]: Finished modprobe@fuse.service - Load Kernel Module fuse.
+[Thu Oct 22 11:31:39 2026] systemd[1]: Finished systemd-modules-load.service - Load Kernel Modules.
+[Thu Oct 22 11:31:39 2026] systemd[1]: Finished systemd-network-generator.service - Generate network units from Kernel command line.
+[Thu Oct 22 11:31:39 2026] systemd[1]: Finished systemd-remount-fs.service - Remount Root and Kernel File Systems.
+[Thu Oct 22 11:31:39 2026] systemd[1]: Mounting sys-fs-fuse-connections.mount - FUSE Control File System...
+[Thu Oct 22 11:31:39 2026] systemd[1]: Mounting sys-kernel-config.mount - Kernel Configuration File System...
+[Thu Oct 22 11:31:39 2026] systemd[1]: regenerate_ssh_host_keys.service - Regenerate SSH host keys was skipped because of an unmet condition check (ConditionFirstBoot=yes).
+[Thu Oct 22 11:31:39 2026] systemd[1]: Starting rpi-resize-swap-file.service - rpi-resize-var-swap-service - resize swapfile...
+[Thu Oct 22 11:31:39 2026] systemd[1]: systemd-hwdb-update.service - Rebuild Hardware Database was skipped because of an unmet condition check (ConditionNeedsUpdate=/etc).
+[Thu Oct 22 11:31:39 2026] systemd[1]: systemd-pstore.service - Platform Persistent Storage Archival was skipped because of an unmet condition check (ConditionDirectoryNotEmpty=/sys/fs/pstore).
+[Thu Oct 22 11:31:39 2026] systemd[1]: Starting systemd-random-seed.service - Load/Save OS Random Seed...
+[Thu Oct 22 11:31:39 2026] systemd[1]: Starting systemd-sysctl.service - Apply Kernel Variables...
+[Thu Oct 22 11:31:39 2026] systemd[1]: Starting systemd-tmpfiles-setup-dev-early.service - Create Static Device Nodes in /dev gracefully...
+[Thu Oct 22 11:31:39 2026] systemd[1]: Started systemd-journald.service - Journal Service.
+[Thu Oct 22 11:31:40 2026] systemd-journald[271]: Received client request to flush runtime journal.
+[Thu Oct 22 11:31:40 2026] loop0: detected capacity change from 0 to 1884160
+[Thu Oct 22 11:31:41 2026] zram: setup backing device /dev/disk/by-backingfile/var-swap
+[Thu Oct 22 11:31:41 2026] zram0: detected capacity change from 0 to 1884160
+[Thu Oct 22 11:31:42 2026] Adding 942076k swap on /dev/zram0.  Priority:100 extents:1 across:942076k SS
+[Thu Oct 22 11:31:42 2026] rpi-gpiomem 3f200000.gpiomem: window base 0x3f200000 size 0x00001000
+[Thu Oct 22 11:31:42 2026] rpi-gpiomem 3f200000.gpiomem: initialised 1 regions as /dev/gpiomem
+[Thu Oct 22 11:31:42 2026] mc: Linux media interface: v0.10
+[Thu Oct 22 11:31:42 2026] videodev: Linux video capture interface: v2.00
+[Thu Oct 22 11:31:43 2026] snd_bcm2835: module is from the staging directory, the quality is unknown, you have been warned.
+[Thu Oct 22 11:31:43 2026] bcm2835-audio bcm2835-audio: card created with 8 channels
+[Thu Oct 22 11:31:43 2026] vc_sm_cma: module is from the staging directory, the quality is unknown, you have been warned.
+[Thu Oct 22 11:31:43 2026] bcm2835_vc_sm_cma_probe: Videocore shared memory driver
+[Thu Oct 22 11:31:43 2026] [vc_sm_connected_init]: start
+[Thu Oct 22 11:31:43 2026] [vc_sm_connected_init]: installed successfully
+[Thu Oct 22 11:31:43 2026] bcm2835_mmal_vchiq: module is from the staging directory, the quality is unknown, you have been warned.
+[Thu Oct 22 11:31:43 2026] bcm2835_isp: module is from the staging directory, the quality is unknown, you have been warned.
+[Thu Oct 22 11:31:43 2026] bcm2835-isp bcm2835-isp: Device node output[0] registered as /dev/video13
+[Thu Oct 22 11:31:43 2026] bcm2835-isp bcm2835-isp: Device node capture[0] registered as /dev/video14
+[Thu Oct 22 11:31:43 2026] bcm2835-isp bcm2835-isp: Device node capture[1] registered as /dev/video15
+[Thu Oct 22 11:31:43 2026] bcm2835-isp bcm2835-isp: Device node stats[2] registered as /dev/video16
+[Thu Oct 22 11:31:43 2026] bcm2835-isp bcm2835-isp: Register output node 0 with media controller
+[Thu Oct 22 11:31:43 2026] bcm2835-isp bcm2835-isp: Register capture node 1 with media controller
+[Thu Oct 22 11:31:43 2026] bcm2835-isp bcm2835-isp: Register capture node 2 with media controller
+[Thu Oct 22 11:31:43 2026] bcm2835-isp bcm2835-isp: Register capture node 3 with media controller
+[Thu Oct 22 11:31:43 2026] bcm2835-isp bcm2835-isp: Device node output[0] registered as /dev/video20
+[Thu Oct 22 11:31:43 2026] bcm2835-isp bcm2835-isp: Device node capture[0] registered as /dev/video21
+[Thu Oct 22 11:31:43 2026] bcm2835-isp bcm2835-isp: Device node capture[1] registered as /dev/video22
+[Thu Oct 22 11:31:43 2026] bcm2835-isp bcm2835-isp: Device node stats[2] registered as /dev/video23
+[Thu Oct 22 11:31:43 2026] bcm2835-isp bcm2835-isp: Register output node 0 with media controller
+[Thu Oct 22 11:31:43 2026] bcm2835-isp bcm2835-isp: Register capture node 1 with media controller
+[Thu Oct 22 11:31:43 2026] bcm2835-isp bcm2835-isp: Register capture node 2 with media controller
+[Thu Oct 22 11:31:43 2026] bcm2835-isp bcm2835-isp: Register capture node 3 with media controller
+[Thu Oct 22 11:31:43 2026] bcm2835-isp bcm2835-isp: Loaded V4L2 bcm2835-isp
+[Thu Oct 22 11:31:43 2026] bcm2835_v4l2: module is from the staging directory, the quality is unknown, you have been warned.
+[Thu Oct 22 11:31:43 2026] bcm2835_codec: module is from the staging directory, the quality is unknown, you have been warned.
+[Thu Oct 22 11:31:43 2026] bcm2835-codec bcm2835-codec: Device registered as /dev/video10
+[Thu Oct 22 11:31:43 2026] bcm2835-codec bcm2835-codec: Loaded V4L2 decode
+[Thu Oct 22 11:31:43 2026] bcm2835-codec bcm2835-codec: Device registered as /dev/video11
+[Thu Oct 22 11:31:43 2026] bcm2835-codec bcm2835-codec: Loaded V4L2 encode
+[Thu Oct 22 11:31:43 2026] cfg80211: Loading compiled-in X.509 certificates for regulatory database
+[Thu Oct 22 11:31:43 2026] bcm2835-codec bcm2835-codec: Device registered as /dev/video12
+[Thu Oct 22 11:31:43 2026] bcm2835-codec bcm2835-codec: Loaded V4L2 isp
+[Thu Oct 22 11:31:43 2026] bcm2835-codec bcm2835-codec: Device registered as /dev/video18
+[Thu Oct 22 11:31:43 2026] bcm2835-codec bcm2835-codec: Loaded V4L2 image_fx
+[Thu Oct 22 11:31:43 2026] Loaded X.509 cert 'benh@debian.org: 577e021cb980e0e820821ba7b54b4961b8b4fadf'
+[Thu Oct 22 11:31:43 2026] bcm2835-codec bcm2835-codec: Device registered as /dev/video31
+[Thu Oct 22 11:31:43 2026] bcm2835-codec bcm2835-codec: Loaded V4L2 encode_image
+[Thu Oct 22 11:31:43 2026] Loaded X.509 cert 'romain.perier@gmail.com: 3abbc6ec146e09d1b6016ab9d6cf71dd233f0328'
+[Thu Oct 22 11:31:43 2026] Loaded X.509 cert 'sforshee: 00b28ddf47aef9cea7'
+[Thu Oct 22 11:31:43 2026] Loaded X.509 cert 'wens: 61c038651aabdcf94bd0ac7ff06c7248db18c600'
+[Thu Oct 22 11:31:44 2026] Console: switching to colour dummy device 80x30
+[Thu Oct 22 11:31:44 2026] vc4-drm soc:gpu: bound 3f400000.hvs (ops vc4_hvs_ops [vc4])
+[Thu Oct 22 11:31:44 2026] Registered IR keymap rc-cec
+[Thu Oct 22 11:31:44 2026] rc rc0: vc4-hdmi as /devices/platform/soc/3f902000.hdmi/rc/rc0
+[Thu Oct 22 11:31:44 2026] input: vc4-hdmi as /devices/platform/soc/3f902000.hdmi/rc/rc0/input0
+[Thu Oct 22 11:31:44 2026] input: vc4-hdmi HDMI Jack as /devices/platform/soc/3f902000.hdmi/sound/card1/input1
+[Thu Oct 22 11:31:44 2026] vc4-drm soc:gpu: bound 3f902000.hdmi (ops vc4_hdmi_ops [vc4])
+[Thu Oct 22 11:31:44 2026] vc4-drm soc:gpu: bound 3f004000.txp (ops vc4_txp_ops [vc4])
+[Thu Oct 22 11:31:44 2026] vc4-drm soc:gpu: bound 3f206000.pixelvalve (ops vc4_crtc_ops [vc4])
+[Thu Oct 22 11:31:44 2026] vc4-drm soc:gpu: bound 3f207000.pixelvalve (ops vc4_crtc_ops [vc4])
+[Thu Oct 22 11:31:44 2026] vc4-drm soc:gpu: bound 3f807000.pixelvalve (ops vc4_crtc_ops [vc4])
+[Thu Oct 22 11:31:44 2026] vc4-drm soc:gpu: bound 3fc00000.v3d (ops vc4_v3d_ops [vc4])
+[Thu Oct 22 11:31:44 2026] [drm] Initialized vc4 0.0.0 for soc:gpu on minor 0
+[Thu Oct 22 11:31:44 2026] vc4-drm soc:gpu: [drm] Cannot find any crtc or sizes
+[Thu Oct 22 11:31:44 2026] vc4-drm soc:gpu: [drm] Cannot find any crtc or sizes
+[Thu Oct 22 11:31:44 2026] usb 1-1.5: reset high-speed USB device number 4 using dwc_otg
+[Thu Oct 22 11:31:44 2026] ieee80211 phy0: rt2x00_set_rt: Info - RT chipset 5390, rev 0502 detected
+[Thu Oct 22 11:31:44 2026] ieee80211 phy0: rt2x00_set_rf: Info - RF chipset 5370 detected
+[Thu Oct 22 11:31:44 2026] ieee80211 phy0: Selected rate control algorithm 'minstrel_ht'
+[Thu Oct 22 11:31:44 2026] usbcore: registered new interface driver rt2800usb
+[Thu Oct 22 11:31:44 2026] rt2800usb 1-1.5:1.0 wlan1: renamed from wlan0
+[Thu Oct 22 11:32:20 2026] smsc95xx 1-1.1:1.0 eth0: hardware isn't capable of remote wakeup
+[Thu Oct 22 11:32:20 2026] smsc95xx 1-1.1:1.0 eth0: Link is Down
+[Thu Oct 22 11:32:20 2026] ieee80211 phy0: rt2x00lib_request_firmware: Info - Loading firmware file 'rt2870.bin'
+[Thu Oct 22 11:32:20 2026] ieee80211 phy0: rt2x00lib_request_firmware: Info - Firmware detected - version: 0.36
+[Thu Oct 22 11:32:22 2026] smsc95xx 1-1.1:1.0 eth0: Link is Up - 100Mbps/Full - flow control rx/tx
+[Thu Oct 22 11:32:23 2026] wlan1: authenticate with 02:b8:c2:fb:da:71 (local address=00:0f:60:03:cb:13)
+[Thu Oct 22 11:32:23 2026] wlan1: send auth to 02:b8:c2:fb:da:71 (try 1/3)
+[Thu Oct 22 11:32:23 2026] wlan1: authenticated
+[Thu Oct 22 11:32:23 2026] wlan1: associate with 02:b8:c2:fb:da:71 (try 1/3)
+[Thu Oct 22 11:32:23 2026] wlan1: RX AssocResp from 02:b8:c2:fb:da:71 (capab=0x1411 status=0 aid=18)
+[Thu Oct 22 11:32:23 2026] wlan1: associated
+[Thu Oct 22 11:32:23 2026] wlan1: Limiting TX power to 30 (30 - 0) dBm as advertised by 02:b8:c2:fb:da:71
+[Thu Oct 22 11:52:34 2026] usb 1-1.2: new full-speed USB device number 5 using dwc_otg
