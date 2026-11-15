@@ -19,8 +19,11 @@ every client — a walled garden, no internet upstream. hostapd + dnsmasq + ngin
   from a pool in `ssids.txt`. The USB radio can only broadcast one network at a
   time, so this stands in for multi-SSID bait networks; see `docs/multi-ssid.md`.
 - **Built to sit on a hostile network.** It's made to run at a hacker conference:
-  parameterised SQL, inert stored XSS, CSV-injection escaping, key-only SSH, and
-  management restricted to the wired port. See `docs/security-hardening.md`.
+  parameterised SQL, inert stored XSS, CSV-injection escaping, and a sandboxed
+  guestbook service. See `docs/security-hardening.md`.
+- **SSH only from the Pi's Ethernet port.** The firewall drops port 22 on the
+  Wi-Fi side, so nobody connected to the portal can even reach SSH. Login is
+  key-only (password auth is off) and happens over the wired port.
 - **Probe-request logging (optional).** With a second USB radio in monitor
   mode, it logs nearby devices and the network names they're searching for into
   SQLite. Off by default; see `docs/probe-logging.md`.
